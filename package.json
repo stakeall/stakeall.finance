@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy-graph": "npx hardhat run scripts/deploy_graph_protocol.js --network rinkeby --show-stack-traces",
     "hardhat-compile": "npx hardhat compile",
-    "deploy-bitstakerregistry": "npx hardhat run scripts/deploy_bit_staker_registry.js --network rinkeby --show-stack-traces"
+    "deploy-bitstakerregistry": "npx hardhat run scripts/deploy_bit_staker_registry.js --network rinkeby --show-stack-traces",
+    "deploy-aave": "npx hardhat run scripts/deploy_aaveV2.js --network kovan --show-stack-traces"
   },
   "repository": {
     "type": "git",
