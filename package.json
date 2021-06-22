@@ -1,0 +1,39 @@
+{
+  "name": "onchain-staking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "truffle compile",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-graph": "npx hardhat run scripts/deploy_graph_protocol.js --network rinkeby --show-stack-traces",
+    "hardhat-compile": "npx hardhat compile",
+    "deploy-bitstakerregistry": "npx hardhat run scripts/deploy_bit_staker_registry.js --network rinkeby --show-stack-traces"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robin-eth/onchain-staking.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robin-eth/onchain-staking/issues"
+  },
+  "homepage": "https://github.com/robin-eth/onchain-staking#readme",
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "^2.1.2",
+    "@nomiclabs/hardhat-truffle5": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/test-helpers": "^0.5.10",
+    "abi-decoder": "^2.4.0",
+    "axios": "^0.21.1",
+    "chai": "^4.3.3",
+    "ethereum-waffle": "^3.3.0",
+    "hardhat": "^2.3.0",
+    "truffle": "^5.3.9",
+    "web3": "^1.3.6"
+  }
+}
