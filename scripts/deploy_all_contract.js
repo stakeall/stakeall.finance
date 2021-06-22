@@ -12,21 +12,22 @@ function sleep(ms) {
 
 async function main() {
 
+    console.log(hre.network.name);
     const sig = await hre.ethers.getSigner();
     const accounts = await hre.ethers.getSigners()
     const wallet = accounts[0]
 
     console.log(wallet.address);
     
-    const BitStakerRegistery = await ethers.getContractFactory("BitStakerRegistery", {signer: sig});
+    const BitStakerRegistery = await ethers.getContractFactory("BitStakerRegistery",{}, sig);
 
-    //const bitStakerRegisteryInstance = await BitStakerRegistery.deploy(
-    //);
+    const bitStakerRegisteryInstance = await BitStakerRegistery.deploy(
+    );
 
-    //await bitStakerRegisteryInstance.deployed();
+    await bitStakerRegisteryInstance.deployed();
 
 
-    // console.log("Bit staker registry deployed at " + bitStakerRegisteryInstance.address);
+    console.log("Bit staker registry deployed at " + bitStakerRegisteryInstance.address);
 
 
     // console.log('waiting 30 seconds');
@@ -39,14 +40,14 @@ async function main() {
     //     constructorArguments: [],
     // });
 
-    // const GraphProtocol = await ethers.getContractFactory("GraphProtocol");
+    const GraphProtocol = await ethers.getContractFactory("GraphProtocol");
 
-    // const graphProtocolInstance = await GraphProtocol.deploy(
-    // );
+    const graphProtocolInstance = await GraphProtocol.deploy(
+    );
 
-    // await graphProtocolInstance.deployed();
+    await graphProtocolInstance.deployed();
 
-    // console.log("Graph protocol ethereum deployed at " + graphProtocolInstance.address);
+     console.log("Graph protocol ethereum deployed at " + graphProtocolInstance.address);
 
     // console.log('waiting 30 seconds');
     // await sleep(30000);
@@ -57,13 +58,13 @@ async function main() {
     //     ],
     // });
 
-    // const oneInchProtocol = await ethers.getContractFactory("OneInch");
-    // const oneInchProtocolInstance = await oneInchProtocol.deploy(
-    // );
+     const oneInchProtocol = await ethers.getContractFactory("OneInch");
+    const oneInchProtocolInstance = await oneInchProtocol.deploy(
+    );
 
-    // await oneInchProtocolInstance.deployed();
+     await oneInchProtocolInstance.deployed();
 
-    // console.log("1Inch protocol ethereum deployed at " + oneInchProtocolInstance.address);
+      console.log("1Inch protocol ethereum deployed at " + oneInchProtocolInstance.address);
 
     // console.log('waiting 30 seconds');
     // await sleep(30000);
@@ -76,14 +77,14 @@ async function main() {
 
 
 
-    // const ConnectV2AaveV2 = await ethers.getContractFactory("ConnectV2AaveV2");
+    const ConnectV2AaveV2 = await ethers.getContractFactory("ConnectV2AaveV2");
 
-    // const connectV2AaveV2Instance = await ConnectV2AaveV2.deploy(
-    // );
+    const connectV2AaveV2Instance = await ConnectV2AaveV2.deploy(
+    );
 
-    // await connectV2AaveV2Instance.deployed();
+      await connectV2AaveV2Instance.deployed();
 
-    // console.log("Aave v2 instance deployed at " + connectV2AaveV2Instance.address);
+     console.log("Aave v2 instance deployed at " + connectV2AaveV2Instance.address);
 
     // console.log('waiting 30 seconds');
     // await sleep(30000);
@@ -93,14 +94,14 @@ async function main() {
     //     ],
     // });
 
-    // const contractAddress = {
-    //     BitStakerRegistery: bitStakerRegisteryInstance.address,
-    //     GraphProtocol: graphProtocolInstance.address,
-    //     oneProtocol: oneInchProtocolInstance.address,
-    //     AAVEProtocol: connectV2AaveV2Instance.address
-    // };
+    const contractAddress = {
+        BitStakerRegistery: bitStakerRegisteryInstance.address,
+        GraphProtocol: graphProtocolInstance.address,
+        oneProtocol: oneInchProtocolInstance.address,
+        AAVEProtocol: connectV2AaveV2Instance.address
+    };
 
-    // fs.writeFileSync(`${hre.network.name}contract.json`, contractAddress);
+     fs.writeFileSync(`${hre.network.name}_contract.json`, JSON.stringify(contractAddress));
 }
 
 main()
