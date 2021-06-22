@@ -2,15 +2,8 @@
 
 pragma solidity ^0.7.0;
 
-interface TokenInterface {
-    function approve(address, uint256) external;
-    function transfer(address, uint) external;
-    function transferFrom(address, address, uint) external;
-    function deposit() external payable;
-    function withdraw(uint) external;
-    function balanceOf(address) external view returns (uint);
-    function decimals() external view returns (uint);
-}
+import "../../IERC20Interface.sol";
+import "./AAVEInterface.sol";
 
 interface MemoryInterface {
     function getUint(uint id) external returns (uint num);
@@ -358,11 +351,11 @@ abstract contract Basic is DSMath, Stores {
         amt = mul(_amt, 10 ** (18 - _dec));
     }
 
-    function getTokenBal(TokenInterface token) internal view returns(uint _amt) {
+    function getTokenBal(IERC20Interface token) internal view returns(uint _amt) {
         _amt = address(token) == ethAddr ? address(this).balance : token.balanceOf(address(this));
     }
 
-    function getTokensDec(TokenInterface buyAddr, TokenInterface sellAddr) internal view returns(uint buyDec, uint sellDec) {
+    function getTokensDec(IERC20Interface buyAddr, IERC20Interface sellAddr) internal view returns(uint buyDec, uint sellDec) {
         buyDec = address(buyAddr) == ethAddr ?  18 : buyAddr.decimals();
         sellDec = address(sellAddr) == ethAddr ?  18 : sellAddr.decimals();
     }
@@ -371,19 +364,19 @@ abstract contract Basic is DSMath, Stores {
         return abi.encode(eventName, eventParam);
     }
 
-    function changeEthAddress(address buy, address sell) internal pure returns(TokenInterface _buy, TokenInterface _sell){
-        _buy = buy == ethAddr ? TokenInterface(wethAddr) : TokenInterface(buy);
-        _sell = sell == ethAddr ? TokenInterface(wethAddr) : TokenInterface(sell);
+    function changeEthAddress(address buy, address sell) internal pure returns(IERC20Interface _buy, IERC20Interface _sell){
+        _buy = buy == ethAddr ? IERC20Interface(wethAddr) : IERC20Interface(buy);
+        _sell = sell == ethAddr ? IERC20Interface(wethAddr) : IERC20Interface(sell);
     }
 
-    function convertEthToWeth(bool isEth, TokenInterface token, uint amount) internal {
+    function convertEthToWeth(bool isEth, AAVEInterface token, uint amount) internal {
         if(isEth) token.deposit{value: amount}();
     }
 
-    function convertWethToEth(bool isEth, TokenInterface token, uint amount) internal {
+    function convertWethToEth(bool isEth, IERC20Interface token, uint amount) internal {
        if(isEth) {
             token.approve(address(token), amount);
-            token.withdraw(amount);
+            AAVEInterface(address(token)).withdraw(amount);
         }
     }
 }
@@ -434,7 +427,7 @@ interface AaveAddressProviderRegistryInterface {
     function getAddressesProvidersList() external view returns (address[] memory);
 }
 
-interface ATokenInterface {
+interface AIERC20Interface {
     function balanceOf(address _user) external view returns(uint256);
 }
 
@@ -537,18 +530,18 @@ abstract contract AaveResolver is Events, Helpers {
         uint256 getId,
         uint256 setId
     ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        // uint _amt = getUint(getId, amt);
+        uint _amt;
 
         AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
 
-        TokenInterface tokenContract = TokenInterface(_token);
+        IERC20Interface tokenContract = IERC20Interface(_token);
 
         if (isEth) {
             _amt = _amt == uint(-1) ? address(this).balance : _amt;
-            convertEthToWeth(isEth, tokenContract, _amt);
+            convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), _amt);
         } else {
             _amt = _amt == uint(-1) ? tokenContract.balanceOf(address(this)) : _amt;
         }
@@ -581,13 +574,13 @@ abstract contract AaveResolver is Events, Helpers {
         uint256 getId,
         uint256 setId
     ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        // uint _amt = getUint(getId, amt);
+        uint _amt = getUint(getId, amt);
 
         AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
 
-        TokenInterface tokenContract = TokenInterface(_token);
+        IERC20Interface tokenContract = IERC20Interface(_token);
 
         uint initialBal = tokenContract.balanceOf(address(this));
         aave.withdraw(_token, _amt, address(this));
@@ -619,15 +612,15 @@ abstract contract AaveResolver is Events, Helpers {
         uint256 getId,
         uint256 setId
     ) external payable {
-        // uint _amt = getUint(getId, amt);
+        uint _amt = getUint(getId, amt);
 
         AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
 
-        aave.borrow(_token, _amt, rateMode, referralCode, address(this));
-        convertWethToEth(isEth, TokenInterface(_token), _amt);
+        aave.borrow(_token, amt, rateMode, referralCode, address(this));
+        convertWethToEth(isEth, IERC20Interface(_token), amt);
 
         // setUint(setId, _amt);
 
@@ -658,11 +651,11 @@ abstract contract AaveResolver is Events, Helpers {
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
 
-        TokenInterface tokenContract = TokenInterface(_token);
+        IERC20Interface tokenContract = IERC20Interface(_token);
 
         _amt = _amt == uint(-1) ? getPaybackBalance(_token, rateMode) : _amt;
 
-        if (isEth) convertEthToWeth(isEth, tokenContract, _amt);
+        if (isEth) convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), _amt);
 
         tokenContract.approve(address(aave), _amt);
 
