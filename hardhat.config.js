@@ -1,7 +1,9 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 
+const MAINNET_INFURA_API = 'https://eth-mainnet.alchemyapi.io/v2/-Rg_LUu7QjW0HlaqZSS1hNtr1Jfw8D29';
 const INFURA_API = 'https://rinkeby.infura.io/v3/0b3c6bddd7d14140a0640806a04c2d49'; // network api key from infura
+const KOVAN_INFURA_API = 'https://kovan.infura.io/v3/0b3c6bddd7d14140a0640806a04c2d49'; // network api key from infura
 const PRIVATE_KEY = 'bf6a5360ab60d382c2eba4fd79b176cdd8d661a7e8bf5d35aa39d4aae614d088'; // prepend with private key without 0x
 const defaultNetwork = "localhost";
 
@@ -26,7 +28,7 @@ module.exports = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: ""
+    apiKey: "UUKB2GYW44DVNMVXSIHVG7KR7ZBZH29ZP7"
   },
   defaultNetwork,
   networks: {
@@ -42,7 +44,7 @@ module.exports = {
       accounts: [`0x${PRIVATE_KEY}`],
     },
     kovan: {
-      url: INFURA_API,
+      url: KOVAN_INFURA_API,
       accounts: [`0x${PRIVATE_KEY}`],
     },
     ropsten: {
@@ -66,8 +68,7 @@ module.exports = {
     },
     hardhat: {
       forking: {
-        url: INFURA_API,
-        blockNumber: 4824140// after transfer tx : https://goerli.etherscan.io/tx/0x2ba0b8b77ca953af64978160046c161c2ba23b4a4c2c367edac10b94d259bb09
+        url: MAINNET_INFURA_API
       },
     },
   },
