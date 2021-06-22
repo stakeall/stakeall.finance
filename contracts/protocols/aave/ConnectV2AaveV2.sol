@@ -37,31 +37,10 @@ abstract contract Stores {
   /**
    * @dev Return Wrapped ETH address
    */
-  address constant internal wethAddr = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+//   address constant internal wethAddr = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
-  /**
-   * @dev Return memory variable address
-   */
-  MemoryInterface constant internal instaMemory = MemoryInterface(0x8a5419CfC711B2343c17a6ABf4B2bAFaBb06957F);
-
-  /**
-   * @dev Return InstaDApp Mapping Addresses
-   */
-  InstaMapping constant internal instaMapping = InstaMapping(0xe81F70Cc7C0D46e12d70efc60607F16bbD617E88);
-
-  /**
-   * @dev Get Uint value from InstaMemory Contract.
-   */
-  function getUint(uint getId, uint val) internal returns (uint returnVal) {
-    returnVal = getId == 0 ? val : instaMemory.getUint(getId);
-  }
-
-  /**
-  * @dev Set Uint value in InstaMemory Contract.
-  */
-  function setUint(uint setId, uint val) virtual internal {
-    if (setId != 0) instaMemory.setUint(setId, val);
-  }
+    // Testnet
+  address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
 
 }
 
@@ -561,42 +540,6 @@ abstract contract AaveResolver is Events, Helpers {
     }
 
     /**
-     * @dev Withdraw ETH/ERC20_Token.
-     * @notice Withdraw deposited token from Aave v2
-     * @param token The address of the token to withdraw.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-     * @param amt The amount of the token to withdraw. (For max: `uint256(-1)`)
-     * @param getId ID to retrieve amt.
-     * @param setId ID stores the amount of tokens withdrawn.
-    */
-    function withdraw(
-        address token,
-        uint256 amt,
-        uint256 getId,
-        uint256 setId
-    ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        uint _amt = getUint(getId, amt);
-
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
-        bool isEth = token == ethAddr;
-        address _token = isEth ? wethAddr : token;
-
-        IERC20Interface tokenContract = IERC20Interface(_token);
-
-        uint initialBal = tokenContract.balanceOf(address(this));
-        aave.withdraw(_token, _amt, address(this));
-        uint finalBal = tokenContract.balanceOf(address(this));
-
-        _amt = sub(finalBal, initialBal);
-
-        convertWethToEth(isEth, tokenContract, _amt);
-        
-        // setUint(setId, _amt);
-
-        _eventName = "LogWithdraw(address,uint256,uint256,uint256)";
-        _eventParam = abi.encode(token, _amt, getId, setId);
-    }
-
-    /**
      * @dev Borrow ETH/ERC20_Token.
      * @notice Borrow a token using Aave v2
      * @param token The address of the token to borrow.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
@@ -612,7 +555,7 @@ abstract contract AaveResolver is Events, Helpers {
         uint256 getId,
         uint256 setId
     ) external payable {
-        uint _amt = getUint(getId, amt);
+        // uint _amt = getUint(getId, amt);
 
         AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
 
@@ -626,45 +569,6 @@ abstract contract AaveResolver is Events, Helpers {
 
         // _eventName = "LogBorrow(address,uint256,uint256,uint256,uint256)";
         // _eventParam = abi.encode(token, _amt, rateMode, getId, setId);
-    }
-
-    /**
-     * @dev Payback borrowed ETH/ERC20_Token.
-     * @notice Payback debt owed.
-     * @param token The address of the token to payback.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-     * @param amt The amount of the token to payback. (For max: `uint256(-1)`)
-     * @param rateMode The type of debt paying back. (For Stable: 1, Variable: 2)
-     * @param getId ID to retrieve amt.
-     * @param setId ID stores the amount of tokens paid back.
-    */
-    function payback(
-        address token,
-        uint256 amt,
-        uint256 rateMode,
-        uint256 getId,
-        uint256 setId
-    ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        uint _amt = getUint(getId, amt);
-
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
-
-        bool isEth = token == ethAddr;
-        address _token = isEth ? wethAddr : token;
-
-        IERC20Interface tokenContract = IERC20Interface(_token);
-
-        _amt = _amt == uint(-1) ? getPaybackBalance(_token, rateMode) : _amt;
-
-        if (isEth) convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), _amt);
-
-        tokenContract.approve(address(aave), _amt);
-
-        aave.repay(_token, _amt, rateMode, address(this));
-
-        setUint(setId, _amt);
-
-        _eventName = "LogPayback(address,uint256,uint256,uint256,uint256)";
-        _eventParam = abi.encode(token, _amt, rateMode, getId, setId);
     }
 
     /**
@@ -689,28 +593,6 @@ abstract contract AaveResolver is Events, Helpers {
 
         _eventName = "LogEnableCollateral(address[])";
         _eventParam = abi.encode(tokens);
-    }
-
-    /**
-     * @dev Swap borrow rate mode
-     * @notice Swaps user borrow rate mode between variable and stable
-     * @param token The address of the token to swap borrow rate.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-     * @param rateMode Desired borrow rate mode. (Stable = 1, Variable = 2)
-    */
-    function swapBorrowRateMode(
-        address token,
-        uint rateMode
-    ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
-
-        uint currentRateMode = rateMode == 1 ? 2 : 1;
-
-        if (getPaybackBalance(token, currentRateMode) > 0) {
-            aave.swapBorrowRateMode(token, rateMode);
-        }
-
-        _eventName = "LogSwapRateMode(address,uint256)";
-        _eventParam = abi.encode(token, rateMode);
     }
 }
 
