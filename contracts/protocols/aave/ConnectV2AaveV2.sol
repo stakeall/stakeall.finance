@@ -1,421 +1,10 @@
-// File: contracts/mainnet/common/interfaces.sol
-
-pragma solidity ^0.7.0;
+pragma experimental ABIEncoderV2;
 
 import "../../IERC20Interface.sol";
 import "./AAVEInterface.sol";
-
-interface MemoryInterface {
-    function getUint(uint id) external returns (uint num);
-    function setUint(uint id, uint val) external;
-}
-
-interface InstaMapping {
-    function cTokenMapping(address) external view returns (address);
-    function gemJoinMapping(bytes32) external view returns (address);
-}
-
-interface AccountInterface {
-    function enable(address) external;
-    function disable(address) external;
-    function isAuth(address) external view returns (bool);
-}
-
-// File: contracts/mainnet/common/stores.sol
-
-pragma solidity ^0.7.0;
-
-
-
-abstract contract Stores {
-
-  /**
-   * @dev Return ethereum address
-   */
-  address constant internal ethAddr = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-
-  /**
-   * @dev Return Wrapped ETH address
-   */
-//   address constant internal wethAddr = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-
-    // Testnet
-  address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
-
-}
-
-// File: @openzeppelin/contracts/math/SafeMath.sol
-
-// SPDX-License-Identifier: MIT
-
-pragma solidity >=0.6.0 <0.8.0;
-
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        uint256 c = a + b;
-        if (c < a) return (false, 0);
-        return (true, c);
-    }
-
-    /**
-     * @dev Returns the substraction of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        if (b > a) return (false, 0);
-        return (true, a - b);
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-        // benefit is lost if 'b' is also tested.
-        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-        if (a == 0) return (true, 0);
-        uint256 c = a * b;
-        if (c / a != b) return (false, 0);
-        return (true, c);
-    }
-
-    /**
-     * @dev Returns the division of two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        if (b == 0) return (false, 0);
-        return (true, a / b);
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        if (b == 0) return (false, 0);
-        return (true, a % b);
-    }
-
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     *
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "SafeMath: addition overflow");
-        return c;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b <= a, "SafeMath: subtraction overflow");
-        return a - b;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     *
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        if (a == 0) return 0;
-        uint256 c = a * b;
-        require(c / a == b, "SafeMath: multiplication overflow");
-        return c;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b > 0, "SafeMath: division by zero");
-        return a / b;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b > 0, "SafeMath: modulo by zero");
-        return a % b;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {trySub}.
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
-        return a - b;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {tryDiv}.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b > 0, errorMessage);
-        return a / b;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting with custom message when dividing by zero.
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {tryMod}.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b > 0, errorMessage);
-        return a % b;
-    }
-}
-
-// File: contracts/mainnet/common/math.sol
-
-pragma solidity ^0.7.0;
-
-
-contract DSMath {
-  uint constant WAD = 10 ** 18;
-  uint constant RAY = 10 ** 27;
-
-  function add(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.add(x, y);
-  }
-
-  function sub(uint x, uint y) internal virtual pure returns (uint z) {
-    z = SafeMath.sub(x, y);
-  }
-
-  function mul(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.mul(x, y);
-  }
-
-  function div(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.div(x, y);
-  }
-
-  function wmul(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.add(SafeMath.mul(x, y), WAD / 2) / WAD;
-  }
-
-  function wdiv(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.add(SafeMath.mul(x, WAD), y / 2) / y;
-  }
-
-  function rdiv(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.add(SafeMath.mul(x, RAY), y / 2) / y;
-  }
-
-  function rmul(uint x, uint y) internal pure returns (uint z) {
-    z = SafeMath.add(SafeMath.mul(x, y), RAY / 2) / RAY;
-  }
-
-  function toInt(uint x) internal pure returns (int y) {
-    y = int(x);
-    require(y >= 0, "int-overflow");
-  }
-
-  function toRad(uint wad) internal pure returns (uint rad) {
-    rad = mul(wad, 10 ** 27);
-  }
-
-}
-
-// File: contracts/mainnet/common/basic.sol
-
-pragma solidity ^0.7.0;
-
-
-
-
-abstract contract Basic is DSMath, Stores {
-
-    function convert18ToDec(uint _dec, uint256 _amt) internal pure returns (uint256 amt) {
-        amt = (_amt / 10 ** (18 - _dec));
-    }
-
-    function convertTo18(uint _dec, uint256 _amt) internal pure returns (uint256 amt) {
-        amt = mul(_amt, 10 ** (18 - _dec));
-    }
-
-    function getTokenBal(IERC20Interface token) internal view returns(uint _amt) {
-        _amt = address(token) == ethAddr ? address(this).balance : token.balanceOf(address(this));
-    }
-
-    function getTokensDec(IERC20Interface buyAddr, IERC20Interface sellAddr) internal view returns(uint buyDec, uint sellDec) {
-        buyDec = address(buyAddr) == ethAddr ?  18 : buyAddr.decimals();
-        sellDec = address(sellAddr) == ethAddr ?  18 : sellAddr.decimals();
-    }
-
-    function encodeEvent(string memory eventName, bytes memory eventParam) internal pure returns (bytes memory) {
-        return abi.encode(eventName, eventParam);
-    }
-
-    function changeEthAddress(address buy, address sell) internal pure returns(IERC20Interface _buy, IERC20Interface _sell){
-        _buy = buy == ethAddr ? IERC20Interface(wethAddr) : IERC20Interface(buy);
-        _sell = sell == ethAddr ? IERC20Interface(wethAddr) : IERC20Interface(sell);
-    }
-
-    function convertEthToWeth(bool isEth, AAVEInterface token, uint amount) internal {
-        if(isEth) token.deposit{value: amount}();
-    }
-
-    function convertWethToEth(bool isEth, IERC20Interface token, uint amount) internal {
-       if(isEth) {
-            token.approve(address(token), amount);
-            AAVEInterface(address(token)).withdraw(amount);
-        }
-    }
-}
-
-// File: contracts/mainnet/connectors/aave/v2/interface.sol
-
-pragma solidity ^0.7.0;
-
-interface AaveInterface {
-    function deposit(address _asset, uint256 _amount, address _onBehalfOf, uint16 _referralCode) external;
-    function withdraw(address _asset, uint256 _amount, address _to) external;
-    function borrow(
-        address _asset,
-        uint256 _amount,
-        uint256 _interestRateMode,
-        uint16 _referralCode,
-        address _onBehalfOf
-    ) external;
-    function repay(address _asset, uint256 _amount, uint256 _rateMode, address _onBehalfOf) external;
-    function setUserUseReserveAsCollateral(address _asset, bool _useAsCollateral) external;
-    function swapBorrowRateMode(address _asset, uint256 _rateMode) external;
-}
-
-interface AaveLendingPoolProviderInterface {
-    function getLendingPool() external view returns (address);
-}
-
-interface AaveDataProviderInterface {
-    function getReserveTokensAddresses(address _asset) external view returns (
-        address aTokenAddress,
-        address stableDebtTokenAddress,
-        address variableDebtTokenAddress
-    );
-    function getUserReserveData(address _asset, address _user) external view returns (
-        uint256 currentATokenBalance,
-        uint256 currentStableDebt,
-        uint256 currentVariableDebt,
-        uint256 principalStableDebt,
-        uint256 scaledVariableDebt,
-        uint256 stableBorrowRate,
-        uint256 liquidityRate,
-        uint40 stableRateLastUpdated,
-        bool usageAsCollateralEnabled
-    );
-}
-
-interface AaveAddressProviderRegistryInterface {
-    function getAddressesProvidersList() external view returns (address[] memory);
-}
-
-interface AIERC20Interface {
-    function balanceOf(address _user) external view returns(uint256);
-}
-
-// File: contracts/mainnet/connectors/aave/v2/helpers.sol
-
-pragma solidity ^0.7.0;
-
-
-
+import "../../helpers/DSMath.sol";
+import "../../helpers/Basic.sol";
+import "./AAVEInterface.sol";
 
 abstract contract Helpers is DSMath, Basic {
     
@@ -467,10 +56,6 @@ abstract contract Helpers is DSMath, Basic {
     }
 }
 
-// File: contracts/mainnet/connectors/aave/v2/events.sol
-
-pragma solidity ^0.7.0;
-
 contract Events {
     event LogDeposit(address indexed token, uint256 tokenAmt, uint256 getId, uint256 setId);
     event LogWithdraw(address indexed token, uint256 tokenAmt, uint256 getId, uint256 setId);
@@ -480,19 +65,6 @@ contract Events {
     event LogSwapRateMode(address indexed token, uint256 rateMode);
 }
 
-// File: contracts/mainnet/connectors/aave/v2/main.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @title Aave v2.
- * @dev Lending & Borrowing.
- */
-
-
-
-
-
 
 abstract contract AaveResolver is Events, Helpers {
     /**
@@ -500,18 +72,13 @@ abstract contract AaveResolver is Events, Helpers {
      * @notice Deposit a token to Aave v2 for lending / collaterization.
      * @param token The address of the token to deposit.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param amt The amount of the token to deposit. (For max: `uint256(-1)`)
-     * @param getId ID to retrieve amt.
-     * @param setId ID stores the amount of tokens deposited.
     */
     function deposit(
         address token,
-        uint256 amt,
-        uint256 getId,
-        uint256 setId
-    ) external payable returns (string memory _eventName, bytes memory _eventParam) {
-        uint _amt;
+        uint256 amt
+    ) external payable returns (uint256 amount_, address token_) {
 
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
+        AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
@@ -519,15 +86,18 @@ abstract contract AaveResolver is Events, Helpers {
         IERC20Interface tokenContract = IERC20Interface(_token);
 
         if (isEth) {
-            _amt = _amt == uint(-1) ? address(this).balance : _amt;
-            convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), _amt);
+            amt = amt == uint(-1) ? address(this).balance : amt;
+            convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), amt);
         } else {
-            _amt = _amt == uint(-1) ? tokenContract.balanceOf(address(this)) : _amt;
+            amt = amt == uint(-1) ? tokenContract.balanceOf(address(this)) : amt;
         }
 
-        tokenContract.approve(address(aave), _amt);
+        tokenContract.approve(address(aave), amt);
 
-        aave.deposit(_token, _amt, address(this), referralCode);
+        aave.deposit(_token, amt, address(this), referralCode);
+
+        amount_ = amt;
+        token_ = _token;
 
         // if (!getIsColl(_token)) {
         //     aave.setUserUseReserveAsCollateral(_token, true);
@@ -545,19 +115,15 @@ abstract contract AaveResolver is Events, Helpers {
      * @param token The address of the token to borrow.(For ETH: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
      * @param amt The amount of the token to borrow.
      * @param rateMode The type of borrow debt. (For Stable: 1, Variable: 2)
-     * @param getId ID to retrieve amt.
-     * @param setId ID stores the amount of tokens borrowed.
     */
     function borrow(
         address token,
         uint256 amt,
-        uint256 rateMode,
-        uint256 getId,
-        uint256 setId
+        uint256 rateMode
     ) external payable {
         // uint _amt = getUint(getId, amt);
 
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
+        AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
@@ -582,7 +148,7 @@ abstract contract AaveResolver is Events, Helpers {
         uint _length = tokens.length;
         require(_length > 0, "0-tokens-not-allowed");
 
-        AaveInterface aave = AaveInterface(aaveProvider.getLendingPool());
+        AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
         for (uint i = 0; i < _length; i++) {
             address token = tokens[i];
