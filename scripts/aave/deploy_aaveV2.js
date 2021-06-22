@@ -7,7 +7,15 @@
 const hre = require("hardhat");
 // console.log('hre : ', hre);
 const ethers = hre.ethers;
-const config = require('./config.json');
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+
+
 async function main() {
   const ConnectV2AaveV2 = await ethers.getContractFactory("ConnectV2AaveV2");
 
@@ -17,6 +25,9 @@ async function main() {
   await connectV2AaveV2Instance.deployed();
 
   console.log("Aave v2 instance deployed at " + connectV2AaveV2Instance.address);
+
+  console.log('waiting 30 seconds');
+  await sleep(30000);
 
   await hre.run("verify:verify", {
     address: connectV2AaveV2Instance.address,
