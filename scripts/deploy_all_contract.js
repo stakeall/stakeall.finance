@@ -15,7 +15,7 @@ async function main() {
     console.log(hre.network.name);
     const sig = await hre.ethers.getSigner();
     const accounts = await hre.ethers.getSigners()
-    const wallet = accounts[0]
+    const address = accounts[0].address
     
     const BitStakerRegistery = await ethers.getContractFactory("BitStakerRegistery",{}, sig);
 
@@ -25,16 +25,6 @@ async function main() {
     await bitStakerRegisteryInstance.deployed();
 
 
-    // console.log('waiting 30 seconds');
-    // await sleep(30000);
-
-    // console.log(bitStakerRegisteryInstance.address);
-    // await hre.run("verify:verify", {
-    //     contract: 'contracts/BitStakerRegistry.sol:BitStakerRegistery',
-    //     address: bitStakerRegisteryInstance.address,
-    //     constructorArguments: [],
-    // });
-
     const GraphProtocol = await ethers.getContractFactory("GraphProtocol");
 
     const graphProtocolInstance = await GraphProtocol.deploy(
@@ -43,15 +33,6 @@ async function main() {
     await graphProtocolInstance.deployed();
 
      console.log("Graph protocol ethereum deployed at " + graphProtocolInstance.address);
-
-    // console.log('waiting 30 seconds');
-    // await sleep(30000);
-
-    // await hre.run("verify:verify", {
-    //     address: graphProtocolInstance.address,
-    //     constructorArguments: [
-    //     ],
-    // });
 
      const oneInchProtocol = await ethers.getContractFactory("OneInch");
     const oneInchProtocolInstance = await oneInchProtocol.deploy(
@@ -87,11 +68,25 @@ async function main() {
     //     ],
     // });
 
+
+    
+    
+    await bitStakerRegisteryInstance.functions.build();
+
+    const userWalletAddress = await bitStakerRegisteryInstance.functions.proxies(address);
+    
+    await bitStakerRegisteryInstance.functions.enableLogic(graphProtocolInstance.address);
+    await bitStakerRegisteryInstance.functions.enableLogic(oneInchProtocolInstance.address);
+    await bitStakerRegisteryInstance.functions.enableLogic(connectV2AaveV2Instance.address);
+
+    const response = await bitStakerRegisteryInstance.functions.logic(graphProtocolInstance.address);
+    console.log(response);
     const contractAddress = {
         BitStakerRegistery: bitStakerRegisteryInstance.address,
         GraphProtocol: graphProtocolInstance.address,
         oneInchProtocol: oneInchProtocolInstance.address,
-        AAVEProtocol: connectV2AaveV2Instance.address
+        AAVEProtocol: connectV2AaveV2Instance.address,
+        userWalletAddress: userWalletAddress[0]
     };
 
      fs.writeFileSync(`${hre.network.name}_contract.json`, JSON.stringify(contractAddress));

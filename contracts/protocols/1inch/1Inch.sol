@@ -1,7 +1,8 @@
 pragma experimental ABIEncoderV2;
 import "../../IERC20Interface.sol";
+ import "../../helpers/Basic.sol";
 
-contract OneInch {
+contract OneInch is Basic {
     event TokenSwapped(
         address _source,
         uint256 _sourceAmount,
@@ -17,11 +18,18 @@ contract OneInch {
         bytes memory _callData,
         uint256 _value
     ) public payable returns (uint256 _swappedAmount) {
+
+        
+        bool isEth = _sourceToken == ethAddr;
+        
+        if(!isEth) {
         IERC20Interface(_sourceToken).transferFrom(
             msg.sender,
             address(this),
             _amount
         );
+        }
+      
         _swappedAmount = _swap(
             _amount,
             _sourceToken,
@@ -30,6 +38,8 @@ contract OneInch {
             _callData,
             _value
         );
+
+        IERC20Interface(_destinationToken).transfer(msg.sender, _swappedAmount);
     }
 
     function chainedSwap(
@@ -58,7 +68,13 @@ contract OneInch {
         bytes memory _callData,
         uint256 _value
     ) private returns (uint256 _swappedAmount) {
-        IERC20Interface(_sourceToken).approve(_to, _amount);
+
+        bool isEth = _sourceToken == ethAddr;
+
+        if(!isEth) {
+            IERC20Interface(_sourceToken).approve(_to, _amount);
+        }
+        
 
         uint256 initialBalance =
             IERC20Interface(_destinationToken).balanceOf(address(this));
@@ -67,7 +83,11 @@ contract OneInch {
         if (!success) revert("1Inch-swap-failed");
         uint256 finalBalance =
             IERC20Interface(_destinationToken).balanceOf(address(this));
-        IERC20Interface(_sourceToken).approve(_to, 0);
+
+        if(!isEth) {
+            IERC20Interface(_sourceToken).approve(_to, 0);    
+        }    
+        
         _swappedAmount = finalBalance - initialBalance;
 
         emit TokenSwapped(

@@ -319,13 +319,13 @@ contract WalletRegistry is LogicRegistry {
     /// Throws if the owner already have a UserWallet
     /// @return proxy ()
     function build() public returns (UserWallet proxy) {
-        proxy = build(msg.sender);
+        proxy = create(msg.sender);
     }
 
     /// @dev update the proxy record whenever owner changed on any proxy
     /// Throws if msg.sender is not a proxy contract created via this contract
     /// @return proxy () UserWallet
-    function build(address _owner) public returns (UserWallet proxy) {
+    function create(address _owner) public returns (UserWallet proxy) {
         require(
             proxies[_owner] == UserWallet(0),
             "multiple-proxy-per-user-not-allowed"
