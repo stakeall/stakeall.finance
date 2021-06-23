@@ -1,6 +1,6 @@
 pragma experimental ABIEncoderV2;
 import "../../IERC20Interface.sol";
- import "../../helpers/Basic.sol";
+import "../../helpers/Basic.sol";
 
 contract OneInch is Basic {
     event TokenSwapped(
@@ -18,18 +18,7 @@ contract OneInch is Basic {
         bytes memory _callData,
         uint256 _value
     ) public payable returns (uint256 _swappedAmount) {
-
-        
-        bool isEth = _sourceToken == ethAddr;
-        
-        if(!isEth) {
-        IERC20Interface(_sourceToken).transferFrom(
-            msg.sender,
-            address(this),
-            _amount
-        );
-        }
-      
+   
         _swappedAmount = _swap(
             _amount,
             _sourceToken,
@@ -39,25 +28,6 @@ contract OneInch is Basic {
             _value
         );
 
-        IERC20Interface(_destinationToken).transfer(msg.sender, _swappedAmount);
-    }
-
-    function chainedSwap(
-        uint256 _amount,
-        address _sourceToken,
-        address _destinationToken,
-        address _to,
-        bytes memory _callData,
-        uint256 _value
-    ) public payable returns (uint256 _swappedAmount) {
-        _swappedAmount = _swap(
-            _amount,
-            _sourceToken,
-            _destinationToken,
-            _to,
-            _callData,
-            _value
-        );
     }
 
     function _swap(
@@ -74,8 +44,6 @@ contract OneInch is Basic {
         if(!isEth) {
             IERC20Interface(_sourceToken).approve(_to, _amount);
         }
-        
-
         uint256 initialBalance =
             IERC20Interface(_destinationToken).balanceOf(address(this));
         // solium-disable-next-line security/no-call-value

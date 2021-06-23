@@ -2,6 +2,9 @@ const Web3 = require('web3');
 const axios = require('axios');
 const abiDecoder = require('abi-decoder'); 
 const OneInch = require('../../artifacts/contracts/protocols/1inch/1Inch.sol/OneInch.json');
+const GraphProtocol = require("../../artifacts/contracts/protocols/graph-protocol/GraphProtocol.sol/GraphProtocol.json");
+const UserWallet = require("../../artifacts/contracts/BitStakerRegistry.sol/UserWallet.json");
+
 const ERC20 = require('../../artifacts/contracts/IERC20Interface.sol/IERC20Interface.json');
 const LocalContract = require('../../localhost_contract.json')
 
@@ -22,23 +25,14 @@ const perform = async () => {
     const slippage = 1;
     const fromAddress = account.address;;
 
-    // let request = `https://api.1inch.exchange/v3.0/1/quote?fromTokenAddress=${sourceToken}&toTokenAddress=${destinationToken}&amount=${amount}`;
-    // const quoteResponse = await axios.get(request);
     
-    // console.log(request);
-    // console.log('destination Amount from quote  ' + quoteResponse.data.toTokenAmount);
+    const userWalletInstance = new web3.eth.Contract(UserWallet.abi, LocalContract.userWalletAddress);
 
     request = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${sourceToken}&toTokenAddress=${destinationToken}&amount=${amount}&slippage=${slippage}&fromAddress=${fromAddress}&disableEstimate=true`;
     console.log(request);
     const swapResponse = await axios.get(request);
-
-    console.log('destination Amount from swap  ' +swapResponse.data.toTokenAmount);
-
-    console.log('destination Amount from swap  ' +swapResponse.data.toTokenAmount);
-    console.log('Contract address '+swapResponse.data.tx.to);
     
     const decodedData = abiDecoder.decodeMethod(swapResponse.data.tx.data);
-    console.log(JSON.stringify(decodedData));
 
     const oneInchProxy = new web3.eth.Contract(OneInch.abi, LocalContract.oneInchProtocol);
 
@@ -55,20 +49,9 @@ const perform = async () => {
         amount
     );
 
-    //const estimatedGas = await swapTransaction.estimateGas({from: fromAddress});
+    const swapTransactionEncodeABISwap = swapTransaction.encodeABI();
 
-    const receit = await swapTransaction.send({
-        gas: 300000,
-        from: fromAddress,
-        value: amount
-    });
-
-    console.log(receit);
-
-    const destinationERC20Token = new web3.eth.Contract(ERC20.abi, destinationToken);
-
-    const postBalance = await destinationERC20Token.methods.balanceOf(fromAddress).call({from: fromAddress});
-    console.log('post swap balance  '+postBalance);
+    
     
 }
 

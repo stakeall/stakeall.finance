@@ -69,8 +69,16 @@ async function main() {
     // });
 
 
+    const FundGateway = await ethers.getContractFactory("FundGateway");
+
+    const fundGatewayInstance = await FundGateway.deploy(
+    );
+
+      await fundGatewayInstance.deployed();
+
+     console.log("Fund Gateway deployed at " + fundGatewayInstance.address);
     
-    
+
     await bitStakerRegisteryInstance.functions.build();
 
     const userWalletAddress = await bitStakerRegisteryInstance.functions.proxies(address);
@@ -78,6 +86,7 @@ async function main() {
     await bitStakerRegisteryInstance.functions.enableLogic(graphProtocolInstance.address);
     await bitStakerRegisteryInstance.functions.enableLogic(oneInchProtocolInstance.address);
     await bitStakerRegisteryInstance.functions.enableLogic(connectV2AaveV2Instance.address);
+    await bitStakerRegisteryInstance.functions.enableLogic(fundGatewayInstance.address);
 
     const response = await bitStakerRegisteryInstance.functions.logic(graphProtocolInstance.address);
     console.log(response);
@@ -86,6 +95,7 @@ async function main() {
         GraphProtocol: graphProtocolInstance.address,
         oneInchProtocol: oneInchProtocolInstance.address,
         AAVEProtocol: connectV2AaveV2Instance.address,
+        fundGateway: fundGatewayInstance.address,
         userWalletAddress: userWalletAddress[0]
     };
 
