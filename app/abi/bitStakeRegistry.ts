@@ -1,4 +1,4 @@
-[
+export const bitStakeRegistryABI = [
   {
     "constant": true,
     "inputs": [

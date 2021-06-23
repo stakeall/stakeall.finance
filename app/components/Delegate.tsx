@@ -9,7 +9,7 @@ import Box from "@material-ui/core/Box";
 const amount = "100000000000000000000";
 
 export const Delegate = () => {
-    const { delegate } = useBitstake();
+    const { delegate, checkIfOnChainWalletExists, deployOnChainWallet } = useBitstake();
     const [indexerId, setIndexerId] = useState('');
 
     return (
@@ -23,7 +23,7 @@ export const Delegate = () => {
                 </Typography>
             </Grid>
             <Grid item>
-                <Button variant="outlined" onClick={() => delegate(indexerId,amount)}> delegate </Button>
+                <Button variant="outlined" onClick={() => deployOnChainWallet()}> delegate </Button>
             </Grid>
         </Grid>
     );
