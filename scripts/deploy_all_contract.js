@@ -16,9 +16,6 @@ async function main() {
     const sig = await hre.ethers.getSigner();
     const accounts = await hre.ethers.getSigners()
     const wallet = accounts[0]
-
-    console.log(wallet.address);
-    console.log(sig);
     
     const BitStakerRegistery = await ethers.getContractFactory("BitStakerRegistery",{}, sig);
 
@@ -26,9 +23,6 @@ async function main() {
     );
 
     await bitStakerRegisteryInstance.deployed();
-
-
-    console.log("Bit staker registry deployed at " + bitStakerRegisteryInstance.address);
 
 
     // console.log('waiting 30 seconds');
@@ -76,8 +70,6 @@ async function main() {
     //     ],
     // });
 
-
-
     const ConnectV2AaveV2 = await ethers.getContractFactory("ConnectV2AaveV2");
 
     const connectV2AaveV2Instance = await ConnectV2AaveV2.deploy(
@@ -98,7 +90,7 @@ async function main() {
     const contractAddress = {
         BitStakerRegistery: bitStakerRegisteryInstance.address,
         GraphProtocol: graphProtocolInstance.address,
-        oneProtocol: oneInchProtocolInstance.address,
+        oneInchProtocol: oneInchProtocolInstance.address,
         AAVEProtocol: connectV2AaveV2Instance.address
     };
 
