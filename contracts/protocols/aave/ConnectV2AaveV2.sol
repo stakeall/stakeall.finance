@@ -11,18 +11,18 @@ abstract contract Helpers is DSMath, Basic {
     /**
      * @dev Aave Lending Pool Provider
     */
-    // AaveLendingPoolProviderInterface constant internal aaveProvider = AaveLendingPoolProviderInterface(0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5);
+    AaveLendingPoolProviderInterface constant internal aaveProvider = AaveLendingPoolProviderInterface(0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5);
     
     // Kovan testnet
-    AaveLendingPoolProviderInterface constant internal aaveProvider = AaveLendingPoolProviderInterface(0x88757f2f99175387aB4C6a4b3067c77A695b0349);
+    // AaveLendingPoolProviderInterface constant internal aaveProvider = AaveLendingPoolProviderInterface(0x88757f2f99175387aB4C6a4b3067c77A695b0349);
 
     /**
      * @dev Aave Protocol Data Provider
     */
-    // AaveDataProviderInterface constant internal aaveData = AaveDataProviderInterface(0x057835Ad21a177dbdd3090bB1CAE03EaCF78Fc6d);
+    AaveDataProviderInterface constant internal aaveData = AaveDataProviderInterface(0x057835Ad21a177dbdd3090bB1CAE03EaCF78Fc6d);
     
     // Kovan testnet
-    AaveDataProviderInterface constant internal aaveData = AaveDataProviderInterface(0x3c73A5E5785cAC854D468F727c606C07488a29D6);
+    // AaveDataProviderInterface constant internal aaveData = AaveDataProviderInterface(0x3c73A5E5785cAC854D468F727c606C07488a29D6);
 
     /**
      * @dev Aave Referral Code
@@ -76,7 +76,7 @@ abstract contract AaveResolver is Events, Helpers {
     function deposit(
         address token,
         uint256 amt
-    ) external payable returns (uint256 amount_, address token_) {
+    ) public payable returns (uint256 amount_, address token_) {
 
         AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
@@ -120,7 +120,7 @@ abstract contract AaveResolver is Events, Helpers {
         address token,
         uint256 amt,
         uint256 rateMode
-    ) external payable {
+    ) public payable {
         // uint _amt = getUint(getId, amt);
 
         AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
@@ -135,6 +135,19 @@ abstract contract AaveResolver is Events, Helpers {
 
         // _eventName = "LogBorrow(address,uint256,uint256,uint256,uint256)";
         // _eventParam = abi.encode(token, _amt, rateMode, getId, setId);
+    }
+
+    function depositAndBorrow(
+        address depositToken,
+        address borrowToken,
+        uint256 depositAmt,
+        uint256 borrowAmt,
+        uint256 rateMode
+    ) 
+        external payable
+    {
+        deposit(depositToken, depositAmt);
+        borrow(borrowToken, borrowAmt, rateMode);
     }
 
     /**

@@ -14,10 +14,10 @@ abstract contract Stores {
   /**
    * @dev Return Wrapped ETH address
    */
-//   address constant internal wethAddr = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address constant internal wethAddr = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     // Testnet
-  address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
+//   address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
 
 }
 
