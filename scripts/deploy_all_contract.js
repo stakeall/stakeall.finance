@@ -18,6 +18,7 @@ async function main() {
     const wallet = accounts[0]
 
     console.log(wallet.address);
+    console.log(sig);
     
     const BitStakerRegistery = await ethers.getContractFactory("BitStakerRegistery",{}, sig);
 
