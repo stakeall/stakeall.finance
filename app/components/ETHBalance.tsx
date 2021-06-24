@@ -5,8 +5,6 @@ import useETHBalance from "../hooks/useETHBalance";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import {isConnected} from "../util";
-import useEagerConnect from "../hooks/useEagerConnect";
-import {Account} from "./Account";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";

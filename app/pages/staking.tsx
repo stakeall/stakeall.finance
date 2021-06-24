@@ -1,5 +1,5 @@
 import {Paper, Theme} from "@material-ui/core";
-import {useCallback, useContext, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -8,11 +8,12 @@ import {Overview} from "../components/Overview";
 import {Indexers} from "../components/Indexers";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
+import {WalletStake} from "../components/WalletStake";
+import {useRouter} from "next/router";
 
 const useStakingStyles = makeStyles((theme: Theme) =>
     createStyles({
         stakingContainer: {
-            margin: '30px',
         },
     })
 )
@@ -23,6 +24,15 @@ const Staking = () => {
     const handleTabChange = useCallback((event, newValue) => {
         setTabValue(newValue);
     }, [])
+    const { validator } = useContext(AppCommon);
+    const router = useRouter();
+
+    useEffect(() => {
+        if(!validator) {
+            router.push('/');
+        }
+    }, [validator]);
+
     return (
         <section className={classes.stakingContainer}>
             <Paper elevation={3}>
@@ -33,10 +43,7 @@ const Staking = () => {
                 </Tabs>
             </Paper>
             <DashboardTabLayout value={tabValue} index={0}>
-                <Overview />
-            </DashboardTabLayout>
-            <DashboardTabLayout value={tabValue} index={1}>
-                <Indexers />
+                <WalletStake />
             </DashboardTabLayout>
         </section>
     );
