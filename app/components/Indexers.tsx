@@ -1,16 +1,16 @@
 import {useQuery, gql} from "@apollo/client";
-import {AllocationsEntity, IndexersEntity, IndexersResponse} from "../types/Indexers";
-import React, {useCallback, useEffect, useState} from "react";
+import {IndexersEntity, IndexersResponse} from "../types/Indexers";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";
-import {useWeb3React} from "@web3-react/core";
 import {formatToken, truncateMiddle} from "../util";
 import Button from "@material-ui/core/Button";
-import {useBitstake} from "../hooks/useBitstake";
 import {DelegateModal} from "./DelegateModal";
+import {AppCommon} from "../contexts/AppCommon";
+import Link from "next/link";
+import {useRouter} from "next/router";
 
 const str = `
 {"operationName":"indexers","variables":{"orderBy":"stakedTokens","orderDirection":"desc","first":500,"skip":0},"query":"query indexers($orderBy: Indexer_orderBy, $orderDirection: OrderDirection, $first: Int, $skip: Int, $where: Indexer_filter, $searchText: String, $addressSearchText: String) {\\n  indexers(orderBy: $orderBy, orderDirection: $orderDirection, first: $first, skip: $skip, where: $where) {\\n    id\\n    createdAt\\n    account {\\n      id\\n      defaultName {\\n        id\\n        name\\n        __typename\\n      }\\n      image\\n      __typename\\n    }\\n    allocations(first: 1000, orderBy: allocatedTokens, orderDirection: desc, where: {status: Active}) {\\n      id\\n      subgraphDeployment {\\n        id\\n        versions(orderBy: createdAt, orderDirection: desc, first: 1) {\\n          id\\n          subgraph {\\n            id\\n            image\\n            displayName\\n            __typename\\n          }\\n          __typename\\n        }\\n        __typename\\n      }\\n      __typename\\n    }\\n    stakedTokens\\n    allocatedTokens\\n    delegatedTokens\\n    lockedTokens\\n    delegationExchangeRate\\n    delegatorParameterCooldown\\n    lastDelegationParameterUpdate\\n    queryFeeCut\\n    queryFeeRebates\\n    delegatorQueryFees\\n    indexingRewardCut\\n    indexingRewardEffectiveCut\\n    queryFeesCollected\\n    rewardsEarned\\n    url\\n    __typename\\n  }\\n}\\n"}
@@ -185,7 +185,7 @@ const mapToTableData = (data: IndexersResponse['data'], onDelegate: (indexerId: 
             <Button
                 variant="outlined"
                 color="secondary"
-                onClick={() => onDelegate(indexer.account.id)}
+                onClick={() => { onDelegate(indexer.account.id) }}
             >
                 Delegate
             </Button>
@@ -213,16 +213,13 @@ export const Indexers = () => {
         variables: queryVariables,
     });
     const [tableData, setTableData] = useState<StandardTableRows<typeof headers>>([]);
-    const [delegateModalOpen, setDelegateModalOpen] = useState<boolean>(false);
-    const [indexerId, setIndexerId] = useState<string>('');
+    const { setValidator } = useContext(AppCommon);
+    const router = useRouter();
 
-    const handleDelegateModalClose = useCallback(() => {
-        setDelegateModalOpen(false)
-    }, []);
 
     const onDelegate = useCallback((indexerId: string) => {
-        setIndexerId(indexerId);
-        setDelegateModalOpen(true);
+        setValidator?.(indexerId);
+        router.push('/staking');
     }, []);
 
     useEffect(() => {
@@ -243,7 +240,6 @@ export const Indexers = () => {
     return (
         <Grid className={classes.tableContainer} container>
             <StandardTable headers={headers} rows={tableData}/>
-            <DelegateModal open={delegateModalOpen} handleClose={handleDelegateModalClose} indexerId={indexerId}/>
         </Grid>
     );
 }

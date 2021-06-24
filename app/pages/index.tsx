@@ -1,4 +1,3 @@
-import useEagerConnect from "../hooks/useEagerConnect";
 import {Theme} from "@material-ui/core";
 import {Dashboard} from "../components/Dashboard";
 import makeStyles from "@material-ui/core/styles/makeStyles";
@@ -7,7 +6,6 @@ import Paper from "@material-ui/core/Paper";
 import {Header} from "../components/Header";
 import {ClientOnly} from "../components/ClientOnly";
 import {InjectWeb3} from "../components/InjectWeb3";
-import {Delegate} from "../components/Delegate";
 
 const useBackgroundStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -25,8 +23,6 @@ export default function Home() {
     return (
         <ClientOnly>
             <InjectWeb3/>
-            <Header/>
-            <Delegate/>
             <Paper
                 component="main"
                 elevation={0}

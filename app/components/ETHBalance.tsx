@@ -23,12 +23,13 @@ const ETHBalance = () => {
     const classes = useBalanceStyles();
     const {account, library} = useWeb3React<Web3Provider>();
     const {data} = useETHBalance(account);
-    const triedToEagerConnect = useEagerConnect();
 
     const isAccountConnected = useMemo(() => isConnected(account, library), [account, library]);
     if (!isAccountConnected) {
         return (
-            <Account triedToEagerConnect={triedToEagerConnect}/>
+            <Grid className={classes.container} container direction="column" alignItems="center" justify="center">
+                <Typography component="div" variant="body1">Connect your wallet</Typography>
+            </Grid>
         )
     }
     return (

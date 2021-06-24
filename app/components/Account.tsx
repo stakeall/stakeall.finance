@@ -1,11 +1,14 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
 import {useWeb3React} from "@web3-react/core";
 import Button from "@material-ui/core/Button";
-import {Theme} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
-import Grid from "@material-ui/core/Grid";
 import {useConnectAccount} from "../hooks/useConnectAccount";
+import useEagerConnect from "../hooks/useEagerConnect";
+import {OnChain} from "./OnChain";
+import {AccountId} from "./AccountId";
+import {useContext} from "react";
+import {Bitstake} from "../contexts/Bitstake";
 
 type Props = {
     triedToEagerConnect: boolean;
@@ -13,18 +16,20 @@ type Props = {
 
 const useAccountStyles = makeStyles(() =>
     createStyles({
-        container: {
-            height: '50px',
-        },
+        container: {},
     })
 )
 
-export const Account = ({triedToEagerConnect}: Props) => {
+export const Account = () => {
     const classes = useAccountStyles();
-    const { account, error } = useWeb3React();
-    const { hasMetaMaskOrWeb3Available, onMetaMaskConnect, installMetamask} = useConnectAccount();
+    const {account, error} = useWeb3React();
+    const {hasMetaMaskOrWeb3Available, onMetaMaskConnect, installMetamask} = useConnectAccount();
+    const {
+        onChainWalletAddressExists,
+    } = useContext(Bitstake);
+    const triedToEagerConnect = useEagerConnect();
 
-        if (error) {
+    if (error) {
         return null;
     }
 
@@ -33,26 +38,27 @@ export const Account = ({triedToEagerConnect}: Props) => {
     }
 
     if (typeof account !== "string") {
-        return (
-                <Grid className={classes.container} container justify="center" alignItems="center">
-                    {hasMetaMaskOrWeb3Available ? (
-                        <Button
-                            color="primary"
-                            onClick={onMetaMaskConnect}
-                            variant="outlined"
-                        >
-                            {MetaMaskOnboarding.isMetaMaskInstalled()
-                                ? "Connect to MetaMask"
-                                : "Connect to Wallet"}
-                        </Button>
-                    ) : (
-                        <Button onClick={installMetamask}>
-                            Install Metamask
-                        </Button>
-                    )}
-                </Grid>
-        );
+        return hasMetaMaskOrWeb3Available ? (
+            <Button
+                color="secondary"
+                onClick={onMetaMaskConnect}
+                variant="outlined"
+            >
+                {MetaMaskOnboarding.isMetaMaskInstalled()
+                    ? "Connect to MetaMask"
+                    : "Connect to Wallet"}
+            </Button>
+        ) : (
+            <Button onClick={installMetamask}>
+                Install Metamask
+            </Button>
+        )
     }
-    return null;
+    else if(!onChainWalletAddressExists) {
+        return <OnChain />
+    }
+    else {
+        return <AccountId />
+    }
 };
 

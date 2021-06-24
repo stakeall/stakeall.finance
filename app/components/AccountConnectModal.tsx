@@ -1,22 +1,20 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {useContext} from "react";
 import {Modal} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {Bitstake} from "../contexts/Bitstake";
 
-interface DelegateModalProps {
+interface AccountConnectModalProps {
     open: boolean;
     handleClose: VoidFunction;
-    indexerId: string;
 }
 
 
-const useModalStyles = makeStyles((theme) =>
+const useAccountConnectModalStyles = makeStyles((theme) =>
     createStyles({
         modalContainer: {
             position: 'absolute' as 'absolute',
@@ -33,21 +31,9 @@ const useModalStyles = makeStyles((theme) =>
         }
     })
 )
-export const DelegateModal: React.FC<DelegateModalProps> = ({open, handleClose, indexerId}) => {
-    const classes = useModalStyles();
-    const { delegate } = useContext(Bitstake);
-    const [amount, setAmount] = useState<string>('');
-    const [clicked, setClicked] = useState<boolean>(true);
-
-    useEffect(() => {
-        if(open) {
-            setClicked(false);
-            setAmount('');
-        }
-    }, [open])
-
-    const amountError = useMemo(() => !amount && clicked, [amount, clicked]);
-
+export const AccountConnectModal: React.FC<AccountConnectModalProps> = ({open, handleClose}) => {
+    const classes = useAccountConnectModalStyles();
+    const { deployOnChainWallet } = useContext(Bitstake);
     return (
         <Modal
             open={open}
@@ -57,29 +43,11 @@ export const DelegateModal: React.FC<DelegateModalProps> = ({open, handleClose, 
         >
             <Box className={classes.modalContainer}>
                 <Typography id="modal-modal-title" variant="h5" component="h2">
-                    Delegate Amount
+                    Create Account to manage your funds
                 </Typography>
-                <Typography id="modal-modal-description">
-                    Indexer Id : {indexerId}
-                </Typography>
-                <TextField
-                    value={amount}
-                    error={amountError}
-                    helperText={amountError && "Please enter amount"}
-                    type="number"
-                    onChange={(e) => {setAmount(e.target.value)}}
-                    label="Amount"
-                    fullWidth
-                />
                 <Grid className={classes.buttonContainer} container justify="flex-end" spacing={2}>
                     <Grid item>
-                        <Button variant="outlined" onClick={() => {
-                            setClicked(true);
-                            if(!!amount) {
-                                delegate?.(indexerId, amount)
-                                handleClose();
-                            }
-                        }}> Confirm </Button>
+                        <Button variant="outlined" onClick={deployOnChainWallet}> Create </Button>
                     </Grid>
                     <Grid item>
                         <Button variant="outlined" color="secondary" onClick={handleClose}> Cancel </Button>

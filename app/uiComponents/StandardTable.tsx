@@ -99,12 +99,12 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
                     {(rowsPerPage > 0
                             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : rows
-                    ).map((row) => {
-                        return (<TableRow>
-                            {(headers).map((header) => (
+                    ).map((row, index) => {
+                        return (<TableRow key={index.toString()}>
+                            {(headers).map((header, index) => (
                                 <TableCell
                                     style={cellStyles({width: header.width})}
-                                    key={header.label}
+                                    key={header.label || index.toString()}
                                 >
                                     {renderRowItem(row[header.id])}
                                 </TableCell>
