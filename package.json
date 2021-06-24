@@ -12,7 +12,8 @@
     "deploy-aave": "npx hardhat run scripts/aave/deploy_aaveV2.js --network kovan --show-stack-traces",
     "deploy-all-rinkeby": "npx hardhat run scripts/deploy_all_contract.js --network rinkeby --show-stack-traces",
     "deploy-all-kovan": "npx hardhat run scripts/deploy_all_contract.js --network kovan --show-stack-traces",
-    "deploy-all-fork": "npx hardhat run scripts/deploy_all_contract.js --network localhost --show-stack-traces"
+    "deploy-all-fork": "npx hardhat run scripts/deploy_all_contract.js --network localhost --show-stack-traces",
+    "start-mainnet-fork": "npx hardhat node"
   },
   "repository": {
     "type": "git",
