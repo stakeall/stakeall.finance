@@ -88,6 +88,12 @@ async function main() {
     await bitStakerRegisteryInstance.functions.enableLogic(connectV2AaveV2Instance.address);
     await bitStakerRegisteryInstance.functions.enableLogic(fundGatewayInstance.address);
 
+    console.log((await bitStakerRegisteryInstance.functions.logicProxies(graphProtocolInstance.address)));
+    console.log((await bitStakerRegisteryInstance.functions.logicProxies(oneInchProtocolInstance.address)));
+    console.log((await bitStakerRegisteryInstance.functions.logicProxies(connectV2AaveV2Instance.address)));
+    console.log((await bitStakerRegisteryInstance.functions.logicProxies(fundGatewayInstance.address)));
+
+
     const response = await bitStakerRegisteryInstance.functions.logic(graphProtocolInstance.address);
     console.log(response);
     const contractAddress = {

@@ -20,6 +20,7 @@ interface IGraphProtocolInterface {
     );
 
     function delegate(address _indexer, uint256 _tokens)
+        payable
         external
         returns (uint256 shares_);
 
@@ -34,23 +35,15 @@ interface IGraphProtocolInterface {
 
 contract GraphProtocol is IGraphProtocolInterface {
     IGraphProtocolInterface public constant graphProxy =
-        IGraphProtocolInterface(0x2d44C0e097F6cD0f514edAC633d82E01280B4A5c);
+        IGraphProtocolInterface(0xF55041E37E12cD407ad00CE2910B8269B01263b9);
     IERC20Interface public constant grtTokenAddress =
-        IERC20Interface(0x54Fe55d5d255b8460fB3Bc52D5D676F9AE5697CD);
+        IERC20Interface(0xc944E90C64B2c07662A292be6244BDf05Cda44a7);
 
     event LogDelegate(address _graphProxy, address _grtTokenAddress);
 
     function delegate(address _indexer, uint256 _tokens)
         public
-        returns (uint256 shares_)
-    {
-        grtTokenAddress.transferFrom(msg.sender, address(this), _tokens);
-        shares_ = _delegate(_indexer, _tokens);
-    }
-
-    // It assumes that contract already have funds
-    function chainedDelegate(address _indexer, uint256 _tokens)
-        public
+        payable
         returns (uint256 shares_)
     {
         shares_ = _delegate(_indexer, _tokens);
@@ -79,7 +72,6 @@ contract GraphProtocol is IGraphProtocolInterface {
         returns (uint256 tokens_)
     {
         tokens_ = graphProxy.withdrawDelegated(_indexer, _delegateToIndexer);
-        grtTokenAddress.transfer(msg.sender, tokens_);
         emit GraphProtocolWithdrawDelegated(
             _indexer,
             _delegateToIndexer,

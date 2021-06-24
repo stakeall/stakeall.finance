@@ -36,21 +36,21 @@ const perform = async () => {
 
     const userWalletInstance = new web3.eth.Contract(UserWallet.abi, ContractAddresses.userWalletAddress);
 
-    const aaveDepositAndBorrowEncodedData = aaveInstance.methods.depositAndBorrow(
-        sourceToken,
-        borrowTokenAddress,
-        amount,
-        borrowAmount,
-        rateMode
-    ).encodeABI();
+    // const aaveDepositAndBorrowEncodedData = aaveInstance.methods.depositAndBorrow(
+    //     sourceToken,
+    //     borrowTokenAddress,
+    //     amount,
+    //     borrowAmount,
+    //     rateMode
+    // ).encodeABI();
 
-    console.log('aaveDepositAndBorrowEncodedData :', aaveDepositAndBorrowEncodedData);
+    // console.log('aaveDepositAndBorrowEncodedData :', aaveDepositAndBorrowEncodedData);
 
 
     // One Inch 
 
     const request =
-        `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${borrowTokenAddress}&toTokenAddress=${destinationToken}&amount=${borrowAmount}&slippage=${slippage}&fromAddress=${ContractAddresses.userWalletAddress}&disableEstimate=true`;
+        `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${sourceToken}&toTokenAddress=${destinationToken}&amount=${amount}&slippage=${slippage}&fromAddress=${ContractAddresses.userWalletAddress}&disableEstimate=true`;
     console.log(request);
     const swapResponse = await axios.get(request);
 
@@ -61,12 +61,12 @@ const perform = async () => {
     const oneInchProxy = new web3.eth.Contract(OneInch.abi, ContractAddresses.oneInchProtocol);
 
     const swapTransactionEncodedData = oneInchProxy.methods.swap(
-        borrowAmount,
-        borrowTokenAddress,
+        amount,
+        sourceToken,
         destinationToken,
         swapResponse.data.tx.to,
         swapResponse.data.tx.data,
-        0
+        amount
     ).encodeABI();
 
     // One Inch finish
@@ -77,15 +77,13 @@ const perform = async () => {
     const graphInstance = new web3.eth.Contract(GraphProtocol.abi, ContractAddresses.GraphProtocol);
     const graphProtocolEncodedData = graphInstance.methods.delegate(
         indexer,
-        swapResponse.data.toTokenAmount
+        "100971045019998194761" 
     ).encodeABI();
     // Graph Protocol
 
     const transaction = userWalletInstance.methods.executeMulti(
-        [aaveProtocolAddress, ContractAddresses.oneInchProtocol, ContractAddresses.GraphProtocol],
-        [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, graphProtocolEncodedData],
-        //     [ ContractAddresses.oneInchProtocol],
-        //    [ swapTransactionEncodedData],
+        [ContractAddresses.oneInchProtocol, ContractAddresses.GraphProtocol],
+        [swapTransactionEncodedData, graphProtocolEncodedData],
         1,
         1
     );
@@ -98,7 +96,7 @@ const perform = async () => {
 
     const executeReceipt = await transaction.send({
         from: fromAddress,
-        gas: '10000000',
+        gas: gas,
         value: amount
     }).on('transactionHash', (hash) => {
         console.log(" approval hash " + hash);
