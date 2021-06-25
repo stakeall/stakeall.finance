@@ -7,7 +7,6 @@ const KOVAN_INFURA_API = 'https://kovan.infura.io/v3/0b3c6bddd7d14140a0640806a04
 const PRIVATE_KEY = 'bf6a5360ab60d382c2eba4fd79b176cdd8d661a7e8bf5d35aa39d4aae614d088'; // prepend with private key without 0x
 const defaultNetwork = "localhost";
 
-
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async () => {
@@ -70,6 +69,10 @@ module.exports = {
       forking: {
         url: MAINNET_INFURA_API
       },
+    },
+    mainnetfork: {
+      url: "http://35.208.215.170:8080",
+      accounts: ['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80']
     },
   },
   solidity: {
