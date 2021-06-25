@@ -7,7 +7,6 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {formatToken, truncateMiddle} from "../util";
 import Button from "@material-ui/core/Button";
-import {DelegateModal} from "./WalletStake";
 import {AppCommon} from "../contexts/AppCommon";
 import Link from "next/link";
 import {useRouter} from "next/router";
