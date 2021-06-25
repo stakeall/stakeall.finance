@@ -13,6 +13,9 @@ const api = axios.create({
 
 export const covalent = {
     getAllBalance: (chainId: string | number, address: string) => {
+        if(chainId === 31337) {
+            chainId = 1;
+        }
         return api.get<{}, BalanceResponse>(`${covalentBaseUrl}/v1/${chainId}/address/${address}/balances_v2/?&key=${covalentKey}`)
     },
 
