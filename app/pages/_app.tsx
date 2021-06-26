@@ -17,7 +17,6 @@ import {BitstakeProvider} from "../components/BitstakeProvider";
 import {AppCommonProvider} from "../components/AppCommonProvider";
 import {PageLoader} from "../components/PageLoader";
 import {Header} from "../components/Header";
-import {ClientOnly} from "../components/ClientOnly";
 
 function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc) {
     return new Web3Provider(provider);

@@ -3,7 +3,6 @@ import {Dashboard} from "../components/Dashboard";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
-import {Header} from "../components/Header";
 import {ClientOnly} from "../components/ClientOnly";
 import {InjectWeb3} from "../components/InjectWeb3";
 

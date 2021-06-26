@@ -18,19 +18,17 @@ function sleep(ms: number) {
 export const useBitstake = () => {
     const {account} = useWeb3ReactWrapper()
     const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>('');
-    const {setPageLoading} = useContext(AppCommon);
+    const {setPageLoading, injectedEth} = useContext(AppCommon);
 
     const onChainWalletAddressExists = useMemo(() => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS, [onChainWalletAddress]);
 
     const checkIfOnChainWalletExists = async () => {
-        await sleep(1000); //todo @Anto Onload behavior is random. So had to add some sleep here. Please check
         if (typeof window !== 'undefined' && window.web3?.eth && account) {
             const bitStakeRegistryInstance = new window.web3.eth.Contract(
                 bitStakeRegistryABI,
                 bitStakeRegistry
             );
             const walletAddress = await bitStakeRegistryInstance.methods.proxies(account).call();
-            console.log('walletAddress  '+ walletAddress);
             setOnChainWalletAddress(walletAddress);
         }
     };
@@ -39,14 +37,14 @@ export const useBitstake = () => {
         if (account) {
             checkIfOnChainWalletExists();
         }
-    }, [account]);
+    }, [injectedEth]);
 
 
     const delegate = useCallback(async (indexerId: string, amount: string) => {
         if (typeof window !== 'undefined' && account) {
             const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
             const grtERC20Instance = new window.web3.eth.Contract(erc20Abi, graphToken);
-            await grtERC20Instance.methods.approve('0x33121d2246bbca5b04bb09f565d90ee9d68ecb78', amount).send({
+            await grtERC20Instance.methods.approve(onChainWalletAddress, amount).send({
                 from: account,
                 gas: 300000,
             });
@@ -54,7 +52,7 @@ export const useBitstake = () => {
                 indexerId,
                 amount
             ).encodeABI();
-            const userWalletInstance = new window.web3.eth.Contract(userWalletRegistryAbi, '0x33121d2246bbca5b04bb09f565d90ee9d68ecb78');
+            const userWalletInstance = new window.web3.eth.Contract(userWalletRegistryAbi, onChainWalletAddress);
             await userWalletInstance.methods.executeMulti(
                 [graphProtocol],
                 [data],
@@ -65,12 +63,10 @@ export const useBitstake = () => {
                 gas: 300000,
             });
         }
-    }, [account]);
+    }, [account, onChainWalletAddress]);
 
     const deployOnChainWallet = useCallback(async () => {
         try {
-            console.log('window  '+typeof window !== 'undefined');
-            console.log('account  '+account);
             if (typeof window !== 'undefined' && account) {
                 const bitStakeRegistryInstance = new window.web3.eth.Contract(
                     bitStakeRegistryABI,
@@ -92,8 +88,6 @@ export const useBitstake = () => {
 
             }
         } catch (e) {
-            console.log('deploy on chain wallet error');
-            console.log(e);
             setPageLoading?.(false);
         }
     }, [account, checkIfOnChainWalletExists]);
@@ -152,7 +146,7 @@ export const useBitstake = () => {
 
 
     // It will be called whenever user changes amount in the field in `swap and stake` tab.
-    const getEstimatedSwapAmount = useCallback(async (sourceToken: string, destinationToken: string, swapAmount: string, slippage: string) => {
+    const getEstimatedSwapAmount = useCallback(async (sourceToken: string, destinationToken: string, swapAmount: string, slippage: string = '1') => {
 
         const request = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${sourceToken}&toTokenAddress=${destinationToken}&amount=${swapAmount}&slippage=${slippage}&fromAddress=${onChainWalletAddress}&disableEstimate=true`;
 
@@ -178,5 +172,7 @@ export const useBitstake = () => {
         onChainWalletAddress,
         onChainWalletAddressExists,
         deployOnChainWallet,
+        swapAndStake,
+        getEstimatedSwapAmount,
     }
 }

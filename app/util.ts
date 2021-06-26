@@ -60,3 +60,7 @@ export const formatToken = (str: string) => {
   return `${(base / 10 ** 6).toFixed(2)}M`;
 };
 
+
+export const createMetamaskTokenUrl = (str: string) => {
+  return `https://raw.githubusercontent.com/MetaMask/contract-metadata/master/images/${str}`;
+}

@@ -15,11 +15,6 @@ export const useConnectAccount = () => {
     // initialize metamask onboarding
     const onboarding = useRef<MetaMaskOnboarding>();
 
-    useEffect(() => {
-        onboarding.current = new MetaMaskOnboarding();
-    }, []);
-
-    // manage connecting state for injected connector
     const [connecting, setConnecting] = useState(false);
     useEffect(() => {
         if (active || error) {

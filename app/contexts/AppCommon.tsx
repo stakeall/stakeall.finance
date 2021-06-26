@@ -5,6 +5,8 @@ interface AppCommonData {
     setPageLoading: (loading: boolean) => void,
     validator: string,
     setValidator: (validator: string) => void,
+    injectedEth: boolean,
+    setInjectedEth: (injected: boolean) => void,
 }
 
 export const AppCommon = React.createContext<Partial<AppCommonData>>({});
