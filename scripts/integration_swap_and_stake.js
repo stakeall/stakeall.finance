@@ -7,29 +7,27 @@ const UserWallet = require('../artifacts/contracts/BitStakerRegistry.sol/UserWal
 const ERC20 = require('../artifacts/contracts/IERC20Interface.sol/IERC20Interface.json');
 const OneInch = require('../artifacts/contracts/protocols/1inch/1Inch.sol/OneInch.json');
 const GraphProtocol = require('../artifacts/contracts/protocols/graph-protocol/GraphProtocol.sol/GraphProtocol.json');
-const ContractAddresses = require('../localhost_contract.json');
+const ContractAddresses = require('../mainnetfork_contract.json');
 const AaveProtocolArtifacts = require('../artifacts/contracts/protocols/aave/ConnectV2AaveV2.sol/AaveResolver.json');
 
 const perform = async () => {
 
     const privateKey = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-    const web3 = new Web3('http://localhost:8545');
+    const web3 = new Web3('http://35.208.215.170:8080');
     const account = web3.eth.accounts.privateKeyToAccount(privateKey)
     web3.eth.accounts.wallet.add(account);
 
-    const aaveProtocolAddress = ContractAddresses.AAVEProtocol;
-
-    const aaveInstance = new web3.eth.Contract(AaveProtocolArtifacts.abi, aaveProtocolAddress);
-
+    const balance = await web3.eth.getBalance(account.address);
+    console.log(balance);
     const borrowTokenAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
     const sourceToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
     const amount = '1000000000000000000';
-    const borrowAmount = '1000000000';
-    const rateMode = '1';
     const slippage = 1;
     const destinationToken = '0xc944e90c64b2c07662a292be6244bdf05cda44a7';
     const fromAddress = account.address;
     const indexer = '0x85fe868adf7f5950b052469075556fb207e5372d';
+    const getId = 1;
+    const setId = 1;
 
     const borrowERC20Instance = new web3.eth.Contract(ERC20.abi, borrowTokenAddress);
     const destinationTokenERC20Instance = new web3.eth.Contract(ERC20.abi, destinationToken);
@@ -66,7 +64,9 @@ const perform = async () => {
         destinationToken,
         swapResponse.data.tx.to,
         swapResponse.data.tx.data,
-        amount
+        amount,
+        0,
+        setId
     ).encodeABI();
 
     // One Inch finish
@@ -77,7 +77,8 @@ const perform = async () => {
     const graphInstance = new web3.eth.Contract(GraphProtocol.abi, ContractAddresses.GraphProtocol);
     const graphProtocolEncodedData = graphInstance.methods.delegate(
         indexer,
-        "100971045019998194761" 
+        "100971045019998194761" ,
+        getId
     ).encodeABI();
     // Graph Protocol
 
@@ -106,6 +107,7 @@ const perform = async () => {
     abiDecoder.addABI(OneInch.abi);
     abiDecoder.addABI(AaveProtocolArtifacts.abi);
     abiDecoder.addABI(UserWallet.abi);
+    abiDecoder.addABI(GraphProtocol.abi);
 
     const receipt = await web3.eth.getTransactionReceipt(executeReceipt.transactionHash);
     const decodedLogs = abiDecoder.decodeLogs(receipt.logs);

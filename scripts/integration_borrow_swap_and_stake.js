@@ -7,13 +7,13 @@ const UserWallet = require('../artifacts/contracts/BitStakerRegistry.sol/UserWal
 const ERC20 = require('../artifacts/contracts/IERC20Interface.sol/IERC20Interface.json');
 const OneInch = require('../artifacts/contracts/protocols/1inch/1Inch.sol/OneInch.json');
 const GraphProtocol = require('../artifacts/contracts/protocols/graph-protocol/GraphProtocol.sol/GraphProtocol.json');
-const ContractAddresses = require('../localhost_contract.json');
+const ContractAddresses = require('../mainnetfork_contract.json');
 const AaveProtocolArtifacts = require('../artifacts/contracts/protocols/aave/ConnectV2AaveV2.sol/AaveResolver.json');
 
 const perform = async () => {
 
     const privateKey = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-    const web3 = new Web3('http://localhost:8545');
+    const web3 = new Web3('http://35.208.215.170:8080');
     const account = web3.eth.accounts.privateKeyToAccount(privateKey)
     web3.eth.accounts.wallet.add(account);
 
