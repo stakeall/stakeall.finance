@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {useWeb3React} from "@web3-react/core";
 import {Theme} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
@@ -8,7 +7,7 @@ import Grid from "@material-ui/core/Grid";
 import {covalent} from "../api/api";
 import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
-import { useWeb3ReactWrapper } from "../util";
+import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({

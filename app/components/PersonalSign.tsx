@@ -1,13 +1,12 @@
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import {useWeb3React} from "@web3-react/core";
 import usePersonalSign from "../hooks/usePersonalSign";
 import {verifyMessage} from "@ethersproject/wallet";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
-import { useWeb3ReactWrapper } from "../util";
+import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
 
 const usePersonalSignStyles = makeStyles((theme: Theme) =>
     createStyles({

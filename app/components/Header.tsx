@@ -4,7 +4,6 @@ import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {Account} from "./Account";
-import {useWeb3React} from "@web3-react/core";
 import {ClientOnly} from "./ClientOnly";
 
 const useHeaderStyles = makeStyles((theme: Theme) =>

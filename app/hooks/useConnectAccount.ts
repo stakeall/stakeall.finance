@@ -1,9 +1,8 @@
-import {useWeb3React} from "@web3-react/core";
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import MetaMaskOnboarding from "@metamask/onboarding";
 import {injected} from "../connectors";
 import {UserRejectedRequestError} from "@web3-react/injected-connector";
-import { useWeb3ReactWrapper } from "../util";
+import {useWeb3ReactWrapper} from "./useWeb3ReactWrapper";
 
 export const useConnectAccount = () => {
     const {

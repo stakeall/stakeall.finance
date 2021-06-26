@@ -1,6 +1,5 @@
 import type { BigNumberish } from "@ethersproject/bignumber";
 import { formatUnits } from "@ethersproject/units";
-import { useWeb3React } from "@web3-react/core";
 
 export function shortenHex(hex?: string | null, length = 4) {
   if (!hex) return "";
@@ -61,14 +60,3 @@ export const formatToken = (str: string) => {
   return `${(base / 10 ** 6).toFixed(2)}M`;
 };
 
-// Using fork useWeb3React was not returning account and chainID. Had to write wrapper 
-export const useWeb3ReactWrapper = () => {
-  const account = useWeb3React().account || (typeof window !== 'undefined' && window.ethereum && window.ethereum.selectedAddress);
-  const chainId = useWeb3React().chainId || (typeof window !== 'undefined' && window.ethereum && window.ethereum.networkVersion);
-
-  return {
-    ...useWeb3React(),
-    account,
-    chainId,
-  };
-};

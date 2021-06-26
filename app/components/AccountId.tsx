@@ -1,9 +1,9 @@
-import {shortenHex, useWeb3ReactWrapper} from "../util";
+import {shortenHex} from "../util";
 import useENSName from "../hooks/useENSName";
-import {useWeb3React} from "@web3-react/core";
 import {Typography} from "@material-ui/core";
 import {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
+import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
 
 export const AccountId = () => {
     const {

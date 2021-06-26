@@ -1,6 +1,5 @@
 import {useMemo} from "react";
 import type {Web3Provider} from "@ethersproject/providers";
-import {useWeb3React} from "@web3-react/core";
 import useETHBalance from "../hooks/useETHBalance";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -8,6 +7,7 @@ import {isConnected} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";
+import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
 
 
 const useBalanceStyles = makeStyles((theme: Theme) =>
@@ -19,7 +19,7 @@ const useBalanceStyles = makeStyles((theme: Theme) =>
 )
 const ETHBalance = () => {
     const classes = useBalanceStyles();
-    const {account, library} = useWeb3React<Web3Provider>();
+    const {account, library} = useWeb3ReactWrapper<Web3Provider>();
     const {data} = useETHBalance(account);
 
     const isAccountConnected = useMemo(() => isConnected(account, library), [account, library]);

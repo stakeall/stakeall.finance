@@ -3,12 +3,11 @@ import {erc20Abi} from "../abi/erc20";
 import {graphProtocolAbi} from "../abi/graphProtocolRegistry";
 import {bitStakeRegistryABI} from "../abi/bitStakeRegistry";
 import {oneInchRegistryABI} from "../abi/oneInchRegistry";
-import {useWeb3React} from "@web3-react/core";
 import {userWalletRegistryAbi} from "../abi/userWalletRegistry";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import {oneInchApi} from "../api/api";
-import { useWeb3ReactWrapper } from "../util";
+import {useWeb3ReactWrapper} from "./useWeb3ReactWrapper";
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
