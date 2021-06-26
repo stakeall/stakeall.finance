@@ -13,6 +13,7 @@ import TextField from "@material-ui/core/TextField";
 import Box from "@material-ui/core/Box";
 import {Bitstake} from "../contexts/Bitstake";
 import {AppCommon} from "../contexts/AppCommon";
+import {BN} from "ethereumjs-util";
 
 
 const useSwapAndStakeStyles = makeStyles(() =>
@@ -49,10 +50,30 @@ export const SwapAndStake = () => {
     useEffect(() => {
 
         const getEstimate = async () => {
-            const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id, graphToken, amount)
-            setEstimatedAmount(estimated);
+            console.log('test ====== ', new BN(10).pow(new BN(-1)).toString());
+            const [whole, fractional] = amount.split('.');
+            const convertedAmount = new BN(whole)
+                .add(
+                    new BN(fractional || 0)
+                    .mul(
+                        new BN(10)
+                        .pow(new BN(-1 * fractional?.length || 1))
+                    )
+                )
+                .mul(
+                    new BN(10)
+                    .pow(new BN(tokenDetails?.decimals || 1)));
+
+            console.log({convertedAmount: convertedAmount.toString()});
+            const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', graphToken, convertedAmount.toString());
+            console.log({estimated});
+            const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1) ));
+            console.log({convertedEstimated: convertedEstimated.toString()});
+            setEstimatedAmount(convertedEstimated.toString() || '');
         }
-        getEstimate();
+        if(amount && tokenDetails) {
+            getEstimate();
+        }
     }, [amount, tokenDetails]);
 
     return (
