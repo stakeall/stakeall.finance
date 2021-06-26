@@ -1,8 +1,26 @@
-pragma solidity ^0.5.2;
+pragma experimental ABIEncoderV2;
 
 import "../../IERC20Interface.sol";
+import "../../helpers/Basic.sol";
 
 interface IGraphProtocolInterface {
+
+    function delegate(address _indexer, uint256 _tokens)
+        payable
+        external
+        returns (uint256 shares_);
+
+    function undelegate(address _indexer, uint256 _shares)
+        external
+        returns (uint256 tokens_);
+
+    function withdrawDelegated(address _indexer, address _delegateToIndexer)
+        external
+        returns (uint256 tokens_);
+}
+
+contract GraphProtocol is  Basic {
+
     event GraphProtocolDelegated(
         address _indexer,
         uint256 _amount,
@@ -19,21 +37,6 @@ interface IGraphProtocolInterface {
         uint256 _tokens
     );
 
-    function delegate(address _indexer, uint256 _tokens)
-        payable
-        external
-        returns (uint256 shares_);
-
-    function undelegate(address _indexer, uint256 _shares)
-        external
-        returns (uint256 tokens_);
-
-    function withdrawDelegated(address _indexer, address _delegateToIndexer)
-        external
-        returns (uint256 tokens_);
-}
-
-contract GraphProtocol is IGraphProtocolInterface {
     IGraphProtocolInterface public constant graphProxy =
         IGraphProtocolInterface(0xF55041E37E12cD407ad00CE2910B8269B01263b9);
     IERC20Interface public constant grtTokenAddress =
@@ -41,12 +44,13 @@ contract GraphProtocol is IGraphProtocolInterface {
 
     event LogDelegate(address _graphProxy, address _grtTokenAddress);
 
-    function delegate(address _indexer, uint256 _tokens)
+    function delegate(address _indexer, uint256 _tokens, uint256 getId)
         public
         payable
         returns (uint256 shares_)
     {
-        shares_ = _delegate(_indexer, _tokens);
+        uint256 tokens = getUint(getId, _tokens);
+        shares_ = _delegate(_indexer, tokens);
     }
 
     function _delegate(address _indexer, uint256 _tokens)
@@ -59,14 +63,16 @@ contract GraphProtocol is IGraphProtocolInterface {
         emit GraphProtocolDelegated(_indexer, _tokens, shares_);
     }
 
-    function undelegate(address _indexer, uint256 _shares)
+    function undelegate(address _indexer, uint256 _shares, uint getId)
         public
         returns (uint256 tokens_)
     {
-        tokens_ = graphProxy.undelegate(_indexer, _shares);
+        uint256 shares = getUint(getId, _shares);
+        tokens_ = graphProxy.undelegate(_indexer, shares);
         emit GraphProtocolDelegated(_indexer, tokens_, _shares);
     }
 
+    
     function withdrawDelegated(address _indexer, address _delegateToIndexer)
         public
         returns (uint256 tokens_)

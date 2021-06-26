@@ -16,18 +16,21 @@ contract OneInch is Basic {
         address _destinationToken,
         address _to,
         bytes memory _callData,
-        uint256 _value
+        uint256 _value,
+        uint256 getId,
+        uint256 setId
     ) public payable returns (uint256 _swappedAmount) {
    
+        uint256 amount = getUint(getId, _amount);
         _swappedAmount = _swap(
-            _amount,
+             amount,
             _sourceToken,
             _destinationToken,
             _to,
             _callData,
             _value
         );
-
+       setUint(setId, _swappedAmount);
     }
 
     function _swap(

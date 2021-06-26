@@ -4,6 +4,11 @@ import "./DSMath.sol";
 import "../IERC20Interface.sol";
 import "../protocols/aave/AAVEInterface.sol";
 
+interface BitStakeMemoryInterface {
+    function getUint(uint id) external returns (uint num);
+    function setUint(uint id, uint val) external;
+}
+
 abstract contract Stores {
 
   /**
@@ -19,6 +24,18 @@ abstract contract Stores {
     // Testnet
 //   address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
 
+  BitStakeMemoryInterface constant internal bitStakeMemory = BitStakeMemoryInterface(0x172076E0166D1F9Cc711C77Adf8488051744980C);
+
+  function getUint(uint getId, uint val) internal returns (uint returnVal) {
+    returnVal = getId == 0 ? val : bitStakeMemory.getUint(getId);
+  }
+
+  /**
+  * @dev Set Uint value in InstaMemory Contract.
+  */
+  function setUint(uint setId, uint val) virtual internal {
+    if (setId != 0) bitStakeMemory.setUint(setId, val);
+  }
 }
 
 

@@ -75,9 +75,11 @@ abstract contract AaveResolver is Events, Helpers {
     */
     function deposit(
         address token,
-        uint256 amt
+        uint256 amt,
+        uint256 setId
     ) public payable returns (uint256 amount_, address token_) {
 
+        uint _amt = amt;
         AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
@@ -86,27 +88,19 @@ abstract contract AaveResolver is Events, Helpers {
         IERC20Interface tokenContract = IERC20Interface(_token);
 
         if (isEth) {
-            amt = amt == uint(-1) ? address(this).balance : amt;
-            convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), amt);
+            _amt = _amt == uint(-1) ? address(this).balance : _amt;
+            convertEthToWeth(isEth, AAVEInterface(address(tokenContract)), _amt);
         } else {
-            amt = amt == uint(-1) ? tokenContract.balanceOf(address(this)) : amt;
+            _amt = _amt == uint(-1) ? tokenContract.balanceOf(address(this)) : _amt;
         }
 
-        tokenContract.approve(address(aave), amt);
+        tokenContract.approve(address(aave), _amt);
 
-        aave.deposit(_token, amt, address(this), referralCode);
+        aave.deposit(_token, _amt, address(this), referralCode);
 
-        amount_ = amt;
+        amount_ = _amt;
         token_ = _token;
-
-        // if (!getIsColl(_token)) {
-        //     aave.setUserUseReserveAsCollateral(_token, true);
-        // }
-
-        // setUint(setId, _amt);
-
-        // _eventName = "LogDeposit(address,uint256,uint256,uint256)";
-        // _eventParam = abi.encode(token, _amt, getId, setId);
+        setUint(setId, _amt);
     }
 
     /**
@@ -119,20 +113,21 @@ abstract contract AaveResolver is Events, Helpers {
     function borrow(
         address token,
         uint256 amt,
-        uint256 rateMode
+        uint256 rateMode,
+        uint256 getId,
+        uint256 setId
     ) public payable {
-        // uint _amt = getUint(getId, amt);
+        uint _amt = getUint(getId, amt);
 
         AaveProtocolInterface aave = AaveProtocolInterface(aaveProvider.getLendingPool());
 
         bool isEth = token == ethAddr;
         address _token = isEth ? wethAddr : token;
 
-        aave.borrow(_token, amt, rateMode, referralCode, address(this));
-        convertWethToEth(isEth, IERC20Interface(_token), amt);
+        aave.borrow(_token, _amt, rateMode, referralCode, address(this));
+        convertWethToEth(isEth, IERC20Interface(_token), _amt);
 
-        // setUint(setId, _amt);
-
+        setUint(setId, _amt);
         // _eventName = "LogBorrow(address,uint256,uint256,uint256,uint256)";
         // _eventParam = abi.encode(token, _amt, rateMode, getId, setId);
     }
@@ -142,12 +137,14 @@ abstract contract AaveResolver is Events, Helpers {
         address borrowToken,
         uint256 depositAmt,
         uint256 borrowAmt,
-        uint256 rateMode
+        uint256 rateMode,
+        uint256 getId,
+        uint256 setId
     ) 
         external payable
     {
-        deposit(depositToken, depositAmt);
-        borrow(borrowToken, borrowAmt, rateMode);
+        deposit(depositToken, depositAmt, setId);
+        borrow(borrowToken, borrowAmt, rateMode, getId, setId);
     }
 
     /**

@@ -30,6 +30,8 @@ const perform = async () => {
     const destinationToken = '0xc944e90c64b2c07662a292be6244bdf05cda44a7';
     const fromAddress = account.address;
     const indexer = '0x85fe868adf7f5950b052469075556fb207e5372d';
+    const getId = 1;
+    const setId = 1;
 
     const borrowERC20Instance = new web3.eth.Contract(ERC20.abi, borrowTokenAddress);
     const destinationTokenERC20Instance = new web3.eth.Contract(ERC20.abi, destinationToken);
@@ -41,7 +43,9 @@ const perform = async () => {
         borrowTokenAddress,
         amount,
         borrowAmount,
-        rateMode
+        rateMode,
+        0,
+        setId
     ).encodeABI();
 
     console.log('aaveDepositAndBorrowEncodedData :', aaveDepositAndBorrowEncodedData);
@@ -66,7 +70,10 @@ const perform = async () => {
         destinationToken,
         swapResponse.data.tx.to,
         swapResponse.data.tx.data,
-        0
+        0,
+        getId,
+        setId
+        
     ).encodeABI();
 
     // One Inch finish
@@ -77,7 +84,8 @@ const perform = async () => {
     const graphInstance = new web3.eth.Contract(GraphProtocol.abi, ContractAddresses.GraphProtocol);
     const graphProtocolEncodedData = graphInstance.methods.delegate(
         indexer,
-        swapResponse.data.toTokenAmount
+        swapResponse.data.toTokenAmount,
+        getId
     ).encodeABI();
     // Graph Protocol
 
@@ -89,12 +97,12 @@ const perform = async () => {
         1,
         1
     );
-    const gas = await transaction.estimateGas({
-        from: fromAddress,
-        value: amount
-    });
+    // const gas = await transaction.estimateGas({
+    //     from: fromAddress,
+    //     value: amount
+    // });
 
-    console.log('gas : ', gas);
+    // console.log('gas : ', gas);
 
     const executeReceipt = await transaction.send({
         from: fromAddress,
@@ -104,10 +112,12 @@ const perform = async () => {
         console.log(" approval hash " + hash);
     });
 
+    console.log(executeReceipt);
 
     abiDecoder.addABI(OneInch.abi);
     abiDecoder.addABI(AaveProtocolArtifacts.abi);
     abiDecoder.addABI(UserWallet.abi);
+    abiDecoder.addABI(GraphProtocol.abi);
 
     const receipt = await web3.eth.getTransactionReceipt(executeReceipt.transactionHash);
     const decodedLogs = abiDecoder.decodeLogs(receipt.logs);

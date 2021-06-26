@@ -13,7 +13,8 @@
     "deploy-all-rinkeby": "npx hardhat run scripts/deploy_all_contract.js --network rinkeby --show-stack-traces",
     "deploy-all-kovan": "npx hardhat run scripts/deploy_all_contract.js --network kovan --show-stack-traces",
     "deploy-all-fork": "npx hardhat run scripts/deploy_all_contract.js --network mainnetfork --show-stack-traces",
-    "start-mainnet-fork": "npx hardhat node"
+    "start-mainnet-fork": "npx hardhat node",
+    "deploy_memory_on_fork": "npx hardhat run scripts/deploy_bitstake_memory.js --network mainnetfork --show-stack-traces"
   },
   "repository": {
     "type": "git",
