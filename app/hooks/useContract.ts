@@ -1,13 +1,14 @@
 import { Contract, ContractInterface } from "@ethersproject/contracts";
 import { useWeb3React } from "@web3-react/core";
 import { useMemo } from "react";
+import { useWeb3ReactWrapper } from "../util";
 
 export default function useContract(
   address: string,
   ABI: ContractInterface,
   withSigner = false
 ) {
-  const { library, account } = useWeb3React();
+  const { library, account } = useWeb3ReactWrapper();
 
   return useMemo(
     () =>

@@ -1,4 +1,4 @@
-import {shortenHex} from "../util";
+import {shortenHex, useWeb3ReactWrapper} from "../util";
 import useENSName from "../hooks/useENSName";
 import {useWeb3React} from "@web3-react/core";
 import {Typography} from "@material-ui/core";
@@ -8,7 +8,7 @@ import {Bitstake} from "../contexts/Bitstake";
 export const AccountId = () => {
     const {
         account,
-    } = useWeb3React();
+    } = useWeb3ReactWrapper();
     const { onChainWalletAddress } = useContext(Bitstake);
 
     const ENSName = useENSName(account);

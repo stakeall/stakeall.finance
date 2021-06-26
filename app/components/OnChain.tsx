@@ -34,7 +34,7 @@ export const OnChain = () => {
                 onClick={() => { setModalOpen(true)}}
                 variant="outlined"
             >
-                Connect OnChain
+                Create Account
             </Button>
             {modalOpen && (
                 <AccountConnectModal

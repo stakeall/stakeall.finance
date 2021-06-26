@@ -9,6 +9,7 @@ import {OnChain} from "./OnChain";
 import {AccountId} from "./AccountId";
 import {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
+import { useWeb3ReactWrapper } from "../util";
 
 type Props = {
     triedToEagerConnect: boolean;
@@ -22,7 +23,7 @@ const useAccountStyles = makeStyles(() =>
 
 export const Account = () => {
     const classes = useAccountStyles();
-    const {account, error} = useWeb3React();
+    const {account, error} = useWeb3ReactWrapper()
     const {hasMetaMaskOrWeb3Available, onMetaMaskConnect, installMetamask} = useConnectAccount();
     const {
         onChainWalletAddressExists,

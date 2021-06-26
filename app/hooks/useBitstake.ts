@@ -8,21 +8,30 @@ import {userWalletRegistryAbi} from "../abi/userWalletRegistry";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import {oneInchApi} from "../api/api";
+import { useWeb3ReactWrapper } from "../util";
+
+function sleep(ms: number) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
 
 export const useBitstake = () => {
-    const {account} = useWeb3React()
+    const {account} = useWeb3ReactWrapper()
     const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>('');
     const {setPageLoading} = useContext(AppCommon);
 
     const onChainWalletAddressExists = useMemo(() => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS, [onChainWalletAddress]);
 
     const checkIfOnChainWalletExists = async () => {
+        await sleep(1000); //todo @Anto Onload behavior is random. So had to add some sleep here. Please check
         if (typeof window !== 'undefined' && window.web3?.eth && account) {
             const bitStakeRegistryInstance = new window.web3.eth.Contract(
                 bitStakeRegistryABI,
                 bitStakeRegistry
             );
             const walletAddress = await bitStakeRegistryInstance.methods.proxies(account).call();
+            console.log('walletAddress  '+ walletAddress);
             setOnChainWalletAddress(walletAddress);
         }
     };
@@ -83,6 +92,7 @@ export const useBitstake = () => {
             }
         } catch (e) {
             console.log('deploy on chain wallet error');
+            console.log(e);
             setPageLoading?.(false);
         }
     }, [account, checkIfOnChainWalletExists]);

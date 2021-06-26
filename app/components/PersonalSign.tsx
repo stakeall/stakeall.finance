@@ -7,6 +7,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
+import { useWeb3ReactWrapper } from "../util";
 
 const usePersonalSignStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -19,7 +20,7 @@ const usePersonalSignStyles = makeStyles((theme: Theme) =>
 
 export const PersonalSign = () => {
     const classes = usePersonalSignStyles();
-    const { account } = useWeb3React();
+    const { account } = useWeb3ReactWrapper();
     const sign = usePersonalSign();
 
     const handleSign = async () => {

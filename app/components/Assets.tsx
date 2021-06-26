@@ -3,19 +3,12 @@ import {useWeb3React} from "@web3-react/core";
 import {Theme} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
-import TableContainer from "@material-ui/core/TableContainer";
-import Paper from "@material-ui/core/Paper";
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 
 import {covalent} from "../api/api";
 import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
+import { useWeb3ReactWrapper } from "../util";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -57,7 +50,7 @@ const headers = [
 
 export const Assets = () => {
     const classes = useAssetStyles();
-    const {account, chainId} = useWeb3React();
+   const {account, chainId} = useWeb3ReactWrapper();
     const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
 
     const mapToAssets = useCallback((balances: BalanceResponse) => {
