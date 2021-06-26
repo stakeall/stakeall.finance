@@ -1,5 +1,7 @@
 import axios, {AxiosResponse} from "axios";
+import { getDefaultContractAddress } from "../constants/contractMap";
 import {BalanceResponse} from "../types/Covalent";
+import { BalanceDetailsMap, getAddressBalances } from "../util";
 
 const covalentKey = 'ckey_1291e35627894f6a92e8c0283ac';
 const covalentBaseUrl = 'https://api.covalenthq.com';
@@ -12,11 +14,14 @@ const api = axios.create({
 })
 
 export const covalent = {
-    getAllBalance: (chainId: string | number, address: string) => {
+    getAllBalance: async (chainId: string | number, address: string): Promise<BalanceDetailsMap> => {
         if(chainId == 31337) {
             chainId = 1;
         }
-        return api.get<{}, BalanceResponse>(`${covalentBaseUrl}/v1/${chainId}/address/${address}/balances_v2/?&key=${covalentKey}`)
+        const result = await getAddressBalances(address);
+        return result;
+        //console.log(result);
+       // return api.get<{}, BalanceResponse>(`${covalentBaseUrl}/v1/${chainId}/address/${address}/balances_v2/?&key=${covalentKey}`)
     },
 
 }

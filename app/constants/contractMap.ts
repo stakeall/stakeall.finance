@@ -1,8 +1,8 @@
-import metamaskContractMap from '@metamask/contract-metadata';
+const metamaskContractMap = require('@metamask/contract-metadata');
 import {ETH_TOKEN} from "./contracts";
 
 
-type InitalContractMap = {
+export type InitalContractMap = {
     [key: string]: {
         name: string,
         erc20: boolean,
@@ -44,3 +44,8 @@ export const contractMap: ContractMap = Object.keys(contractMapInitial).reduce((
         }
     }
 }, {});
+
+
+export const getDefaultContractAddress = (): InitalContractMap => {
+    return metamaskContractMap as InitalContractMap;
+}

@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
+import BN from "bn.js";
 import {Theme} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
@@ -8,6 +9,7 @@ import {covalent} from "../api/api";
 import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
+import { BalanceDetailsMap } from "../util";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -47,19 +49,30 @@ const headers = [
     },
 ] as const;
 
+
+const formatBalance = (balance: string, decimal: number) => {
+    const base = new BN(10).pow(new BN(decimal));
+    const dm = new BN(balance).divmod(base);
+    return parseFloat(dm.div + "." + dm.mod.toString(10, decimal)).toFixed(3);
+}
+
 export const Assets = () => {
     const classes = useAssetStyles();
    const {account, chainId} = useWeb3ReactWrapper();
     const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
 
-    const mapToAssets = useCallback((balances: BalanceResponse) => {
-        return balances.data.data.items.map((item, index) => ({
-            logo: <img className={classes.logo} src={item.logo_url} alt={item.contract_name}/>,
-            name: item.contract_name,
-            quantity: (parseFloat(item.balance) / (10 ^ item.contract_decimals)).toString(),
-            price: item.quote_rate,
-            usdValue: item.quote,
-        }));
+    const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
+        return Object.keys(balances).map((it, index) => {
+            const item = balances[it];
+            console.log(item);
+            return {
+                logo: <img className={classes.logo} src={item.imgSrc} alt={item.name}/>,
+                name: item.name,
+                quantity: formatBalance(item.balance || '0', item.decimals),
+                price: 0,//item.quote_rate,
+                usdValue: 0//item.quote,
+            }
+        });
     }, [classes]);
 
     useEffect(() => {
@@ -71,7 +84,7 @@ export const Assets = () => {
             fetchBalances(account, chainId);
         }
 
-    }, [account, chainId])
+    }, [account, chainId, window.web3])
 
 
     return (
