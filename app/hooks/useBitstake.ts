@@ -70,6 +70,8 @@ export const useBitstake = () => {
 
     const deployOnChainWallet = useCallback(async () => {
         try {
+            console.log('window  '+typeof window !== 'undefined');
+            console.log('account  '+account);
             if (typeof window !== 'undefined' && account) {
                 const bitStakeRegistryInstance = new window.web3.eth.Contract(
                     bitStakeRegistryABI,
