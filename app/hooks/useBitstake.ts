@@ -162,6 +162,17 @@ export const useBitstake = () => {
 
     }, [onChainWalletAddress]);
 
+  const getTokenBalance = useCallback(async (tokenAddress: string) => {
+
+    if(tokenAddress === ETH_TOKEN) {
+      return window.web3.eth.getBalance(account);
+    } 
+    else {
+      const erc20Instance = new new window.web3.eth.Contract(erc20Abi, tokenAddress);
+      return erc20Instance.methods.balanceOf(account);
+    }
+  }, [account]);
+
     return {
         delegate,
         onChainWalletAddress,
