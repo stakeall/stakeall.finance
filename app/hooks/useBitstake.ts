@@ -148,16 +148,15 @@ export const useBitstake = () => {
             1 // setId
         ).encodeABI();
 
-        console.log({sourceToken, destinationToken, graphProtocol, oneInch});
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
         const graphProtocolEncodedData = graphInstance.methods.delegate(
             indexer,
-            new BN(swapAmount).mul(new BN(9)).div(new BN(10)),//"100971045019998194761",
+            new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(),//"100971045019998194761",
             1 // getId
         ).encodeABI();
 
         const transaction = userWalletInstance.methods.executeMulti(
-            [oneInch, graphToken],
+            [oneInch, graphProtocol],
             [swapTransactionEncodedData, graphProtocolEncodedData],
             1,
             1
