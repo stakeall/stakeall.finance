@@ -10,7 +10,7 @@ import {AppCommon} from "../contexts/AppCommon";
 import {Paper} from "@material-ui/core";
 import useETHBalance from "../hooks/useETHBalance";
 import {Web3Provider} from "@ethersproject/providers";
-import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
+import {useWeb3React} from "@web3-react/core";
 
 
 const useWalletStakeStyles = makeStyles((theme) =>
@@ -38,7 +38,7 @@ export const WalletStake: React.FC = () => {
     const {delegate} = useContext(Bitstake);
     const [amount, setAmount] = useState<string>('');
     const [clicked, setClicked] = useState<boolean>(true);
-    const {account} = useWeb3ReactWrapper<Web3Provider>();
+    const {account} = useWeb3React<Web3Provider>();
     const {data} = useETHBalance(account);
 
     useEffect(() => {

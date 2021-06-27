@@ -7,7 +7,8 @@ interface BitstakeContextData {
     onChainWalletAddress: string,
     onChainWalletAddressExists: boolean,
 
-    swapAndStake: (indexer: string, sourceToken: string, destinationToken: string, sourceTokenAmount: string, slippage?: string) => void
+    swapAndStake: (indexer: string, sourceToken: string, sourceTokenAmount: string, slippage?: string) => void
+
     getEstimatedSwapAmount: (sourceToken: string, destinationToken: string, swapAmount: string, slippage?: string) => Promise<string>
 }
 

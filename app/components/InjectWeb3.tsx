@@ -12,18 +12,17 @@ declare global {
 export const InjectWeb3 = () => {
     const { injectedEth, setInjectedEth } = useContext(AppCommon);
     const { account } = useWeb3React();
-
     useEffect(() => {
-        const ethEnabled = async () => {
+        const enableEth = async () => {
+            console.log('in enableEth', window.ethereum, injectedEth);
             if (window.ethereum && !injectedEth) {
-                await window.ethereum.send('eth_requestAccounts');
                 window.web3 = new Web3(window.ethereum);
                 setInjectedEth?.(true);
                 return true;
             }
             return false;
         }
-        ethEnabled();
+        enableEth();
     }, [account])
     return null;
 }

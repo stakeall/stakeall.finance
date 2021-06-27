@@ -1,13 +1,16 @@
-import {graphProtocol, graphToken, bitStakeRegistry, ZERO_ADDRESS, oneInch, ETH_TOKEN} from "../constants/contracts";
+import { graphProtocol, graphToken, bitStakeRegistry, ZERO_ADDRESS, oneInch, ETH_TOKEN, aaveProtocol} from "../constants/contracts";
 import {erc20Abi} from "../abi/erc20";
 import {graphProtocolAbi} from "../abi/graphProtocolRegistry";
 import {bitStakeRegistryABI} from "../abi/bitStakeRegistry";
 import {oneInchRegistryABI} from "../abi/oneInchRegistry";
+import { aaveProtocolABI} from "../abi/aaveProtocol";
 import {userWalletRegistryAbi} from "../abi/userWalletRegistry";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import {oneInchApi} from "../api/api";
-import {useWeb3ReactWrapper} from "./useWeb3ReactWrapper";
+import {Contract} from "@ethersproject/contracts";
+import {useWeb3React} from "@web3-react/core";
+import {injected} from "../connectors";
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
@@ -16,9 +19,9 @@ function sleep(ms: number) {
 }
 
 export const useBitstake = () => {
-    const {account} = useWeb3ReactWrapper()
+    const {active, account, library, chainId} = useWeb3React()
     const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>('');
-    const {setPageLoading, injectedEth} = useContext(AppCommon);
+    const {setPageInactive, setPageInactiveReason, setPageLoading} = useContext(AppCommon);
 
     const onChainWalletAddressExists = useMemo(() => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS, [onChainWalletAddress]);
 
@@ -34,10 +37,23 @@ export const useBitstake = () => {
     };
 
     useEffect(() => {
+        if(injected.supportedChainIds?.includes(chainId || -1)) {
+            setPageInactive?.(false);
+            setPageInactiveReason?.('');
+        }
+        else {
+            setPageInactive?.(true);
+            setPageInactiveReason?.('Unsupported Network');
+        }
+    }, [chainId, account])
+
+    useEffect(() => {
+        console.log({account});
         if (account) {
             checkIfOnChainWalletExists();
         }
-    }, [injectedEth]);
+    }, [account]);
+
 
 
     const delegate = useCallback(async (indexerId: string, amount: string) => {
@@ -50,7 +66,8 @@ export const useBitstake = () => {
             });
             const data = graphInstance.methods.delegate(
                 indexerId,
-                amount
+                amount,
+                0 // getId
             ).encodeABI();
             const userWalletInstance = new window.web3.eth.Contract(userWalletRegistryAbi, onChainWalletAddress);
             await userWalletInstance.methods.executeMulti(
@@ -90,18 +107,25 @@ export const useBitstake = () => {
         } catch (e) {
             setPageLoading?.(false);
         }
-    }, [account, checkIfOnChainWalletExists]);
+    }, [account, checkIfOnChainWalletExists, setPageLoading]);
 
 
-    const swapAndStake = useCallback(async (indexer: string, sourceToken: string, destinationToken: string, sourceTokenAmount: string, slippage: string = '1') => {
+    const swapAndStake = useCallback(async (indexer: string, sourceToken: string, sourceTokenAmount: string, slippage: string = '1') => {
+        const destinationToken = graphToken;
         if (sourceToken !== ETH_TOKEN) {
             // approval
 
-            const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
-            await sourceTokenInstance.methods.approve(onChainWalletAddress, sourceTokenAmount).send({
-                from: account,
-                gas: 300000,
-            });
+          const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
+
+          const approveTransaction = sourceTokenInstance.methods.approve(onChainWalletAddress, sourceTokenAmount);
+
+          const gasForApproval = approveTransaction.estimateGas();
+
+          await approveTransaction.send({
+            from: account,
+            gas: gasForApproval,
+          })
+
 
         }
 
@@ -118,13 +142,16 @@ export const useBitstake = () => {
             destinationToken,
             swapResponse.data.tx.to,
             swapResponse.data.tx.data,
-            sourceToken === ETH_TOKEN ? 0 : sourceTokenAmount
+            sourceToken === ETH_TOKEN ? sourceTokenAmount : 0,
+            0, // getId
+            1 // setId
         ).encodeABI();
 
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
         const graphProtocolEncodedData = graphInstance.methods.delegate(
             indexer,
-            swapAmount * 0.90//"100971045019998194761"
+            swapAmount * 0.90,//"100971045019998194761",
+            1 // getId
         ).encodeABI();
 
         const transaction = userWalletInstance.methods.executeMulti(
@@ -143,6 +170,78 @@ export const useBitstake = () => {
         setPageLoading?.(false);
 
     }, [account, onChainWalletAddress]);
+
+  const borrowSwapAndStake = useCallback(async (indexer: string, sourceToken: string, destinationToken: string, depositAmount: string, borrowAmount: string, borrowTokenAddress: string, rateMode: string, slippage: string = '1') => {
+    if (sourceToken !== ETH_TOKEN) {
+      // approval
+
+      const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
+
+      const approveTransaction = sourceTokenInstance.methods.approve(onChainWalletAddress, depositAmount);
+
+      const gasForApproval = approveTransaction.estimateGas();
+
+      await approveTransaction.send({
+        from: account,
+        gas: gasForApproval,
+      });
+
+    }
+
+    const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
+
+    const aaveDepositAndBorrowEncodedData = aaveInstance.methods.depositAndBorrow(
+      sourceToken,
+      borrowTokenAddress,
+      depositAmount,
+      borrowAmount,
+      rateMode,
+      0,
+      1 // setId
+    ).encodeABI();
+
+    const swapResponse = await oneInchApi.getSwapDetails(borrowTokenAddress, destinationToken, borrowAmount, slippage, onChainWalletAddress);
+
+    const userWalletInstance = new window.web3.eth.Contract(userWalletRegistryAbi, onChainWalletAddress);
+
+    const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
+
+    const swapAmount = swapResponse.data.toTokenAmount;
+    const swapTransactionEncodedData = oneInchProxy.methods.swap(
+      borrowAmount,
+      sourceToken,
+      destinationToken,
+      swapResponse.data.tx.to,
+      swapResponse.data.tx.data,
+      borrowTokenAddress === ETH_TOKEN ? borrowAmount : 0,
+      1, // getId
+      1 // setId
+    ).encodeABI();
+
+    const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
+    const graphProtocolEncodedData = graphInstance.methods.delegate(
+      indexer,
+      swapResponse.data.toTokenAmount,
+      1 // getId
+    ).encodeABI();
+
+    const transaction = userWalletInstance.methods.executeMulti(
+      [aaveProtocol, oneInch, graphProtocol],
+      [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, graphProtocolEncodedData],
+      1,
+      1
+    );
+
+    const estimatedGas = await transaction.estimateGas({ from: account });
+
+    setPageLoading?.(true);
+    await transaction.send({
+      from: account,
+      gas: estimatedGas
+    });
+    setPageLoading?.(false);
+
+  }, [account, onChainWalletAddress]);
 
 
     // It will be called whenever user changes amount in the field in `swap and stake` tab.

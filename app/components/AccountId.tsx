@@ -3,12 +3,12 @@ import useENSName from "../hooks/useENSName";
 import {Typography} from "@material-ui/core";
 import {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
-import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
+import {useWeb3React} from "@web3-react/core";
 
 export const AccountId = () => {
     const {
         account,
-    } = useWeb3ReactWrapper();
+    } = useWeb3React();
     const { onChainWalletAddress } = useContext(Bitstake);
 
     const ENSName = useENSName(account);
