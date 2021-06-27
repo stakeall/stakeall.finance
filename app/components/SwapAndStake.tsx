@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
 import {ETH_TOKEN, graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl} from "../util";
+import {createMetamaskTokenUrl, shortenHex} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
@@ -16,14 +16,16 @@ import {AppCommon} from "../contexts/AppCommon";
 import {BN} from "ethereumjs-util";
 
 
-const useSwapAndStakeStyles = makeStyles(() =>
+const useSwapAndStakeStyles = makeStyles((theme) =>
     createStyles({
         container: {
             padding: '50px',
             margin: '50px',
         },
         buttonContainer: {
-            width: '200px',
+        },
+        validator: {
+            padding: theme.spacing(5),
         },
     })
 )
@@ -82,7 +84,12 @@ export const SwapAndStake = () => {
         <>
             <Paper className={classes.container}>
                 <Grid container spacing={4} direction="column">
-                    <Button variant="outlined" color="secondary" onClick={() => setModalOpen(true)}>
+                    <Grid className={classes.validator}>
+                        <Typography variant="body1" color="secondary" id="modal-modal-description">
+                            Validator Id : {shortenHex(validator)}
+                        </Typography>
+                    </Grid>
+                    <Button variant="outlined" color="primary" onClick={() => setModalOpen(true)}>
                         <Grid
                             className={classes.buttonContainer}
                             direction="row"
@@ -91,7 +98,7 @@ export const SwapAndStake = () => {
                             justify="flex-start"
                             alignItems="center"
                         >
-                            <Grid item alignItems="center">
+                            <Grid item alignItems="center" justify="flex-start">
                                 <img
                                     height="40px"
                                     width="40px"

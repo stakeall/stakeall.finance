@@ -11,6 +11,7 @@ import {Paper} from "@material-ui/core";
 import useETHBalance from "../hooks/useETHBalance";
 import {Web3Provider} from "@ethersproject/providers";
 import {useWeb3React} from "@web3-react/core";
+import {shortenHex} from "../util";
 
 
 const useWalletStakeStyles = makeStyles((theme) =>
@@ -51,8 +52,8 @@ export const WalletStake: React.FC = () => {
     return (
         <Paper className={classes.walletContainer} elevation={2}>
             <Grid className={classes.validator}>
-                <Typography variant="h4" color="secondary" id="modal-modal-description">
-                    Validator Id : {validator}
+                <Typography variant="body1" color="secondary" id="modal-modal-description">
+                    Validator Id : {shortenHex(validator)}
                 </Typography>
             </Grid>
             <Grid className={classes.amount}>

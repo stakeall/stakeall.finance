@@ -85,8 +85,8 @@ export const Assets = () => {
 
     useEffect(() => {
         const fetchBalances = async (acc: string, ch: number) => {
-            const balances = await covalent.getAllBalance(ch, acc)
-            setBalances(mapToAssets(balances));
+            const balance = await covalent.getAllBalance(ch, acc)
+            setBalances(mapToAssets(balance));
         }
         if (account && chainId) {
             fetchBalances(account, chainId);

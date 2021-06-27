@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import {Modal} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -9,7 +9,9 @@ import Grid from "@material-ui/core/Grid";
 import {Bitstake} from "../contexts/Bitstake";
 import TextField from "@material-ui/core/TextField";
 import {contractMap} from "../constants/contractMap";
-import {createMetamaskTokenUrl} from "../util";
+import {BalanceDetailsMap, createMetamaskTokenUrl} from "../util";
+import {covalent} from "../api/api";
+import {useWeb3React} from "@web3-react/core";
 
 interface TokenSelectionModalProps {
     open: boolean;
@@ -52,14 +54,28 @@ const useTokenSelectionModalStyles = makeStyles((theme) =>
 )
 export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, handleClose, handleTokenChange}) => {
     const classes = useTokenSelectionModalStyles();
+    const { account, chainId } = useWeb3React();
     const [search, setSearch] = useState<string>('');
+    const [balances, setBalances] = useState<BalanceDetailsMap>();
 
     const filteredTokens = useMemo(() => {
+        console.log({filteredTokens});
         return Object.values(contractMap).filter(item => {
             return item.name?.toLowerCase().includes(search.toLowerCase()) ||
                 item.symbol?.toLowerCase().includes(search.toLowerCase());
         });
     }, [search]);
+
+    useEffect(() => {
+        const fetchBalances = async (acc: string, ch: number) => {
+            const balances = await covalent.getAllBalance(ch, acc)
+            setBalances(balances);
+        }
+        if (account && chainId) {
+            fetchBalances(account, chainId);
+        }
+
+    }, [account, chainId])
     return (
         <Modal
             open={open}
