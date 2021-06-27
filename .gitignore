@@ -105,5 +105,3 @@ dist
 .DS_Store
 artifacts/
 cache/
-artifacts/build-info
-artifacts/contracts
