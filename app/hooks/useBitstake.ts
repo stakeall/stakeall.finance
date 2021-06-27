@@ -208,13 +208,14 @@ export const useBitstake = () => {
     const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
 
     const swapAmount = swapResponse.data.toTokenAmount;
+    const ethvalue = borrowTokenAddress === ETH_TOKEN ? borrowAmount : 0;
     const swapTransactionEncodedData = oneInchProxy.methods.swap(
       borrowAmount,
-      sourceToken,
+      borrowTokenAddress,
       destinationToken,
       swapResponse.data.tx.to,
       swapResponse.data.tx.data,
-      borrowTokenAddress === ETH_TOKEN ? borrowAmount : 0,
+      ethvalue,
       1, // getId
       1 // setId
     ).encodeABI();
@@ -233,7 +234,7 @@ export const useBitstake = () => {
       1
     );
 
-    const estimatedGas = await transaction.estimateGas({ from: account });
+    const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
 
     setPageLoading?.(true);
     await transaction.send({
