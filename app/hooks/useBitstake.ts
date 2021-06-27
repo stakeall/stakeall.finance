@@ -11,6 +11,7 @@ import {oneInchApi} from "../api/api";
 import {Contract} from "@ethersproject/contracts";
 import {useWeb3React} from "@web3-react/core";
 import {injected} from "../connectors";
+import {BN} from "ethereumjs-util";
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
@@ -147,10 +148,11 @@ export const useBitstake = () => {
             1 // setId
         ).encodeABI();
 
+        console.log({sourceToken, destinationToken, graphProtocol, oneInch});
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
         const graphProtocolEncodedData = graphInstance.methods.delegate(
             indexer,
-            swapAmount * 0.90,//"100971045019998194761",
+            new BN(swapAmount).mul(new BN(9)).div(new BN(10)),//"100971045019998194761",
             1 // getId
         ).encodeABI();
 
