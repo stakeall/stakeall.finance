@@ -137,6 +137,7 @@ export type BalanceDetailsMap = {
     imgSrc?: string;
     logo?: string;
     balance?: string;
+    usdPrice?: string;
   };
 };
 
