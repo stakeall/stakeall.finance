@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import {covalent} from "../api/api";
 import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
-import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
+import {useWeb3React} from "@web3-react/core";
 import { BalanceDetailsMap } from "../util";
 import { parse } from "graphql";
 
@@ -66,7 +66,7 @@ const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):stri
 
 export const Assets = () => {
     const classes = useAssetStyles();
-   const {account, chainId} = useWeb3ReactWrapper();
+   const {account, chainId} = useWeb3React();
     const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
@@ -92,7 +92,7 @@ export const Assets = () => {
             fetchBalances(account, chainId);
         }
 
-    }, [account, chainId, window.web3])
+    }, [account, chainId])
 
 
     return (

@@ -4,6 +4,7 @@ import type {
     JsonRpcFetchFunc,
 } from "@ethersproject/providers";
 import {Web3Provider} from "@ethersproject/providers";
+import Web3 from 'web3'
 import {Web3ReactProvider} from "@web3-react/core";
 import type {AppProps} from "next/app";
 import {ApolloProvider} from "@apollo/client";
@@ -17,26 +18,31 @@ import {BitstakeProvider} from "../components/BitstakeProvider";
 import {AppCommonProvider} from "../components/AppCommonProvider";
 import {PageLoader} from "../components/PageLoader";
 import {Header} from "../components/Header";
+import {ClientOnly} from "../components/ClientOnly";
+import {InjectWeb3} from "../components/InjectWeb3";
 
 function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc) {
-    return new Web3Provider(provider);
+    return new Web3Provider(provider)
 }
 
 export default function NextWeb3App({Component, pageProps}: AppProps) {
     return (
         <Web3ReactProvider getLibrary={getLibrary}>
             <ApolloProvider client={GraphClient}>
-                <AppCommonProvider>
-                    <BitstakeProvider >
-                        <Layout>
-                            <PageLoader >
+                <ClientOnly>
+                    <InjectWeb3 />
+                    <AppCommonProvider>
+                        <BitstakeProvider >
+                            <Layout>
                                 <HeadTags />
                                 <Header/>
-                                <Component {...pageProps} />
-                            </PageLoader>
-                        </Layout>
-                    </BitstakeProvider>
-                </AppCommonProvider>
+                                <PageLoader >
+                                    <Component {...pageProps} />
+                                </PageLoader>
+                            </Layout>
+                        </BitstakeProvider>
+                    </AppCommonProvider>
+                </ClientOnly>
             </ApolloProvider>
         </Web3ReactProvider>
     );

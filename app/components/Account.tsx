@@ -7,7 +7,6 @@ import {OnChain} from "./OnChain";
 import {AccountId} from "./AccountId";
 import {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
-import {useWeb3ReactWrapper} from "../hooks/useWeb3ReactWrapper";
 import {useWeb3React} from "@web3-react/core";
 
 const useAccountStyles = makeStyles(() =>

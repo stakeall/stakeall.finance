@@ -16,7 +16,7 @@ const usePageLoaderStyles = makeStyles((theme) =>
 )
 export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
-    const { pageLoading} = useContext(AppCommon);
+    const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
     if(pageLoading) {
         return (
             <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
@@ -26,6 +26,25 @@ export const PageLoader: React.FC = ({ children }) => {
                 <Grid item>
                     <Typography variant="h3" color="secondary">
                         Please wait while we connect your account...
+                    </Typography>
+                </Grid>
+            </Grid>
+        )
+    }
+    if(pageInactive) {
+        return (
+            <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
+                <Grid item>
+                    <CircularProgress size={100} color="primary"/>
+                </Grid>
+                <Grid item>
+                    <Typography variant="body1" color="primary">
+                        Cannot use the site for the following reason
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography variant="body2" color="secondary">
+                        {pageInactiveReason}
                     </Typography>
                 </Grid>
             </Grid>

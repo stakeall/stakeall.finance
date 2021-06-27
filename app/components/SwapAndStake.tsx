@@ -50,28 +50,30 @@ export const SwapAndStake = () => {
     useEffect(() => {
 
         const getEstimate = async () => {
-            console.log('test ====== ', new BN(10).pow(new BN(-1)).toString());
             const [whole, fractional] = amount.split('.');
-            const convertedAmount = new BN(whole)
-                .add(
-                    new BN(fractional || 0)
-                    .mul(
-                        new BN(10)
-                        .pow(new BN(-1 * fractional?.length || 1))
-                    )
-                )
-                .mul(
-                    new BN(10)
-                    .pow(new BN(tokenDetails?.decimals || 1)));
+            const wholeBN = new BN(whole);
+            const fractionalBN = new BN(fractional);
+            const decimalsBN = new BN(tokenDetails?.decimals || 1);
+            const tenBN = new BN(10)
+            const fractionalLengthBN = new BN(fractional?.length || 1);
 
-            console.log({convertedAmount: convertedAmount.toString()});
+            const convertedAmount =
+                wholeBN
+                    .mul(tenBN
+                        .pow(fractionalLengthBN)
+                    )
+                    .add(fractionalBN)
+                    .mul(tenBN
+                        .pow(decimalsBN
+                            .sub(fractionalLengthBN)
+                        )
+                    )
+
             const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', graphToken, convertedAmount.toString());
-            console.log({estimated});
-            const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1) ));
-            console.log({convertedEstimated: convertedEstimated.toString()});
+            const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1)));
             setEstimatedAmount(convertedEstimated.toString() || '');
         }
-        if(amount && tokenDetails) {
+        if (amount && tokenDetails) {
             getEstimate();
         }
     }, [amount, tokenDetails]);
@@ -125,7 +127,17 @@ export const SwapAndStake = () => {
                             variant="outlined"
                             color="secondary"
                             onClick={() => {
-                                swapAndStake?.(validator || '', tokenDetails?.id || '', graphToken, amount)
+                                swapAndStake?.(
+                                    validator || '',
+                                    tokenDetails?.id || '',
+                                    new BN(amount)
+                                        .mul(
+                                            new BN(10)
+                                            .pow(
+                                                new BN(tokenDetails?.decimals || 1)
+                                            )
+                                        ).toString()
+                                )
                             }}
                         >
                             Delegate
@@ -133,7 +145,8 @@ export const SwapAndStake = () => {
                     </Grid>
                 </Grid>
             </Paper>
-            <TokenSelectionModal open={modalOpen} handleClose={() => setModalOpen(false)} handleTokenChange={handleTokenChange}/>
+            <TokenSelectionModal open={modalOpen} handleClose={() => setModalOpen(false)}
+                                 handleTokenChange={handleTokenChange}/>
         </>
     )
 };

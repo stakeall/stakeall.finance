@@ -8,7 +8,9 @@ import {userWalletRegistryAbi} from "../abi/userWalletRegistry";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import {oneInchApi} from "../api/api";
-import {useWeb3ReactWrapper} from "./useWeb3ReactWrapper";
+import {Contract} from "@ethersproject/contracts";
+import {useWeb3React} from "@web3-react/core";
+import {injected} from "../connectors";
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
@@ -17,9 +19,9 @@ function sleep(ms: number) {
 }
 
 export const useBitstake = () => {
-    const {account} = useWeb3ReactWrapper()
+    const {active, account, library, chainId} = useWeb3React()
     const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>('');
-    const {setPageLoading, injectedEth} = useContext(AppCommon);
+    const {setPageInactive, setPageInactiveReason, setPageLoading} = useContext(AppCommon);
 
     const onChainWalletAddressExists = useMemo(() => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS, [onChainWalletAddress]);
 
@@ -35,10 +37,23 @@ export const useBitstake = () => {
     };
 
     useEffect(() => {
+        if(injected.supportedChainIds?.includes(chainId || -1)) {
+            setPageInactive?.(false);
+            setPageInactiveReason?.('');
+        }
+        else {
+            setPageInactive?.(true);
+            setPageInactiveReason?.('Unsupported Network');
+        }
+    }, [chainId, account])
+
+    useEffect(() => {
+        console.log({account});
         if (account) {
             checkIfOnChainWalletExists();
         }
-    }, [injectedEth]);
+    }, [account]);
+
 
 
     const delegate = useCallback(async (indexerId: string, amount: string) => {
@@ -92,10 +107,11 @@ export const useBitstake = () => {
         } catch (e) {
             setPageLoading?.(false);
         }
-    }, [account, checkIfOnChainWalletExists]);
+    }, [account, checkIfOnChainWalletExists, setPageLoading]);
 
 
-    const swapAndStake = useCallback(async (indexer: string, sourceToken: string, destinationToken: string, sourceTokenAmount: string, slippage: string = '1') => {
+    const swapAndStake = useCallback(async (indexer: string, sourceToken: string, sourceTokenAmount: string, slippage: string = '1') => {
+        const destinationToken = graphToken;
         if (sourceToken !== ETH_TOKEN) {
             // approval
 

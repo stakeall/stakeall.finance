@@ -2,7 +2,7 @@ import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from
 import MetaMaskOnboarding from "@metamask/onboarding";
 import {injected} from "../connectors";
 import {UserRejectedRequestError} from "@web3-react/injected-connector";
-import {useWeb3ReactWrapper} from "./useWeb3ReactWrapper";
+import {useWeb3React} from "@web3-react/core";
 
 export const useConnectAccount = () => {
     const {
@@ -10,7 +10,7 @@ export const useConnectAccount = () => {
         error,
         activate,
         setError,
-    } = useWeb3ReactWrapper();
+    } = useWeb3React();
 
     // initialize metamask onboarding
     const onboarding = useRef<MetaMaskOnboarding>();
