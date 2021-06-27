@@ -127,9 +127,7 @@ export const useBitstake = () => {
             gas: gasForApproval,
           })
 
-
         }
-
         const swapResponse = await oneInchApi.getSwapDetails(sourceToken, destinationToken, sourceTokenAmount, slippage, onChainWalletAddress);
 
         const userWalletInstance = new window.web3.eth.Contract(userWalletRegistryAbi, onChainWalletAddress);
@@ -137,13 +135,14 @@ export const useBitstake = () => {
         const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
 
         const swapAmount = swapResponse.data.toTokenAmount;
+        const ethvalue = sourceToken === ETH_TOKEN ? sourceTokenAmount : 0;
         const swapTransactionEncodedData = oneInchProxy.methods.swap(
             sourceTokenAmount,
             sourceToken,
             destinationToken,
             swapResponse.data.tx.to,
             swapResponse.data.tx.data,
-            sourceToken === ETH_TOKEN ? sourceTokenAmount : 0,
+            ethvalue,
             0, // getId
             1 // setId
         ).encodeABI();
@@ -161,12 +160,13 @@ export const useBitstake = () => {
             1,
             1
         );
-        const estimatedGas = await transaction.estimateGas({from: account});
+        const estimatedGas = await transaction.estimateGas({from: account,value: ethvalue });
 
         setPageLoading?.(true);
         await transaction.send({
             from: account,
-            gas: estimatedGas
+            gas: estimatedGas,
+            value: ethvalue
         });
         setPageLoading?.(false);
 
