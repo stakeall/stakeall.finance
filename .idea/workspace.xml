@@ -20,34 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe0141ee-ff35-441a-bd9d-264412a6560f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/bitstake.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/hooks/useInactiveListeners.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/localhost_contract.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/Account.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/Account.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/AccountId.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/AccountId.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/AppCommonProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/AppCommonProvider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/Assets.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/Assets.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/BitstakeProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/BitstakeProvider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/ETHBalance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/ETHBalance.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/InjectWeb3.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/InjectWeb3.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/PageLoader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/PageLoader.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/components/SwapAndStake.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/SwapAndStake.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/WalletStake.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/WalletStake.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/connectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/connectors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/contexts/AppCommon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/contexts/AppCommon.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/contexts/Bitstake.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/contexts/Bitstake.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useBitstake.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useBitstake.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useBlockNumber.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useBlockNumber.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useConnectAccount.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useConnectAccount.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useContract.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useContract.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useENSName.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useENSName.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useETHBalance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useETHBalance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/usePersonalSign.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/usePersonalSign.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/hooks/useWeb3ReactWrapper.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/_app.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +55,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1624712942127</updated>
-      <workItem from="1624712945041" duration="10956000" />
+      <workItem from="1624712945041" duration="11413000" />
     </task>
     <servers />
   </component>

@@ -81,7 +81,7 @@ export const SwapAndStake = () => {
     return (
         <>
             <Paper className={classes.container}>
-                <Grid container direction="column">
+                <Grid container spacing={4} direction="column">
                     <Button variant="outlined" color="secondary" onClick={() => setModalOpen(true)}>
                         <Grid
                             className={classes.buttonContainer}
@@ -106,7 +106,7 @@ export const SwapAndStake = () => {
                             </Grid>
                         </Grid>
                     </Button>
-                    <Grid>
+                    <Grid item>
                         <TextField
                             value={amount}
                             onChange={(e) => {
@@ -115,14 +115,14 @@ export const SwapAndStake = () => {
                             placeholder="Amount"
                         />
                     </Grid>
-                    <Grid>
+                    <Grid item>
                         <Grid item alignItems="center">
                             <Typography variant="body1" color="textPrimary">
                                 Estimated: {estimatedAmount}
                             </Typography>
                         </Grid>
                     </Grid>
-                    <Grid>
+                    <Grid item>
                         <Button
                             variant="outlined"
                             color="secondary"
@@ -133,9 +133,9 @@ export const SwapAndStake = () => {
                                     new BN(amount)
                                         .mul(
                                             new BN(10)
-                                            .pow(
-                                                new BN(tokenDetails?.decimals || 1)
-                                            )
+                                                .pow(
+                                                    new BN(tokenDetails?.decimals || 1)
+                                                )
                                         ).toString()
                                 )
                             }}
@@ -145,8 +145,10 @@ export const SwapAndStake = () => {
                     </Grid>
                 </Grid>
             </Paper>
-            <TokenSelectionModal open={modalOpen} handleClose={() => setModalOpen(false)}
-                                 handleTokenChange={handleTokenChange}/>
+            <TokenSelectionModal
+                open={modalOpen}
+                handleClose={() => setModalOpen(false)}
+                handleTokenChange={handleTokenChange}/>
         </>
     )
 };
