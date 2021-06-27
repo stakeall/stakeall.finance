@@ -61,6 +61,16 @@ export const oneInchRegistryABI = [
         "internalType": "uint256",
         "name": "_value",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "getId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "setId",
+        "type": "uint256"
       }
     ],
     "name": "swap",
