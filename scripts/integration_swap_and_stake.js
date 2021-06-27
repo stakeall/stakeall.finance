@@ -21,7 +21,7 @@ const perform = async () => {
     console.log(balance);
     const borrowTokenAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
     const sourceToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    const amount = '1000000000000000000';
+    const amount = '100000000000000000';
     const slippage = 1;
     const destinationToken = '0xc944e90c64b2c07662a292be6244bdf05cda44a7';
     const fromAddress = account.address;
