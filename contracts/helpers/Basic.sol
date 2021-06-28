@@ -24,7 +24,7 @@ abstract contract Stores {
     // Testnet
 //   address constant internal wethAddr = 0xd0A1E359811322d97991E03f863a0C30C2cF029C;
 
-  BitStakeMemoryInterface constant internal bitStakeMemory = BitStakeMemoryInterface(0x70e0bA845a1A0F2DA3359C97E0285013525FFC49);
+  BitStakeMemoryInterface constant internal bitStakeMemory = BitStakeMemoryInterface(0xCD8a1C3ba11CF5ECfa6267617243239504a98d90);
 
   function getUint(uint getId, uint val) internal returns (uint returnVal) {
     returnVal = getId == 0 ? val : bitStakeMemory.getUint(getId);

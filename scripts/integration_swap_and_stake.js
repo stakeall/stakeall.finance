@@ -34,6 +34,10 @@ const perform = async () => {
 
     const userWalletInstance = new web3.eth.Contract(UserWallet.abi, ContractAddresses.userWalletAddress);
 
+    //console.log(userWalletInstance);
+    userWalletInstance.events.LogExecute({fromBlock: 0 },(e, res) => console.log('res'+res))
+
+
     // const aaveDepositAndBorrowEncodedData = aaveInstance.methods.depositAndBorrow(
     //     sourceToken,
     //     borrowTokenAddress,
@@ -97,7 +101,7 @@ const perform = async () => {
 
     const executeReceipt = await transaction.send({
         from: fromAddress,
-        gas: gas,
+        gas: 500000,
         value: amount
     }).on('transactionHash', (hash) => {
         console.log(" approval hash " + hash);
