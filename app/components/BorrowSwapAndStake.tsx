@@ -17,20 +17,62 @@ import {BN} from "ethereumjs-util";
 import {gql, useQuery} from "@apollo/client";
 import {IndexersResponse} from "../types/Indexers";
 import {AaveClient} from "../api/graphQl/apolloClient";
+import { v2 } from "@aave/protocol-js"
+import { AaveReserveResponse } from "../types/AaveData";
 
 const query = gql`
 {
   reserves (where: {
     usageAsCollateralEnabled: true
   }) {
-    id
-    name
+    id,
+    underlyingAsset,
+    name,
+    symbol,
+    decimals,
+    isActive,
+    isFrozen,
+    usageAsCollateralEnabled,
+    # aTokenAddress,
+    # stableDebtTokenAddress,
+    # variableDebtTokenAddress,
+    borrowingEnabled,
+    stableBorrowRateEnabled,
+    reserveFactor,
+    baseLTVasCollateral,
+    optimalUtilisationRate,
+    stableRateSlope1,
+    stableRateSlope2,
+    averageStableRate,
+    stableDebtLastUpdateTimestamp,
+    baseVariableBorrowRate,
+    variableRateSlope1,
+    variableRateSlope2,
+    liquidityIndex,
+    reserveLiquidationThreshold,
+    reserveLiquidationBonus,
+    variableBorrowIndex,
+    variableBorrowRate,
+    # avg30DaysVariableBorrowRate,
+    availableLiquidity,
+    stableBorrowRate,
+    liquidityRate,
+    # avg30DaysLiquidityRate,
+    totalPrincipalStableDebt,
+    # totalScaledVariableDebt,
+    lastUpdateTimestamp,
     price {
-      id
-    }
-    liquidityRate
-    variableBorrowRate
-    stableBorrowRate
+        priceInEth
+    },
+    aEmissionPerSecond,
+    vEmissionPerSecond,
+    sEmissionPerSecond,
+    aIncentivesLastUpdateTimestamp,
+    vIncentivesLastUpdateTimestamp,
+    sIncentivesLastUpdateTimestamp,
+    aTokenIncentivesIndex,
+    vTokenIncentivesIndex,
+    sTokenIncentivesIndex
   }
 }
 `;
@@ -49,23 +91,62 @@ const useBorrowSwapAndStakeStyles = makeStyles((theme) =>
     })
 )
 
-export const BorrowSwapAndStake = () => {
-    const classes = useBorrowSwapAndStakeStyles();
+const mappedData = (reserveFormattedData) => {
 
-    const {data, loading, error} = useQuery<IndexersResponse['data']>(query, {
+    return reserveFormattedData.map((row) => {
+        return {
+            "assetAddress": row.underlyingAsset,
+            "assetName": row.name,
+            "symbol" : row.symbol,
+            "borrowInterestRate": 2,
+            "borrowAmount": 4,
+            "swapAmount": "100",
+            "borrowSymbol": "GRT",
+            "borrowAssetAddress": graphToken
+        }
+
+    });
+
+}   
+
+export const BorrowSwapAndStake = (sourceTokenAddress: string,) => {
+    const classes = useBorrowSwapAndStakeStyles();
+    const [formattedData, setFormattedData] = useState();
+    const {data, loading, error} = useQuery<AaveReserveResponse['data']>(query, {
         client: AaveClient,
     });
 
+    // aave js
+    useEffect(() => {
+        if(data) {
+            // call 
+            // a = modify
+            const reserveFormattedData = v2.formatReserves(data.reserves);
+            console.log('reserveFormattedData :', reserveFormattedData);
+            const mappedReservedData = mappedData(reserveFormattedData);
+            console.log('mappedReservedData  ', mappedReservedData);
+            setFormattedData(mappedReservedData);
+        }
+    }, [data]);
 
     return (
         <>
             <Paper className={classes.container}>
                 <Grid container spacing={4} direction="column">
                     <pre>
-                        {JSON.stringify(error || data, null, 4)}
+                        {JSON.stringify(error || formattedData, null, 4)}
                     </pre>
                 </Grid>
             </Paper>
         </>
     )
 };
+
+/**
+ * borrow asset .. underlyingAsset.. name
+ * borrow intereset rate
+ * borrow amount
+ * swap amount
+ */
+
+
