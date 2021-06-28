@@ -48,7 +48,7 @@ export const AccountConnectModal: React.FC<AccountConnectModalProps> = ({open, h
                 <Grid className={classes.buttonContainer} container justify="flex-end" spacing={2}>
                     <Grid item>
                         <Button variant="outlined" onClick={() => {
-                            deployOnChainWallet();
+                            deployOnChainWallet?.();
                             handleClose();
                         }}> Create </Button>
                     </Grid>

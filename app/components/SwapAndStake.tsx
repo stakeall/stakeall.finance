@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
 import {ETH_TOKEN, graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl, shortenHex} from "../util";
+import {BalanceDetailsMap, createMetamaskTokenUrl, shortenHex} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";

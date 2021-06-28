@@ -9,9 +9,10 @@ import Grid from "@material-ui/core/Grid";
 import {Bitstake} from "../contexts/Bitstake";
 import TextField from "@material-ui/core/TextField";
 import {contractMap} from "../constants/contractMap";
-import {BalanceDetailsMap, createMetamaskTokenUrl} from "../util";
+import {BalanceDetailsMap, createMetamaskTokenUrl, formatBalance} from "../util";
 import {covalent} from "../api/api";
 import {useWeb3React} from "@web3-react/core";
+import {graphToken} from "../constants/contracts";
 
 interface TokenSelectionModalProps {
     open: boolean;
@@ -48,19 +49,28 @@ const useTokenSelectionModalStyles = makeStyles((theme) =>
             width: '400px',
             overflowY: 'scroll',
             overflowX: 'hidden',
+        },
+        item: {
+            width: 'auto',
+            marginRight: theme.spacing(2),
         }
 
     })
 )
 export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, handleClose, handleTokenChange}) => {
     const classes = useTokenSelectionModalStyles();
-    const { account, chainId } = useWeb3React();
+    const {account, chainId} = useWeb3React();
     const [search, setSearch] = useState<string>('');
     const [balances, setBalances] = useState<BalanceDetailsMap>();
 
     const filteredTokens = useMemo(() => {
-        console.log({filteredTokens});
-        return Object.values(contractMap).filter(item => {
+        if(!balances) {
+            return [];
+        }
+        const availableContractMap = Object.values(contractMap)
+            .filter(item => Object.keys(balances).includes(item.id))
+            .filter(item => item.id !== graphToken);
+        return Object.values(availableContractMap).filter(item => {
             return item.name?.toLowerCase().includes(search.toLowerCase()) ||
                 item.symbol?.toLowerCase().includes(search.toLowerCase());
         });
@@ -68,14 +78,14 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
 
     useEffect(() => {
         const fetchBalances = async (acc: string, ch: number) => {
-            const balances = await covalent.getAllBalance(ch, acc)
-            setBalances(balances);
+            const balance = await covalent.getAllBalance(ch, acc)
+            setBalances(balance);
         }
         if (account && chainId) {
             fetchBalances(account, chainId);
         }
 
-    }, [account, chainId])
+    }, [account, chainId, open])
     return (
         <Modal
             open={open}
@@ -111,17 +121,24 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
                                     justify="flex-start"
                                     alignItems="center"
                                 >
-                                    <Grid item alignItems="center">
-                                        <img
-                                            height="40px"
-                                            width="40px"
-                                            src={token?.imgSrc || createMetamaskTokenUrl(token?.logo || '')}
-                                            alt={token?.name}
-                                        />
+                                    <Grid container item direction="row">
+                                        <Grid className={classes.item} item container alignItems="center">
+                                            <img
+                                                height="40px"
+                                                width="40px"
+                                                src={token?.imgSrc || createMetamaskTokenUrl(token?.logo || '')}
+                                                alt={token?.name}
+                                            />
+                                        </Grid>
+                                        <Grid item container alignItems="center">
+                                            <Typography variant="body1" color="textPrimary">
+                                                {token?.symbol}
+                                            </Typography>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item alignItems="center">
+                                    <Grid className={classes.item} item container alignItems="center">
                                         <Typography variant="body1" color="textPrimary">
-                                            {token?.symbol}
+                                            {formatBalance(balances?.[token?.id].balance || '0', token?.decimals)}
                                         </Typography>
                                     </Grid>
                                 </Grid>

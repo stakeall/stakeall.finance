@@ -185,3 +185,11 @@ export async function getAddressBalances(address: string): Promise<BalanceDetail
     ...formattedResult,
   };
 }
+
+export const formatBalance = (balance: string, decimal: number):string => {
+  const base = new BN(10).pow(new BN(decimal));
+  // @ts-ignore
+  const dm = new BN(balance).divmod(base);
+  return parseFloat(dm.div + "." + dm.mod.toString(10, decimal)).toFixed(3);
+}
+

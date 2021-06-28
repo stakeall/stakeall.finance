@@ -20,7 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe0141ee-ff35-441a-bd9d-264412a6560f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/app/api/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/AccountConnectModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/AccountConnectModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/Assets.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/Assets.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/components/SwapAndStake.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/SwapAndStake.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/TokenSelectionModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/TokenSelectionModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/util.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/util.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,16 +77,17 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="2112" y="-112" key="MergeDialog" timestamp="1624792501760">
+    <state x="2112" y="-112" key="MergeDialog" timestamp="1624903550126">
       <screen x="1920" y="-161" width="1920" height="1080" />
     </state>
-    <state x="2112" y="-112" key="MergeDialog/0.0.1920.1200/1920.-161.1920.1080@1920.-161.1920.1080" timestamp="1624792501760" />
-    <state x="2561" y="74" key="MultipleFileMergeDialog" timestamp="1624792501827">
+    <state x="2112" y="-112" key="MergeDialog/0.0.1920.1200/1920.-161.1920.1080@1920.-161.1920.1080" timestamp="1624903550126" />
+    <state x="2561" y="74" key="MultipleFileMergeDialog" timestamp="1624903550182">
       <screen x="1920" y="-161" width="1920" height="1080" />
     </state>
-    <state x="2561" y="74" key="MultipleFileMergeDialog/0.0.1920.1200/1920.-161.1920.1080@1920.-161.1920.1080" timestamp="1624792501827" />
+    <state x="2561" y="74" key="MultipleFileMergeDialog/0.0.1920.1200/1920.-161.1920.1080@1920.-161.1920.1080" timestamp="1624903550182" />
     <state x="2542" y="136" width="1298" height="486" key="find.popup" timestamp="1624787054053">
       <screen x="1920" y="-161" width="1920" height="1080" />
     </state>

@@ -9,7 +9,7 @@ import {covalent} from "../api/api";
 import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {useWeb3React} from "@web3-react/core";
-import { BalanceDetailsMap } from "../util";
+import {BalanceDetailsMap, formatBalance} from "../util";
 import { parse } from "graphql";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
@@ -51,13 +51,6 @@ const headers = [
 ] as const;
 
 
-const formatBalance = (balance: string, decimal: number):string => {
-    const base = new BN(10).pow(new BN(decimal));
-    // @ts-ignore
-    const dm = new BN(balance).divmod(base);
-    return parseFloat(dm.div + "." + dm.mod.toString(10, decimal)).toFixed(3);
-}
-
 const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):string => {
     const usdPriceFloat = parseFloat(usdPrice);
     const formattedBalanceFloat = parseFloat(formattedBalance);
@@ -76,7 +69,7 @@ export const Assets = () => {
             return {
                 logo: <img className={classes.logo} src={item.imgSrc} alt={item.name}/>,
                 name: item.symbol,
-                quantity: formatBalance(item.balance || '0', item.decimals),
+                quantity: formattedBalance,
                 price: item.usdPrice || '-',
                 usdValue: item.usdPrice && formattedBalance && formatUSDWorthOfAsset(formattedBalance, item.usdPrice)
             }
