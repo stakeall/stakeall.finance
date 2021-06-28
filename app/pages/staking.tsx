@@ -11,6 +11,7 @@ import {createStyles} from "@material-ui/styles";
 import {WalletStake} from "../components/WalletStake";
 import {useRouter} from "next/router";
 import {SwapAndStake} from "../components/SwapAndStake";
+import {BorrowSwapAndStake} from "../components/BorrowSwapAndStake";
 
 const useStakingStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -48,6 +49,9 @@ const Staking = () => {
             </DashboardTabLayout>
             <DashboardTabLayout value={tabValue} index={1}>
                 <SwapAndStake />
+            </DashboardTabLayout>
+            <DashboardTabLayout value={tabValue} index={2}>
+                <BorrowSwapAndStake />
             </DashboardTabLayout>
         </section>
     );

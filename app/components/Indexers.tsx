@@ -10,9 +10,6 @@ import Button from "@material-ui/core/Button";
 import {AppCommon} from "../contexts/AppCommon";
 import {useRouter} from "next/router";
 
-const str = `
-{"operationName":"indexers","variables":{"orderBy":"stakedTokens","orderDirection":"desc","first":500,"skip":0},"query":"query indexers($orderBy: Indexer_orderBy, $orderDirection: OrderDirection, $first: Int, $skip: Int, $where: Indexer_filter, $searchText: String, $addressSearchText: String) {\\n  indexers(orderBy: $orderBy, orderDirection: $orderDirection, first: $first, skip: $skip, where: $where) {\\n    id\\n    createdAt\\n    account {\\n      id\\n      defaultName {\\n        id\\n        name\\n        __typename\\n      }\\n      image\\n      __typename\\n    }\\n    allocations(first: 1000, orderBy: allocatedTokens, orderDirection: desc, where: {status: Active}) {\\n      id\\n      subgraphDeployment {\\n        id\\n        versions(orderBy: createdAt, orderDirection: desc, first: 1) {\\n          id\\n          subgraph {\\n            id\\n            image\\n            displayName\\n            __typename\\n          }\\n          __typename\\n        }\\n        __typename\\n      }\\n      __typename\\n    }\\n    stakedTokens\\n    allocatedTokens\\n    delegatedTokens\\n    lockedTokens\\n    delegationExchangeRate\\n    delegatorParameterCooldown\\n    lastDelegationParameterUpdate\\n    queryFeeCut\\n    queryFeeRebates\\n    delegatorQueryFees\\n    indexingRewardCut\\n    indexingRewardEffectiveCut\\n    queryFeesCollected\\n    rewardsEarned\\n    url\\n    __typename\\n  }\\n}\\n"}
-`
 const queryVariables = {
     orderBy: "stakedTokens",
     orderDirection: "desc",
