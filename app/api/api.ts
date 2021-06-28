@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { getDefaultContractAddress } from "../constants/contractMap";
+import { ETH_TOKEN } from "../constants/contracts";
 import { BalanceResponse } from "../types/Covalent";
 import { BalanceDetailsMap, getAddressBalances } from "../util";
 
@@ -16,24 +17,32 @@ export const covalent = {
   getAllBalance: async (chainId: string | number, address: string): Promise<BalanceDetailsMap> => {
     const tokenBalances = await getAddressBalances(address);
     const symbolAddressMap: {
-        [key: string]: string
+      [key: string]: string;
     } = {};
     Object.keys(tokenBalances).forEach((address) => {
-        const symbol:string = tokenBalances[address].symbol;
-        symbolAddressMap[symbol] = address;
-    });    
-    const tickers = Object.keys(symbolAddressMap).join(',');
+      const symbol: string = tokenBalances[address].symbol;
+      symbolAddressMap[symbol] = address;
+    });
+    const tickers = Object.keys(symbolAddressMap).join(",");
     const priceResponse = await api.get(
       `${covalentBaseUrl}/v1/pricing/tickers/?tickers=${tickers}&key=${covalentKey}`
     );
 
     const priceResponseItems = priceResponse.data.data.items;
-    for(let i =0; i<priceResponseItems.length; i++) {
-        const symbol = priceResponseItems[i].contract_ticker_symbol =='WETH'?'ETH': priceResponseItems[i].contract_ticker_symbol;
-        const address = symbolAddressMap[symbol];
-        if(address) {
-            tokenBalances[address].usdPrice = priceResponseItems[i].quote_rate;
-        }
+    for (let i = 0; i < priceResponseItems.length; i++) {
+      const symbol =
+        priceResponseItems[i].contract_ticker_symbol == "WETH"
+          ? "ETH"
+          : priceResponseItems[i].contract_ticker_symbol;
+      const address = symbolAddressMap[symbol];
+      
+      if (
+        address &&
+        (address.toLowerCase() === priceResponseItems[i].contract_address.toLowerCase() ||
+          (priceResponseItems[i].contract_ticker_symbol === "WETH" && address === ETH_TOKEN))
+      ) {
+        tokenBalances[address].usdPrice = priceResponseItems[i].quote_rate;
+      }
     }
 
     return tokenBalances;

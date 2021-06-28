@@ -22,7 +22,7 @@ const perform = async () => {
     const balance = await web3.eth.getBalance(account.address);
     console.log(balance);
     const sourceToken = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    const amount = '1';
+    const amount = '1000000000000000000';
     const slippage = 1;
     const destinationToken = '0xc944e90c64b2c07662a292be6244bdf05cda44a7';
     const fromAddress = account.address;
@@ -100,6 +100,7 @@ const perform = async () => {
 
     console.log(JSON.stringify(decodedLogs));
 
+    console.log('borrow value of user wallet ', await destinationTokenERC20Instance.methods.balanceOf(ContractAddresses.userWalletAddress).call());
     console.log('borrow value of user wallet ', await destinationTokenERC20Instance.methods.balanceOf(ContractAddresses.userWalletAddress).call());
 
 }
