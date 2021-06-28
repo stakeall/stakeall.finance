@@ -115,6 +115,7 @@ export const SwapAndStake = () => {
                     </Button>
                     <Grid item>
                         <TextField
+                            type="number"
                             value={amount}
                             onChange={(e) => {
                                 setAmount(e.target.value)

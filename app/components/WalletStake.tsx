@@ -17,7 +17,6 @@ import {shortenHex} from "../util";
 const useWalletStakeStyles = makeStyles((theme) =>
     createStyles({
         walletContainer: {
-            width: 'calc(100% - 40px)',
             margin: '20px',
             padding: theme.spacing(5),
         },
