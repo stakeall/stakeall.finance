@@ -4,7 +4,6 @@ import Tab from '@material-ui/core/Tab';
 import {Overview} from "./Overview";
 import {DashboardTabLayout} from "../uiComponents/DashboardTabLayout";
 import {Paper, Theme} from "@material-ui/core";
-import {Assets} from "./Assets";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {Indexers} from "./Indexers";

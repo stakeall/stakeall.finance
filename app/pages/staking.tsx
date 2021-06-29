@@ -5,7 +5,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {DashboardTabLayout} from "../uiComponents/DashboardTabLayout";
 import {Overview} from "../components/Overview";
-import {Indexers} from "../components/Indexers";
+import {GraphIndexers} from "../components/GraphIndexers";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {WalletStake} from "../components/WalletStake";

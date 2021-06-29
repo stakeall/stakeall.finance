@@ -15,3 +15,5 @@ export const fundGatway = Contracts.fundGateway;
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export const ETH_TOKEN = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+export const BASE_IMAGE_URL = 'https://raw.githubusercontent.com/MetaMask/contract-metadata/master/images/';

@@ -13,8 +13,6 @@ const api = axios.create({
 
 export const covalent = {
     getAllBalance: async (chainId: string | number, address: string): Promise<BalanceDetailsMap> => {
-
-        setPageLoading?.(true);
         try{
             const tokenBalances = await getAddressBalances(address);
             console.log({tokenBalances});
@@ -46,8 +44,7 @@ export const covalent = {
         }
         catch(e) {
             console.log(e);
-        
-            setPageLoading?.(false);
+            return {}
         }
 
     },
