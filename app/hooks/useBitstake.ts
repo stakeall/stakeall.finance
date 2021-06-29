@@ -381,5 +381,6 @@ export const useBitstake = () => {
     swapAndStake,
     getEstimatedSwapAmount,
     getTokenBalance,
+    borrowSwapAndStake,
   };
 };

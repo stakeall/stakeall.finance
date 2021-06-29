@@ -10,7 +10,6 @@ import Paper from "@material-ui/core/Paper";
 import {TokenSelectionModal} from "./TokenSelectionModal";
 import {ContractMap, contractMap} from "../constants/contractMap";
 import TextField from "@material-ui/core/TextField";
-import Box from "@material-ui/core/Box";
 import {Bitstake} from "../contexts/Bitstake";
 import {AppCommon} from "../contexts/AppCommon";
 import {BN} from "ethereumjs-util";
