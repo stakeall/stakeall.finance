@@ -4,6 +4,7 @@ export interface AaveReserveResponse {
 
 export interface Data {
   reserves: ReserveData[];
+  incentivesControllers: IncentivesControllers[];
 }
 
 export interface ReserveData {
@@ -55,6 +56,10 @@ export interface ReserveData {
   aTokenIncentivesIndex: string;
   vTokenIncentivesIndex: string;
   sTokenIncentivesIndex: string;
+}
+
+export interface IncentivesControllers {
+  emissionEndTimestamp: number
 }
 
 export interface Price {

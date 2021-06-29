@@ -69,7 +69,10 @@ const query = gql`
     aTokenIncentivesIndex,
     vTokenIncentivesIndex,
     sTokenIncentivesIndex
-  }
+  }  
+  incentivesControllers {
+    emissionEndTimestamp
+}
 }
 `;
 
@@ -102,8 +105,13 @@ const headers = [
         width: 50,
     },
     {
-        id: 'borrowInterestRate',
-        label: 'Interest Rate',
+        id: 'variableBorrowRate',
+        label: 'Variable Interest Rate',
+        width: 50,
+    },
+    {
+        id: 'stableBorrowRate',
+        label: 'Stable Borrow Rate',
         width: 50,
     },
     {
@@ -139,7 +147,8 @@ const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow
             "assetAddress": shortenHex(row.underlyingAsset),
             "assetName": row.name,
             "symbol" : row.symbol,
-            "borrowInterestRate": 2,
+            "variableBorrowRate": (row.variableBorrowRate * 100),
+            "stableBorrowRate": (row.stableBorrowRate * 100),
             "borrowAmount": 4,
             "swapAmount": "100",
             "borrowSymbol": "GRT",
@@ -159,6 +168,14 @@ const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow
 
 }
 
+const getAavePrice = (reserveData) => {
+
+    const aaveReserve = reserveData.find(reserve => reserve.symbol === "AAVE");
+    console.log('aaveReserve ', aaveReserve);
+    return aaveReserve.price.priceInEth;
+
+}
+
 export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId}) => {
 
     const classes = useBorrowTableStyles();
@@ -172,9 +189,13 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId}) => {
         setBorrowerId?.(borrowerId);
     }, []);
 
+    const currentTimestamp = (Date.now() / 1000).toFixed();
+
     useEffect(() => {
         if (data) {
-            const reserveFormattedData = v2.formatReserves(data.reserves);
+            const aavePriceInEth = getAavePrice(data?.reserves);
+            const emissionEndTimestamp = data.incentivesControllers[0].emissionEndTimestamp;
+            const reserveFormattedData = v2.formatReserves(data.reserves, parseInt(currentTimestamp), [], aavePriceInEth, emissionEndTimestamp);
             setTableData(mapToTableData(reserveFormattedData, onBorrow));
         }
     }, [data]);
