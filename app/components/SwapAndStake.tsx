@@ -13,6 +13,7 @@ import TextField from "@material-ui/core/TextField";
 import {Bitstake} from "../contexts/Bitstake";
 import {AppCommon} from "../contexts/AppCommon";
 import {BN} from "ethereumjs-util";
+import {SelectToken} from "./SelectToken";
 
 
 const useSwapAndStakeStyles = makeStyles((theme) =>
@@ -29,12 +30,12 @@ const useSwapAndStakeStyles = makeStyles((theme) =>
     })
 )
 
+
 export const SwapAndStake = () => {
     const classes = useSwapAndStakeStyles();
     const {swapAndStake, getEstimatedSwapAmount} = useContext(Bitstake);
     const {validator} = useContext(AppCommon);
     const [selectedToken, setSelectedToken] = useState<string>('Ethereum');
-    const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [amount, setAmount] = useState<string>('');
     const [estimatedAmount, setEstimatedAmount] = useState<string>('0');
     const [tokenDetails, setTokenDetails] = useState<ContractMap[string]>();
@@ -88,30 +89,7 @@ export const SwapAndStake = () => {
                             Validator Id : {shortenHex(validator)}
                         </Typography>
                     </Grid>
-                    <Button variant="outlined" color="primary" onClick={() => setModalOpen(true)}>
-                        <Grid
-                            className={classes.buttonContainer}
-                            direction="row"
-                            container
-                            spacing={2}
-                            justify="flex-start"
-                            alignItems="center"
-                        >
-                            <Grid item alignItems="center" justify="flex-start">
-                                <img
-                                    height="40px"
-                                    width="40px"
-                                    src={tokenDetails?.imgSrc || createMetamaskTokenUrl(tokenDetails?.logo || '')}
-                                    alt={tokenDetails?.name}
-                                />
-                            </Grid>
-                            <Grid item alignItems="center">
-                                <Typography variant="body1" color="textPrimary">
-                                    {tokenDetails?.symbol}
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                    </Button>
+                    <SelectToken tokenDetails={tokenDetails} handleTokenChange={handleTokenChange}/>
                     <Grid item>
                         <TextField
                             type="number"
@@ -152,10 +130,6 @@ export const SwapAndStake = () => {
                     </Grid>
                 </Grid>
             </Paper>
-            <TokenSelectionModal
-                open={modalOpen}
-                handleClose={() => setModalOpen(false)}
-                handleTokenChange={handleTokenChange}/>
         </>
     )
 };

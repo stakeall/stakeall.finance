@@ -34,13 +34,13 @@ const useTokenSelectionModalStyles = makeStyles((theme) =>
             padding: 40,
         },
         buttonContainer: {
-            width: '100%',
+            width: 'auto',
         },
         listButtonContainer: {
-            width: '100%',
             height: '80px',
         },
         tokenSearch: {
+            width: 'auto',
             margin: theme.spacing(4),
         },
         tokenListContainer: {
@@ -67,6 +67,7 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
         if(!balances) {
             return [];
         }
+        console.log({balances});
         const availableContractMap = Object.values(contractMap)
             .filter(item => Object.keys(balances).includes(item.id))
             .filter(item => item.id !== graphToken);

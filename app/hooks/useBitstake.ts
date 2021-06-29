@@ -239,15 +239,25 @@ export const useBitstake = () => {
 
   const borrowSwapAndStake = useCallback(
     async (
-      indexer: string,
-      sourceToken: string,
-      destinationToken: string,
-      depositAmount: string,
-      borrowAmount: string,
-      borrowTokenAddress: string,
-      rateMode: string,
+      indexer: string, //validator
+      sourceToken: string, //deposit Token input dropdown
+      destinationToken: string, //grt hardcoded
+      depositAmount: string, //input
+      borrowAmount: string, // calculate hardcoded for now
+      borrowTokenAddress: string, // borrowId selected from table
+      rateMode: string, // 1 or 2 radio
       slippage: string = "1"
     ) => {
+      console.log({
+        indexer,
+        sourceToken,
+        destinationToken,
+        depositAmount,
+        borrowAmount,
+        borrowTokenAddress,
+        rateMode,
+        slippage,
+      })
       if (sourceToken !== ETH_TOKEN) {
         // approval
 
