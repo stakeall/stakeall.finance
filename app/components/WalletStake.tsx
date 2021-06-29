@@ -12,7 +12,8 @@ import useETHBalance from "../hooks/useETHBalance";
 import {Web3Provider} from "@ethersproject/providers";
 import {useWeb3React} from "@web3-react/core";
 import {shortenHex} from "../util";
-
+import { graphToken, GRT_DECIMAL} from "../constants/contracts";
+import {formatBalance, toWei} from '../util';
 
 const useWalletStakeStyles = makeStyles((theme) =>
     createStyles({
@@ -33,19 +34,34 @@ const useWalletStakeStyles = makeStyles((theme) =>
     })
 )
 export const WalletStake: React.FC = () => {
+
     const classes = useWalletStakeStyles();
     const {validator} = useContext(AppCommon);
-    const {delegate} = useContext(Bitstake);
+    const {delegate, getTokenBalance} = useContext(Bitstake);
     const [amount, setAmount] = useState<string>('');
+    const [data, setData] = useState<string>('');
     const [clicked, setClicked] = useState<boolean>(true);
-    const {account} = useWeb3React<Web3Provider>();
-    const {data} = useETHBalance(account);
+    const {account, chainId} = useWeb3React<Web3Provider>();
+    //const {data} = useETHBalance(account);
 
     useEffect(() => {
         setClicked(false);
         setAmount('');
     }, [])
 
+    useEffect(() => {
+        const fetchAmount = async (acc: string) => {
+            const amount  = await getTokenBalance?.(graphToken);
+            
+            setData(formatBalance(amount || '', GRT_DECIMAL));    
+         }
+
+        if(account) {
+
+         fetchAmount(account);       
+        }
+        
+    }, [account, chainId])
     const amountError = useMemo(() => !amount && clicked, [amount, clicked]);
 
     return (
@@ -79,7 +95,7 @@ export const WalletStake: React.FC = () => {
                     <Button size="large" variant="outlined" onClick={() => {
                         setClicked(true);
                         if (!!amount && validator) {
-                            delegate?.(validator, amount)
+                            delegate?.(validator, toWei(amount, GRT_DECIMAL))
                         }
                     }}>
                         Delegate

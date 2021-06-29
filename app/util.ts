@@ -187,9 +187,16 @@ export async function getAddressBalances(address: string): Promise<BalanceDetail
 }
 
 export const formatBalance = (balance: string, decimal: number):string => {
+  if(!balance || balance.length === 0) {
+    return '-';
+  }
   const base = new BN(10).pow(new BN(decimal));
   // @ts-ignore
   const dm = new BN(balance).divmod(base);
   return parseFloat(dm.div + "." + dm.mod.toString(10, decimal)).toFixed(3);
 }
 
+
+export const toWei = (amount: string, decimal: number): string  => {
+  return (new BN(amount).mul(new BN(10).pow(new BN(decimal)))).toString(10);
+}
