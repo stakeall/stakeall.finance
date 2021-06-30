@@ -13,8 +13,3 @@ const ABI = [
 export default function useERC20Contract(tokenAddress: string) {
   return useContract(tokenAddress, ABI);
 }
-
-export default function useERC20Balance(tokenAddress: string, address: string) {
- const erc20Contract = useContract(tokenAddress, ABI);
- return  erc20Contract.balanceOf(address);
-}

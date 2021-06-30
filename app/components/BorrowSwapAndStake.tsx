@@ -107,7 +107,7 @@ export const BorrowSwapAndStake = () => {
                         onClick={() => {
                             borrowSwapAndStake?.(
                                 validator || '',
-                                depositTokenDetails.id || '',
+                                (depositTokenDetails && depositTokenDetails.id) || '',
                                 graphToken,
                                 new BN(depositAmount)
                                     .mul(

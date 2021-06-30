@@ -468,6 +468,9 @@ export const useBitstake = () => {
         graphProtocolDelegation: graphDelegation,
       };
     }
+    return {
+      graphProtocolDelegation: []
+    }
   };
 
   return {

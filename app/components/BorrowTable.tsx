@@ -1,5 +1,5 @@
 import {gql, useQuery} from "@apollo/client";
-import {AaveReserveResponse} from "../types/AaveData";
+import {AaveReserveResponse, ReserveData} from "../types/AaveData";
 import {AaveClient} from "../api/graphQl/apolloClient";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
@@ -147,8 +147,8 @@ const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow
             "assetAddress": shortenHex(row.underlyingAsset),
             "assetName": row.name,
             "symbol" : row.symbol,
-            "variableBorrowRate": (row.variableBorrowRate * 100),
-            "stableBorrowRate": (row.stableBorrowRate * 100),
+            "variableBorrowRate": (parseFloat(row.variableBorrowRate) * 100),
+            "stableBorrowRate": (parseFloat(row.stableBorrowRate) * 100),
             "borrowAmount": 4,
             "swapAmount": "100",
             "borrowSymbol": "GRT",
@@ -168,11 +168,11 @@ const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow
 
 }
 
-const getAavePrice = (reserveData) => {
+const getAavePrice = (reserveData: ReserveData[]) => {
 
     const aaveReserve = reserveData.find(reserve => reserve.symbol === "AAVE");
     console.log('aaveReserve ', aaveReserve);
-    return aaveReserve.price.priceInEth;
+    return aaveReserve && aaveReserve.price.priceInEth;
 
 }
 

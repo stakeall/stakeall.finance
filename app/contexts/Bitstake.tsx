@@ -1,4 +1,5 @@
 import {createContext, useCallback} from "react";
+import { UserActionResponse } from "../hooks/useBitstake";
 
 interface BitstakeContextData {
     delegate: (indexerId: string, amount: string) => void,
@@ -23,7 +24,7 @@ interface BitstakeContextData {
 
     getTokenBalance(address: string):Promise<string>
 
-    getUserActions(address: string):Promise<void>
+    getUserActions(address: string):Promise<UserActionResponse>
 }
 
 export const Bitstake = createContext<Partial<BitstakeContextData>>({});

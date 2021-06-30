@@ -81,7 +81,7 @@ export const Assets = () => {
         }
 
         const fetchUserTransactions = async(acc: string) => {
-            await getUserActions(acc);
+            getUserActions && (await getUserActions(acc)); //todo @antony how to fix this?
         }
         if (account && chainId) {
             fetchBalances(account, chainId);
