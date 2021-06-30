@@ -83,7 +83,6 @@ const useBorrowTableStyles = makeStyles((theme) =>
         },
         container: {
             padding: '50px',
-            margin: '50px',
         },
         buttonContainer: {
         },
@@ -187,7 +186,7 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId}) => {
 
     const onBorrow = useCallback((borrowerId: string) => {
         setBorrowerId?.(borrowerId);
-    }, []);
+    }, [setBorrowerId]);
 
     const currentTimestamp = (Date.now() / 1000).toFixed();
 

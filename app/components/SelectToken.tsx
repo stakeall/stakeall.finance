@@ -16,6 +16,7 @@ interface SelectTokenProps {
 const useSelectTokenStyles = makeStyles((theme) =>
     createStyles({
         buttonContainer: {
+            minWidth: '300px'
         },
     })
 )
