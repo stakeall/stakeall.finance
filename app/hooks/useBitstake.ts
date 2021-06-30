@@ -21,7 +21,7 @@ import { oneInchApi } from "../api/api";
 import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
-import { sendTransaction } from "../transactions/transactionUtils";
+import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
 
 function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -70,8 +70,6 @@ export const useBitstake = () => {
   const delegate = useCallback(
     async (indexerId: string, amount: string) => {
       if (typeof window !== "undefined" && account) {
-        console.log("indexerOd " + indexerId);
-        console.log("amount " + amount);
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
         const grtERC20Instance = new window.web3.eth.Contract(erc20Abi, graphToken);
 
@@ -79,16 +77,21 @@ export const useBitstake = () => {
           .allowance(account, onChainWalletAddress)
           .call({ from: account });
 
-          console.log('allowances  '+allowances);
         if (new BN(allowances).lt(new BN(amount))) {
           const approvalTx = grtERC20Instance.methods.approve(onChainWalletAddress, amount);
 
           const approvalEstimate = await approvalTx.estimateGas({ from: account });
           console.log("approvalEstimate  " + approvalEstimate);
-          const receipt = await approvalTx.send({
+
+          const receipt = await sendTransaction(approvalTx, {
             from: account,
             gas: approvalEstimate,
-          });
+          } );
+
+          // const receipt = await approvalTx.send({
+          //   from: account,
+          //   gas: approvalEstimate,
+          // });
 
           console.log(receipt);
         }
@@ -121,10 +124,18 @@ export const useBitstake = () => {
         );
         const estimatedGas = await tx.estimateGas({ from: account });
         console.log("multicallEstimate  " + estimatedGas);
-        await tx.send({
-          from: account,
-          gas: estimatedGas,
-        });
+
+        await sendTransaction(
+          tx, 
+          {
+            from: account,
+            gas: estimatedGas,
+          }
+        );
+        // await tx.send({
+        //   from: account,
+        //   gas: estimatedGas,
+        // });
       }
     },
     [account, onChainWalletAddress]
@@ -142,10 +153,18 @@ export const useBitstake = () => {
         const estimatedGas = await transaction.estimateGas({ from: account });
 
         setPageLoading?.(true);
-        await transaction.send({
-          from: account,
-          gas: estimatedGas,
-        });
+
+        await sendTransaction(
+          transaction, 
+          {
+            from: account,
+            gas: estimatedGas,
+          }
+        );
+        // await transaction.send({
+        //   from: account,
+        //   gas: estimatedGas,
+        // });
         setPageLoading?.(false);
 
         await checkIfOnChainWalletExists();
@@ -178,10 +197,18 @@ export const useBitstake = () => {
 
         const gasForApproval = approveTransaction.estimateGas();
 
-        await approveTransaction.send({
-          from: account,
-          gas: gasForApproval,
-        });
+        await sendTransaction(
+          approveTransaction,
+          {
+            from: account || '',
+            gas: gasForApproval,
+          }
+        );
+
+        // await approveTransaction.send({
+        //   from: account,
+        //   gas: gasForApproval,
+        // });
       }
       const swapResponse = await oneInchApi.getSwapDetails(
         sourceToken,
@@ -281,10 +308,16 @@ export const useBitstake = () => {
 
         const gasForApproval = approveTransaction.estimateGas();
 
-        await approveTransaction.send({
-          from: account,
-          gas: gasForApproval,
-        });
+        await sendTransaction(
+          approveTransaction, {
+            from: account || '',
+            gas: gasForApproval,
+          }
+        );
+        // await approveTransaction.send({
+        //   from: account,
+        //   gas: gasForApproval,
+        // });
       }
 
       const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
@@ -350,10 +383,18 @@ export const useBitstake = () => {
       const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
 
       setPageLoading?.(true);
-      await transaction.send({
-        from: account,
-        gas: estimatedGas,
-      });
+
+      await sendTransaction(
+        transaction,
+        {
+          from: account || '',
+          gas: estimatedGas,
+        }
+      );
+      // await transaction.send({
+      //   from: account,
+      //   gas: estimatedGas,
+      // });
       setPageLoading?.(false);
     },
     [account, onChainWalletAddress]
@@ -392,6 +433,16 @@ export const useBitstake = () => {
     },
     [account]
   );
+
+
+  const getUserActions = () => {
+
+    if(account) {
+      const txHashes = getTransactionHashes(account);
+      console.log('txxHashes  '+txHashes);
+    }
+    
+  }
 
   return {
     delegate,
