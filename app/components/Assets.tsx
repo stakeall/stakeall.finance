@@ -1,16 +1,14 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
-import BN from "bn.js";
+import React, {useCallback, useEffect, useMemo, useState, useContext} from "react";
 import {Theme} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
 
 import {covalent} from "../api/api";
-import {BalanceResponse} from "../types/Covalent";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {useWeb3React} from "@web3-react/core";
 import {BalanceDetailsMap, formatBalance} from "../util";
-import { parse } from "graphql";
+import {Bitstake} from "../contexts/Bitstake";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,7 +48,6 @@ const headers = [
     },
 ] as const;
 
-
 const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):string => {
     const usdPriceFloat = parseFloat(usdPrice);
     const formattedBalanceFloat = parseFloat(formattedBalance);
@@ -58,6 +55,7 @@ const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):stri
 }
 
 export const Assets = () => {
+    const {getUserActions} = useContext(Bitstake);
     const classes = useAssetStyles();
    const {account, chainId} = useWeb3React();
     const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
@@ -81,8 +79,13 @@ export const Assets = () => {
             const balance = await covalent.getAllBalance(ch, acc)
             setBalances(mapToAssets(balance));
         }
+
+        const fetchUserTransactions = async(acc: string) => {
+            await getUserActions(acc);
+        }
         if (account && chainId) {
             fetchBalances(account, chainId);
+            fetchUserTransactions(account);
         }
 
     }, [account, chainId])

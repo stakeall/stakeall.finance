@@ -22,6 +22,8 @@ interface BitstakeContextData {
     getEstimatedSwapAmount: (sourceToken: string, destinationToken: string, swapAmount: string, slippage?: string) => Promise<string>
 
     getTokenBalance(address: string):Promise<string>
+
+    getUserActions(address: string):Promise<void>
 }
 
 export const Bitstake = createContext<Partial<BitstakeContextData>>({});

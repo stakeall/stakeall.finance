@@ -21,6 +21,18 @@ import { oneInchApi } from "../api/api";
 import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
+const abiDecoder = require("abi-decoder");
+
+export interface GraphProtocolDelegation {
+  indexer: string;
+  amount: string;
+  blockNumber: string;
+  blockTimestamp: string;
+}
+
+export interface UserActionResponse {
+  graphProtocolDelegation: GraphProtocolDelegation[];
+}
 import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
 
 function sleep(ms: number) {
@@ -30,7 +42,7 @@ function sleep(ms: number) {
 }
 
 export const useBitstake = () => {
-  const { active, account, library, chainId } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>("");
   const { setPageInactive, setPageInactiveReason, setPageLoading } = useContext(AppCommon);
 
@@ -86,7 +98,7 @@ export const useBitstake = () => {
           const receipt = await sendTransaction(approvalTx, {
             from: account,
             gas: approvalEstimate,
-          } );
+          });
 
           // const receipt = await approvalTx.send({
           //   from: account,
@@ -125,13 +137,10 @@ export const useBitstake = () => {
         const estimatedGas = await tx.estimateGas({ from: account });
         console.log("multicallEstimate  " + estimatedGas);
 
-        await sendTransaction(
-          tx, 
-          {
-            from: account,
-            gas: estimatedGas,
-          }
-        );
+        await sendTransaction(tx, {
+          from: account,
+          gas: estimatedGas,
+        });
         // await tx.send({
         //   from: account,
         //   gas: estimatedGas,
@@ -154,13 +163,10 @@ export const useBitstake = () => {
 
         setPageLoading?.(true);
 
-        await sendTransaction(
-          transaction, 
-          {
-            from: account,
-            gas: estimatedGas,
-          }
-        );
+        await sendTransaction(transaction, {
+          from: account,
+          gas: estimatedGas,
+        });
         // await transaction.send({
         //   from: account,
         //   gas: estimatedGas,
@@ -181,9 +187,8 @@ export const useBitstake = () => {
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
-
-      console.log('source Token  '+sourceToken);
-      console.log('source Token amount  '+sourceTokenAmount);
+      console.log("source Token  " + sourceToken);
+      console.log("source Token amount  " + sourceTokenAmount);
       const destinationToken = graphToken;
       if (sourceToken !== ETH_TOKEN) {
         // approval
@@ -197,13 +202,10 @@ export const useBitstake = () => {
 
         const gasForApproval = approveTransaction.estimateGas();
 
-        await sendTransaction(
-          approveTransaction,
-          {
-            from: account || '',
-            gas: gasForApproval,
-          }
-        );
+        await sendTransaction(approveTransaction, {
+          from: account || "",
+          gas: gasForApproval,
+        });
 
         // await approveTransaction.send({
         //   from: account,
@@ -260,10 +262,10 @@ export const useBitstake = () => {
       setPageLoading?.(true);
 
       await sendTransaction(transaction, {
-          from: account || '',
-          gas: estimatedGas,
-          value: ethvalue,
-        });
+        from: account || "",
+        gas: estimatedGas,
+        value: ethvalue,
+      });
 
       // await transaction.send({
       //   from: account,
@@ -295,7 +297,7 @@ export const useBitstake = () => {
         borrowTokenAddress,
         rateMode,
         slippage,
-      })
+      });
       if (sourceToken !== ETH_TOKEN) {
         // approval
 
@@ -308,12 +310,10 @@ export const useBitstake = () => {
 
         const gasForApproval = approveTransaction.estimateGas();
 
-        await sendTransaction(
-          approveTransaction, {
-            from: account || '',
-            gas: gasForApproval,
-          }
-        );
+        await sendTransaction(approveTransaction, {
+          from: account || "",
+          gas: gasForApproval,
+        });
         // await approveTransaction.send({
         //   from: account,
         //   gas: gasForApproval,
@@ -384,13 +384,10 @@ export const useBitstake = () => {
 
       setPageLoading?.(true);
 
-      await sendTransaction(
-        transaction,
-        {
-          from: account || '',
-          gas: estimatedGas,
-        }
-      );
+      await sendTransaction(transaction, {
+        from: account || "",
+        gas: estimatedGas,
+      });
       // await transaction.send({
       //   from: account,
       //   gas: estimatedGas,
@@ -408,7 +405,6 @@ export const useBitstake = () => {
       swapAmount: string,
       slippage: string = "1"
     ) => {
-
       const swapResponse = await oneInchApi.getEstimatedSwapDetails(
         sourceToken,
         destinationToken,
@@ -434,15 +430,45 @@ export const useBitstake = () => {
     [account]
   );
 
-
-  const getUserActions = () => {
-
-    if(account) {
+  const getUserActions = async (): Promise<UserActionResponse> => {
+    if (account) {
       const txHashes = getTransactionHashes(account);
-      console.log('txxHashes  '+txHashes);
+
+      const receiptPromises = await txHashes.map((tx: string) =>
+        window.web3.eth.getTransactionReceipt(tx)
+      );
+
+      const receipts = await Promise.all(receiptPromises);
+
+      abiDecoder.addABI(erc20Abi);
+      abiDecoder.addABI(aaveProtocolABI);
+      abiDecoder.addABI(userWalletRegistryAbi);
+      abiDecoder.addABI(fundGatewaylAbi);
+      abiDecoder.addABI(graphProtocolAbi);
+
+      const graphDelegation: GraphProtocolDelegation[] = [];
+
+      for (let i = 0; i < receipts.length; i++) {
+        const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
+        const graphProtocolEvents = decodedReceipt
+          .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated")
+          .map((event: any): GraphProtocolDelegation => {
+            console.log(event);
+            return {
+              indexer: event.events[0].value,
+              amount: event.events[1].value,
+              blockNumber: receipts[i].blockNumber,
+              blockTimestamp: receipts[i].blockTimestamp,
+            };
+          });
+
+        graphDelegation.push(graphProtocolEvents);
+      }
+      return {
+        graphProtocolDelegation: graphDelegation,
+      };
     }
-    
-  }
+  };
 
   return {
     delegate,
@@ -453,5 +479,6 @@ export const useBitstake = () => {
     getEstimatedSwapAmount,
     getTokenBalance,
     borrowSwapAndStake,
+    getUserActions,
   };
 };

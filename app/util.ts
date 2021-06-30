@@ -151,8 +151,8 @@ export async function getAddressBalances(address: string): Promise<BalanceDetail
 
   const contract = getContract(window.web3);
   let result: BalanceMap = {};
-  for (let i = 0; i < tokens.length; i += 30) {
-    const subset = tokens.slice(i, i + 30);
+  for (let i = 0; i < tokens.length; i += 20) {
+    const subset = tokens.slice(i, i + 20);
     const balances = await contract.methods.balances([address], subset).call();
     result = {
       ...result,

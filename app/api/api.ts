@@ -14,6 +14,7 @@ const api = axios.create({
 export const covalent = {
     getAllBalance: async (chainId: string | number, address: string): Promise<BalanceDetailsMap> => {
         try{
+        
             const tokenBalances = await getAddressBalances(address);
             console.log({tokenBalances});
             const symbolAddressMap: {
@@ -43,6 +44,7 @@ export const covalent = {
 
         }
         catch(e) {
+            console.log('error on fetching balances');
             console.log(e);
             return {}
         }
