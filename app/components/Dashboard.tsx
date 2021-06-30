@@ -27,7 +27,7 @@ export const Dashboard = () => {
             <Paper elevation={3}>
                 <Tabs value={tabValue} onChange={handleTabChange}>
                     <Tab label="Overview" />
-                    <Tab label="Indexers" />
+                    <Tab label="Staking" />
                 </Tabs>
             </Paper>
             <DashboardTabLayout value={tabValue} index={0}>
