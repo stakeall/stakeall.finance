@@ -21,6 +21,7 @@ import { oneInchApi } from "../api/api";
 import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
+import { sendTransaction } from "../transactions/transactionUtils";
 
 function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -161,6 +162,9 @@ export const useBitstake = () => {
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
+
+      console.log('source Token  '+sourceToken);
+      console.log('source Token amount  '+sourceTokenAmount);
       const destinationToken = graphToken;
       if (sourceToken !== ETH_TOKEN) {
         // approval
@@ -227,11 +231,18 @@ export const useBitstake = () => {
       const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
 
       setPageLoading?.(true);
-      await transaction.send({
-        from: account,
-        gas: estimatedGas,
-        value: ethvalue,
-      });
+
+      await sendTransaction(transaction, {
+          from: account || '',
+          gas: estimatedGas,
+          value: ethvalue,
+        });
+
+      // await transaction.send({
+      //   from: account,
+      //   gas: estimatedGas,
+      //   value: ethvalue,
+      // });
       setPageLoading?.(false);
     },
     [account, onChainWalletAddress]
@@ -356,7 +367,6 @@ export const useBitstake = () => {
       swapAmount: string,
       slippage: string = "1"
     ) => {
-      const request = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${sourceToken}&toTokenAddress=${destinationToken}&amount=${swapAmount}&slippage=${slippage}&fromAddress=${onChainWalletAddress}&disableEstimate=true`;
 
       const swapResponse = await oneInchApi.getEstimatedSwapDetails(
         sourceToken,

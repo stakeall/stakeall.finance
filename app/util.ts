@@ -197,6 +197,7 @@ export const formatBalance = (balance: string, decimal: number):string => {
 }
 
 
+// todo Sarvesh Fix the logic for amount with decimals amount = 0.1
 export const toWei = (amount: string, decimal: number): string  => {
   return (new BN(amount).mul(new BN(10).pow(new BN(decimal)))).toString(10);
 }

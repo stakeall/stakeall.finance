@@ -14,7 +14,7 @@ import {Bitstake} from "../contexts/Bitstake";
 import {AppCommon} from "../contexts/AppCommon";
 import {BN} from "ethereumjs-util";
 import {SelectToken} from "./SelectToken";
-
+import {toWei} from '../util';
 
 const useSwapAndStakeStyles = makeStyles((theme) =>
     createStyles({
@@ -103,7 +103,7 @@ export const SwapAndStake = () => {
                     <Grid item>
                         <Grid item alignItems="center">
                             <Typography variant="body1" color="textPrimary">
-                                Estimated: {estimatedAmount}
+                                Estimated: {estimatedAmount} GRT
                             </Typography>
                         </Grid>
                     </Grid>
@@ -115,13 +115,7 @@ export const SwapAndStake = () => {
                                 swapAndStake?.(
                                     validator || '',
                                     tokenDetails?.id || '',
-                                    new BN(amount)
-                                        .mul(
-                                            new BN(10)
-                                                .pow(
-                                                    new BN(tokenDetails?.decimals || 1)
-                                                )
-                                        ).toString()
+                                    toWei(amount, tokenDetails?.decimals || 18),
                                 )
                             }}
                         >
