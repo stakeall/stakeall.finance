@@ -79,6 +79,12 @@ async function main() {
      console.log("Fund Gateway deployed at " + fundGatewayInstance.address);
     
 
+    const MaticProtocol = await ethers.getContractFactory("MaticProtocol");
+    const maticProtocolInstance = await MaticProtocol.deploy(
+    );
+    await maticProtocolInstance.deployed();
+
+     
     await bitStakerRegisteryInstance.functions.build();
 
     const userWalletAddress = await bitStakerRegisteryInstance.functions.proxies(address);
@@ -87,11 +93,13 @@ async function main() {
     await bitStakerRegisteryInstance.functions.enableLogic(oneInchProtocolInstance.address);
     await bitStakerRegisteryInstance.functions.enableLogic(connectV2AaveV2Instance.address);
     await bitStakerRegisteryInstance.functions.enableLogic(fundGatewayInstance.address);
+    await bitStakerRegisteryInstance.functions.enableLogic(maticProtocolInstance.address);
 
     console.log((await bitStakerRegisteryInstance.functions.logicProxies(graphProtocolInstance.address)));
     console.log((await bitStakerRegisteryInstance.functions.logicProxies(oneInchProtocolInstance.address)));
     console.log((await bitStakerRegisteryInstance.functions.logicProxies(connectV2AaveV2Instance.address)));
     console.log((await bitStakerRegisteryInstance.functions.logicProxies(fundGatewayInstance.address)));
+    console.log((await bitStakerRegisteryInstance.functions.logicProxies(maticProtocolInstance.address)));
 
 
     const response = await bitStakerRegisteryInstance.functions.logic(graphProtocolInstance.address);
@@ -102,6 +110,7 @@ async function main() {
         oneInchProtocol: oneInchProtocolInstance.address,
         AAVEProtocol: connectV2AaveV2Instance.address,
         fundGateway: fundGatewayInstance.address,
+        maticProtocol: maticProtocolInstance.address,
         userWalletAddress: userWalletAddress[0]
     };
 
