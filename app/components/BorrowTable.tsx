@@ -4,16 +4,26 @@ import {AaveClient} from "../api/graphQl/apolloClient";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {AppCommon} from "../contexts/AppCommon";
-import {v2} from "@aave/protocol-js";
+import {ComputedReserveData, v2} from "@aave/protocol-js";
 import {Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {shortenHex} from "../util";
 import {graphToken} from "../constants/contracts";
 import Button from "@material-ui/core/Button";
+import {ContractMap} from "../constants/contractMap";
+import {Bitstake} from "../contexts/Bitstake";
+import {oneInchApi} from "../api/api";
 
 interface BorrowTableProps {
     setBorrowerId: (borrowerId: string) => void,
+    borrowDetails: {
+        validator?: string,
+        depositTokenDetails?: ContractMap[string],
+        depositAmount?: string,
+        borrowTokenDetails?: ContractMap[string],
+        borrowerId?: string,
+    },
 }
 
 const query = gql`
@@ -114,8 +124,8 @@ const headers = [
         width: 50,
     },
     {
-        id: 'borrowAmount',
-        label: 'Borrow Amount',
+        id: 'maxBorrowAmount',
+        label: 'Max Borrow Amount',
         width: 50,
     },
     {
@@ -140,16 +150,83 @@ const headers = [
     },
 ] as const;
 
-const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow: (borrowerId: string) => void): StandardTableRows<typeof headers> => {
-    return reserveFormattedData.map((row) => {
+const getReserve = (reserveData: ReserveData[], symbol?: string) => {
+    const aaveReserve = reserveData.find(reserve => reserve.symbol === symbol);
+    console.log('aaveReserve ', aaveReserve);
+    return aaveReserve;
+}
+
+// const mapToTableData = (
+//     reserveFormattedData: v2.ComputedReserveData[],
+//     borrowDetails: BorrowTableProps['borrowDetails'],
+//     onBorrow: (borrowerId: string) => void
+// ): StandardTableRows<typeof headers> => {
+//     const maxBorrowAmount = 1;
+//     return reserveFormattedData.map((row) => {
+//         return {
+//             "assetAddress": shortenHex(row.underlyingAsset),
+//             "assetName": row.name,
+//             "symbol" : row.symbol,
+//             "variableBorrowRate": (parseFloat(row.variableBorrowRate) * 100),
+//             "stableBorrowRate": (parseFloat(row.stableBorrowRate) * 100),
+//             "maxBorrowAmount": 4,
+//             "swapAmount": "100",
+//             "borrowSymbol": "GRT",
+//             "borrowAssetAddress": shortenHex(graphToken),
+//             actions: (
+//                 <Button
+//                     variant="outlined"
+//                     color="secondary"
+//                     onClick={() => { onBorrow(row.underlyingAsset)}}
+//                 >
+//                     Borrow
+//                 </Button>
+//             ),
+//         }
+//
+//     });
+// }
+
+
+const mapTableItem = async (row: ComputedReserveData) => {
+    return {
+
+    }
+}
+const mapToTableData = async (
+    data: AaveReserveResponse['data'],
+    borrowDetails: BorrowTableProps['borrowDetails'],
+    onBorrow: (borrowerId: string) => void,
+    onChainWalletAddress?: string,
+): Promise<StandardTableRows<typeof headers>> => {
+    const currentTimestamp = (Date.now() / 1000).toFixed();
+
+    const aaveReserve = getReserve(data?.reserves, "AAVE");
+
+    const aavePriceInEth = aaveReserve?.price.priceInEth;
+    const sourceTokenReserve = getReserve(data?.reserves, borrowDetails?.depositTokenDetails?.symbol);
+    const sourceTokenPriceInEth = sourceTokenReserve?.price.priceInEth || '0';
+    const sourceTokenBaseLTVasCollateral = sourceTokenReserve?.baseLTVasCollateral || '0';
+    const emissionEndTimestamp = data.incentivesControllers[0].emissionEndTimestamp;
+    const reserveFormattedData = v2.formatReserves(data.reserves, parseInt(currentTimestamp), [], aavePriceInEth, emissionEndTimestamp);
+
+
+    return Promise.all(reserveFormattedData.map(async (row) => {
+        const maxBorrowAmount = (
+            parseFloat(sourceTokenBaseLTVasCollateral)/10000) *
+            (
+                (parseFloat(borrowDetails?.depositAmount || '0') * parseFloat(sourceTokenPriceInEth))
+                /parseFloat(row.price.priceInEth)
+            );
+        const swapAmount = await oneInchApi.getEstimatedSwapDetails(row.underlyingAsset, graphToken, maxBorrowAmount.toString(), "1", onChainWalletAddress);
         return {
             "assetAddress": shortenHex(row.underlyingAsset),
             "assetName": row.name,
             "symbol" : row.symbol,
             "variableBorrowRate": (parseFloat(row.variableBorrowRate) * 100),
             "stableBorrowRate": (parseFloat(row.stableBorrowRate) * 100),
-            "borrowAmount": 4,
-            "swapAmount": "100",
+            "maxBorrowAmount": maxBorrowAmount,
+            "swapAmount": swapAmount,
             "borrowSymbol": "GRT",
             "borrowAssetAddress": shortenHex(graphToken),
             actions: (
@@ -162,41 +239,32 @@ const mapToTableData = (reserveFormattedData: v2.ComputedReserveData[], onBorrow
                 </Button>
             ),
         }
-
-    });
-
+    }));
 }
 
-const getAavePrice = (reserveData: ReserveData[]) => {
-
-    const aaveReserve = reserveData.find(reserve => reserve.symbol === "AAVE");
-    console.log('aaveReserve ', aaveReserve);
-    return aaveReserve && aaveReserve.price.priceInEth;
-
-}
-
-export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId}) => {
+export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId, borrowDetails}) => {
 
     const classes = useBorrowTableStyles();
     const {data, loading, error} = useQuery<AaveReserveResponse['data']>(query, {
         client: AaveClient,
     });
     const [tableData, setTableData] = useState<StandardTableRows<typeof headers>>([]);
+    const {onChainWalletAddress} = useContext(Bitstake);
 
 
     const onBorrow = useCallback((borrowerId: string) => {
         setBorrowerId?.(borrowerId);
     }, [setBorrowerId]);
 
-    const currentTimestamp = (Date.now() / 1000).toFixed();
 
     useEffect(() => {
-        if (data) {
-            const aavePriceInEth = getAavePrice(data?.reserves);
-            const emissionEndTimestamp = data.incentivesControllers[0].emissionEndTimestamp;
-            const reserveFormattedData = v2.formatReserves(data.reserves, parseInt(currentTimestamp), [], aavePriceInEth, emissionEndTimestamp);
-            setTableData(mapToTableData(reserveFormattedData, onBorrow));
+        const mapData = async () => {
+            if (data) {
+                const mappedData = await mapToTableData(data, borrowDetails, onBorrow, onChainWalletAddress);
+                setTableData(mappedData);
+            }
         }
+            mapData();
     }, [data]);
 
     if (loading) {

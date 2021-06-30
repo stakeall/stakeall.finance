@@ -109,10 +109,14 @@ export const BorrowSwapAndStake = () => {
             {showBorrowTable && (
                 <Paper className={classes.table}>
                     <Grid item container spacing={4} direction="column">
-                        <BorrowTable setBorrowerId={(id) => {
-                            setBorrowerId(id);
-                            setModalOpen(true);
-                        }}/>
+                        <BorrowTable
+                            setBorrowerId={(id) => {
+                                setBorrowerId(id);
+                                setModalOpen(true);
+                            }}
+                            borrowDetails={modalBorrowDetails}
+
+                        />
                     </Grid>
                 </Paper>
             )}

@@ -50,7 +50,6 @@ export const SwapAndStake = () => {
     }, []);
 
     useEffect(() => {
-
         const getEstimate = async () => {
             const [whole, fractional] = amount.split('.');
             const wholeBN = new BN(whole);
