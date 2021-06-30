@@ -67,7 +67,6 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
         if(!balances) {
             return [];
         }
-        console.log({balances});
         const availableContractMap = Object.values(contractMap)
             .filter(item => Object.keys(balances).includes(item.id))
             .filter(item => item.id !== graphToken);
@@ -75,11 +74,11 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
             return item.name?.toLowerCase().includes(search.toLowerCase()) ||
                 item.symbol?.toLowerCase().includes(search.toLowerCase());
         });
-    }, [search]);
+    }, [search, balances]);
 
     useEffect(() => {
         const fetchBalances = async (acc: string, ch: number) => {
-            const balance = await covalent.getAllBalance(ch, acc)
+            const balance = await covalent.getAllBalance(ch, acc);
             setBalances(balance);
         }
         if (account && chainId) {
@@ -119,10 +118,10 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
                                     container
                                     item
                                     spacing={2}
-                                    justify="flex-start"
+                                    justify="space-between"
                                     alignItems="center"
                                 >
-                                    <Grid container item direction="row">
+                                    <Grid className={classes.item} container item direction="row">
                                         <Grid className={classes.item} item container alignItems="center">
                                             <img
                                                 height="40px"
@@ -131,7 +130,7 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
                                                 alt={token?.name}
                                             />
                                         </Grid>
-                                        <Grid item container alignItems="center">
+                                        <Grid className={classes.item} item container alignItems="center">
                                             <Typography variant="body1" color="textPrimary">
                                                 {token?.symbol}
                                             </Typography>
@@ -147,7 +146,6 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
                         ))}
                     </Grid>
                 </Grid>
-
             </Box>
         </Modal>
     );

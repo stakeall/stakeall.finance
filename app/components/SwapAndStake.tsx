@@ -97,7 +97,7 @@ export const SwapAndStake = () => {
                             onChange={(e) => {
                                 setAmount(e.target.value)
                             }}
-                            placeholder="Amount"
+                            label="Amount"
                         />
                     </Grid>
                     <Grid item>
