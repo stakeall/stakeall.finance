@@ -322,6 +322,12 @@ export const useBitstake = () => {
 
       const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
 
+      console.log('sourceToken : ', sourceToken);
+      console.log('depositAmount : ', depositAmount);
+      console.log('borrowTokenAddress : ', borrowTokenAddress);
+      console.log('borrowAmount : ', borrowAmount);
+      console.log('rateMode : ', rateMode);
+
       const aaveDepositAndBorrowEncodedData = aaveInstance.methods
         .depositAndBorrow(
           sourceToken,
@@ -368,7 +374,7 @@ export const useBitstake = () => {
       const graphProtocolEncodedData = graphInstance.methods
         .delegate(
           indexer,
-          swapResponse.data.toTokenAmount,
+          swapAmount,
           1 // getId
         )
         .encodeABI();
