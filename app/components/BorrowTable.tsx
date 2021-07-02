@@ -14,6 +14,7 @@ import {ContractMap} from "../constants/contractMap";
 import {Bitstake} from "../contexts/Bitstake";
 import {oneInchApi} from "../api/api";
 import {Loading} from "./Loading";
+import {fromWei} from '../util';
 
 interface BorrowTableProps {
     setBorrowerId: (borrowerId: string) => void,
@@ -199,12 +200,18 @@ const mapToTableData = (
     const sourceTokenBaseLTVasCollateral = sourceTokenReserve?.baseLTVasCollateral || '0';
 
     return reserveFormattedData.map(async (row) => {
+
+        console.log('parseFloat(sourceTokenBaseLTVasCollateral) / 10000)  ',sourceTokenBaseLTVasCollateral );
+        console.log('borrowDetails?.depositAmount  ', borrowDetails?.depositAmount);
+        console.log('sourceTokenPriceInEth  ', sourceTokenPriceInEth);
+        console.log('row.price.priceInEth  ', row.price.priceInEth);
+
         const maxBorrowAmount = (
-            parseFloat(sourceTokenBaseLTVasCollateral) / 10000) *
-            (
-                (parseFloat(borrowDetails?.depositAmount || '0') * parseFloat(sourceTokenPriceInEth))
-                / parseFloat(row.price.priceInEth)
-            );
+            parseFloat(sourceTokenBaseLTVasCollateral)
+            * parseFloat(borrowDetails?.depositAmount || '0') 
+            * parseFloat(sourceTokenPriceInEth)
+            / parseFloat(row.price.priceInEth)
+            ).toFixed(2);
 
         const swapResponse = await oneInchApi.getEstimatedSwapDetails(
             row.underlyingAsset,
@@ -219,10 +226,10 @@ const mapToTableData = (
             "assetAddress": shortenHex(row.underlyingAsset),
             "assetName": row.name,
             "symbol": row.symbol,
-            "variableBorrowRate": (parseFloat(row.variableBorrowRate) * 100),
-            "stableBorrowRate": (parseFloat(row.stableBorrowRate) * 100),
+            "variableBorrowRate": `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
+            "stableBorrowRate": `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
             "maxBorrowAmount": maxBorrowAmount,
-            "swapAmount": swapAmount,
+            "swapAmount": parseFloat(fromWei(swapAmount)).toFixed(2),
             "swapSymbol": "GRT",
             "swapAssetAddress": shortenHex(graphToken),
             actions: (
