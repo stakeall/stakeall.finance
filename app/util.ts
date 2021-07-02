@@ -199,5 +199,6 @@ export const formatBalance = (balance: string, decimal: number):string => {
 
 // todo Sarvesh Fix the logic for amount with decimals amount = 0.1
 export const toWei = (amount: string, decimal: number): string  => {
-  return (new BN(amount).mul(new BN(10).pow(new BN(decimal)))).toString(10);
+  const formatredamt = (parseFloat(amount) * 10000).toFixed(0);
+  return (new BN(formatredamt).mul(new BN(10).pow(new BN(decimal))).div(new BN(10000))).toString(10);
 }
