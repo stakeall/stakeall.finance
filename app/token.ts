@@ -38,5 +38,16 @@ export const tokens: {
   '0xf34960d9d60be18cC1D5Afc1A6F012A723a28811': { symbol: 'KCS' },
   '0xE41d2489571d322189246DaFA5ebDe1F4699F498': { symbol: 'ZRX' },
   '0xdF574c24545E5FfEcb9a659c229253D4111d87e1': { symbol: 'HUSD' },
-  '0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828': { symbol: 'UMA' }
+  '0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828': { symbol: 'UMA' },
+  '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2': { symbol: 'Dummy' },
+  '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9': { symbol: 'Dummy' },
+  '0x4Fabb145d64652a948d72533023f6E7A623C7C53': { symbol: 'Dummy' },
+  '0xdd974D5C2e2928deA5F71b9825b8b646686BD200': { symbol: 'Dummy' },
+  '0x408e41876cCCDC0F92210600ef50372656052a38': { symbol: 'Dummy' },
+  '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51': { symbol: 'Dummy' },
+  '0x0000000000085d4780B73119b644AE5ecd22b376': { symbol: 'Dummy' },
+  '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd': { symbol: 'Dummy' },
+  '0xba100000625a3754423978a60c9317c58a424e3D': { symbol: 'Dummy' },
+  '0x8798249c2E607446EfB7Ad49eC89dD1865Ff4272': { symbol: 'Dummy' },
+  '0xD5147bc8e386d91Cc5DBE72099DAC6C9b99276F5': { symbol: 'Dummy' }
 }
