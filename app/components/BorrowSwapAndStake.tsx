@@ -5,7 +5,7 @@ import {Borrower, BorrowTable} from "./BorrowTable";
 import Paper from "@material-ui/core/Paper";
 import {Grid} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import {shortenHex} from "../util";
+import {isNumeric, shortenHex} from "../util";
 import {SelectToken} from "./SelectToken";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -13,6 +13,7 @@ import {toChecksumAddress} from "ethereumjs-util";
 import {AppCommon} from "../contexts/AppCommon";
 import {contractMap, ContractMap} from "../constants/contractMap";
 import {BorrowModal, BorrowModalProps} from "./BorrowModal";
+import {dep} from "optimism";
 
 const useBorrowSwapAndStakeStyles = makeStyles((theme) =>
     createStyles({
@@ -38,6 +39,7 @@ export const BorrowSwapAndStake = () => {
     const {validator} = useContext(AppCommon);
     const [depositToken, setDepositToken] = useState<string>('Ethereum');
     const [depositAmount, setDepositAmount] = useState<string>('');
+    const [depositAmountError, setDepositAmountError] = useState<string>('');
     const [depositTokenDetails, setDepositTokenDetails] = useState<ContractMap[string]>();
     const [showBorrowTable, setShowBorrowTable] = useState<boolean>(false);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -71,6 +73,14 @@ export const BorrowSwapAndStake = () => {
         setDepositToken(name);
     }, []);
 
+    const validateDepositAmount = useCallback(() => {
+        if(!isNumeric(depositAmount)) {
+            setDepositAmountError('Enter valid amount')
+            return false;
+        }
+        return true;
+    }, [depositAmount]);
+
     return (
         <Grid container direction="column" spacing={8} alignItems="center">
             <Paper className={classes.container}>
@@ -86,7 +96,10 @@ export const BorrowSwapAndStake = () => {
                             <TextField
                                 type="number"
                                 value={depositAmount}
+                                error={depositAmountError !== ''}
+                                helperText={depositAmountError}
                                 onChange={(e) => {
+                                    setDepositAmountError('');
                                     setShowBorrowTable(false);
                                     setDepositAmount(e.target.value)
                                 }}
@@ -98,7 +111,9 @@ export const BorrowSwapAndStake = () => {
                                 variant="outlined"
                                 color="secondary"
                                 onClick={() => {
-                                    setShowBorrowTable(true);
+                                    if(validateDepositAmount()){
+                                        setShowBorrowTable(true);
+                                    }
                                 }}
                             >
                                 Estimate
