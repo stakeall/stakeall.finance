@@ -1,5 +1,5 @@
-import React from "react";
-import {ClassNameMap, createStyles} from "@material-ui/styles";
+import React, {useContext} from "react";
+import {createStyles} from "@material-ui/styles";
 import {Grid} from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -7,11 +7,10 @@ import {BASE_IMAGE_URL, graphToken, maticToken} from "../constants/contracts";
 import {contractMap} from "../constants/contractMap";
 import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {GRAPH, MATIC} from "../constants/Protocols";
+import {AppCommon} from "../contexts/AppCommon";
+import {StakingProtocol} from "../hooks/useBitstake";
 
-interface  ProtocolCardsProps {
-    setSelectedProtocol: (name: string) => void;
-}
+interface  ProtocolCardsProps {}
 
 const useProtocolCardsStyles = makeStyles((theme) =>
     createStyles({
@@ -31,13 +30,17 @@ const useProtocolCardsStyles = makeStyles((theme) =>
     })
 )
 
-export const ProtocolCards: React.FC<ProtocolCardsProps> = ({setSelectedProtocol}) => {
+export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
     const classes = useProtocolCardsStyles();
+    const {setProtocol} = useContext(AppCommon);
     return (
         <Grid className={classes.container} container justify="center" spacing={10}>
             <Grid item>
                 <Card variant="outlined">
-                    <CardActionArea className={classes.card} onClick={() => { setSelectedProtocol(GRAPH)}}>
+                    <CardActionArea className={classes.card} onClick={() => {
+                        console.log({setProtocol});
+                        setProtocol?.(StakingProtocol.GRAPH);
+                    }}>
                         <Grid container direction="column" alignItems="center">
                             <Grid item>
                                 <img className={classes.image} src={`${BASE_IMAGE_URL}${contractMap[graphToken].logo}`} alt="graph" />
@@ -58,7 +61,9 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = ({setSelectedProtocol
             </Grid>
             <Grid item>
                 <Card variant="outlined">
-                    <CardActionArea className={classes.card} onClick={() => { setSelectedProtocol(MATIC)}}>
+                    <CardActionArea className={classes.card} onClick={() => {
+                        setProtocol?.(StakingProtocol.MATIC);
+                    }}>
                         <Grid container direction="column" alignItems="center">
                             <Grid item>
                                 <img className={classes.image} src={`${BASE_IMAGE_URL}${contractMap[maticToken].logo}`} alt="graph" />

@@ -1,10 +1,13 @@
 import React from "react";
+import {StakingProtocol} from "../hooks/useBitstake";
 
 interface AppCommonData {
     pageLoading: boolean,
     setPageLoading: (loading: boolean, metamaskDisconnected?: boolean) => void,
     validator: string,
     setValidator: (validator: string) => void,
+    protocol: StakingProtocol,
+    setProtocol: (protocol: StakingProtocol | undefined) => void,
     injectedEth: boolean,
     setInjectedEth: (injected: boolean) => void,
     pageInactive: boolean,
