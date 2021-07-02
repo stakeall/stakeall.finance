@@ -3,7 +3,7 @@ import { formatUnits } from "@ethersproject/units";
 import Web3 from "web3";
 import BN from "bn.js";
 import {  getDefaultContractAddress } from "./constants/contractMap";
-import { ETH_TOKEN, graphToken, maticToken } from "./constants/contracts";
+import { ETH_TOKEN, graphProtocol, graphToken, maticProtocol, maticToken } from "./constants/contracts";
 import { StakingProtocol } from "./hooks/useBitstake";
 
 export function shortenHex(hex?: string | null, length = 4) {
@@ -241,17 +241,20 @@ export const getTokenByProtocol = (protocol: StakingProtocol): {
   symbol: string;
   decimal: number;
   address: string
+  protocolContractAddress: string;
 } => {
   
   return protocol === StakingProtocol.GRAPH 
        ? {
          symbol: 'GRT',
          decimal: 18,
-         address: graphToken
+         address: graphToken,
+         protocolContractAddress: graphProtocol
        }
        : {
          symbol: 'MATIC',
          decimal: 18, 
-         address: maticToken
+         address: maticToken,
+         protocolContractAddress: maticProtocol
        }
 }

@@ -8,6 +8,7 @@ import {
   aaveProtocol,
   fundGatway,
   maticToken,
+  maticProtocol
 } from "../constants/contracts";
 import { erc20Abi } from "../abi/erc20";
 import { graphProtocolAbi } from "../abi/graphProtocolRegistry";
@@ -24,7 +25,7 @@ import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
 const abiDecoder = require("abi-decoder");
-import { fromWei, formatDate } from "../util";
+import { fromWei, formatDate, getTokenByProtocol } from "../util";
 
 export enum StakingProtocol {
   GRAPH = "GRAPH",
@@ -37,6 +38,12 @@ export interface GraphProtocolDelegation {
   blockTimestamp: string;
 }
 
+export interface MaticProtocolDelegation {
+  validator: string;
+  amount: string;
+  blockNumber: string;
+  blockTimestamp: string;
+}
 export interface AAVEBorrows {
   depositToken: string;
   depositAmt: string;
@@ -53,6 +60,7 @@ export interface Web3Event {
 export interface UserActionResponse {
   graphProtocolDelegation: GraphProtocolDelegation[];
   aaveBorrows: AAVEBorrows[];
+  maticProtocolDelegation: MaticProtocolDelegation[];
 }
 import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
 
@@ -100,17 +108,18 @@ export const useBitstake = () => {
       protocol: StakingProtocol = StakingProtocol.GRAPH
     ) => {
       if (typeof window !== "undefined" && account) {
+
+        const protocolToken = getTokenByProtocol(protocol);
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-        const maticInstance = new window.web3.eth.Contract(graphProtocolAbi, maticProtocolAbi);
-
-        const erc20Address = protocol === StakingProtocol.GRAPH ? graphToken : maticToken;
-
-        const erc20Instance = new window.web3.eth.Contract(erc20Abi, erc20Address);
+        const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+        const erc20Instance = new window.web3.eth.Contract(erc20Abi, protocolToken.address);
 
         const allowances = await erc20Instance.methods
           .allowance(account, onChainWalletAddress)
           .call({ from: account });
 
+        console.log('allowances ',allowances);
+        console.log('amount ',amount);
         if (new BN(allowances).lt(new BN(amount))) {
           const approvalTx = erc20Instance.methods.approve(onChainWalletAddress, amount);
 
@@ -125,7 +134,7 @@ export const useBitstake = () => {
         const fundGatewayInstance = await new window.web3.eth.Contract(fundGatewaylAbi, fundGatway);
 
         const depositEncodedData = fundGatewayInstance.methods
-          .deposit(graphToken, amount)
+          .deposit(protocolToken.address, amount)
           .encodeABI();
 
         let delegateData;
@@ -155,7 +164,7 @@ export const useBitstake = () => {
         );
 
         const tx = userWalletInstance.methods.executeMulti(
-          [fundGatway, graphProtocol],
+          [fundGatway, protocolToken.protocolContractAddress ],
           [depositEncodedData, delegateData],
           1,
           1
@@ -444,9 +453,11 @@ export const useBitstake = () => {
       abiDecoder.addABI(userWalletRegistryAbi);
       abiDecoder.addABI(fundGatewaylAbi);
       abiDecoder.addABI(graphProtocolAbi);
+      abiDecoder.addABI(maticProtocolAbi);
 
       const graphDelegation: GraphProtocolDelegation[] = [];
       const aaveBorrows: AAVEBorrows[] = [];
+      const maticDelegation: MaticProtocolDelegation[] = [];
 
       for (let i = 0; i < receipts.length; i++) {
         if (!receipts[i]) {
@@ -457,7 +468,7 @@ export const useBitstake = () => {
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
         decodedReceipt
           .filter(
-            (dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === "Borrow"
+            (dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === "Borrow" || dr.name === "MaticValidatorDelegated"
           )
           .forEach((event: Web3Event) => {
             if (event.name === "GraphProtocolDelegated") {
@@ -478,19 +489,31 @@ export const useBitstake = () => {
                 blockTimestamp: formatDate(block.timestamp),
               });
             }
+
+              if(event.name === "MaticValidatorDelegated") {
+                maticDelegation.push({
+                  validator: event.events[0].value,
+                  amount: `${parseFloat(fromWei(event.events[2].value)).toFixed(2)} MATIC`,
+                  blockNumber: receipts[i].blockNumber,
+                  blockTimestamp: formatDate(block.timestamp),
+                })
+              }
           });
 
         // graphDelegation.push(...graphProtocolEvents);
       }
       console.log('aaveBorrows  :', aaveBorrows);
+      console.log('aaveBorrows  :', maticDelegation);
       return {
         graphProtocolDelegation: graphDelegation,
         aaveBorrows,
+        maticProtocolDelegation: maticDelegation
       };
     }
     return {
       graphProtocolDelegation: [],
       aaveBorrows: [],
+      maticProtocolDelegation: []
     };
   };
 
