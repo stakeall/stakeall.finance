@@ -203,6 +203,11 @@ export const toWei = (amount: string, decimal: number): string  => {
   return (new BN(formatredamt).mul(new BN(10).pow(new BN(decimal))).div(new BN(10000))).toString(10);
 }
 
+export const fromWei = (amount: string): string  => {
+  
+  return window.web3.utils.fromWei(amount);
+}
+
 export const getBN = (amount: string, decimals: number | string) => {
   const [whole, fractional] = amount.split('.');
   const wholeBN = new BN(whole);

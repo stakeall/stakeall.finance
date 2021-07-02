@@ -22,6 +22,7 @@ import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
 const abiDecoder = require("abi-decoder");
+import {fromWei} from '../util';
 
 export interface GraphProtocolDelegation {
   indexer: string;
@@ -428,20 +429,21 @@ export const useBitstake = () => {
         if(!receipts[i]) {
           continue;
         }
+
+        const block = await window.web3.eth.getBlock(receipts[i].blockNumber);
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
         const graphProtocolEvents = decodedReceipt
           .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated")
           .map((event: any): GraphProtocolDelegation => {
-            console.log(event);
             return {
               indexer: event.events[0].value,
-              amount: event.events[1].value,
+              amount: `${parseFloat(fromWei(event.events[1].value)).toFixed(2)} GRT`,
               blockNumber: receipts[i].blockNumber,
-              blockTimestamp: receipts[i].blockTimestamp,
+              blockTimestamp:new Date( parseInt(block.timestamp) * 1000 ).toLocaleDateString("en-US")
             };
           });
 
-        graphDelegation.push(graphProtocolEvents);
+        graphDelegation.push(...graphProtocolEvents);
       }
       return {
         graphProtocolDelegation: graphDelegation,
