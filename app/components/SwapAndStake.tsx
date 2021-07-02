@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
 import {graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl, getBN, shortenHex} from "../util";
+import {createMetamaskTokenUrl, getBN, isNumeric, shortenHex} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
@@ -37,6 +37,7 @@ export const SwapAndStake = () => {
     const {validator} = useContext(AppCommon);
     const [selectedToken, setSelectedToken] = useState<string>('Ethereum');
     const [amount, setAmount] = useState<string>('');
+    const [amountError, setAmountError] = useState<string>('');
     const [estimatedAmount, setEstimatedAmount] = useState<string>('0');
     const [tokenDetails, setTokenDetails] = useState<ContractMap[string]>();
 
@@ -61,6 +62,14 @@ export const SwapAndStake = () => {
         }
     }, [amount, tokenDetails]);
 
+    const validateAmount = useCallback(() => {
+        if(!isNumeric(amount)) {
+            setAmountError('Enter valid amount')
+            return false;
+        }
+        return true;
+    }, [amount]);
+
     return (
         <>
             <Paper className={classes.container}>
@@ -75,7 +84,10 @@ export const SwapAndStake = () => {
                         <TextField
                             type="number"
                             value={amount}
+                            error={amountError !== ''}
+                            helperText={amountError}
                             onChange={(e) => {
+                                setAmountError('');
                                 setAmount(e.target.value)
                             }}
                             label="Amount"
@@ -93,11 +105,13 @@ export const SwapAndStake = () => {
                             variant="outlined"
                             color="secondary"
                             onClick={() => {
-                                swapAndStake?.(
-                                    validator || '',
-                                    tokenDetails?.id || '',
-                                    toWei(amount, tokenDetails?.decimals || 18),
-                                )
+                                if(validateAmount()){
+                                    swapAndStake?.(
+                                        validator || '',
+                                        tokenDetails?.id || '',
+                                        toWei(amount, tokenDetails?.decimals || 18),
+                                    )
+                                }
                             }}
                         >
                             Delegate

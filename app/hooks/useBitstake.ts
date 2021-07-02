@@ -184,8 +184,6 @@ export const useBitstake = () => {
       console.log("source Token amount  " + sourceTokenAmount);
       const destinationToken = graphToken;
       if (sourceToken !== ETH_TOKEN) {
-        // approval
-
         const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
         const approveTransaction = sourceTokenInstance.methods.approve(
@@ -199,12 +197,8 @@ export const useBitstake = () => {
           from: account || "",
           gas: gasForApproval,
         });
-
-        // await approveTransaction.send({
-        //   from: account,
-        //   gas: gasForApproval,
-        // });
       }
+
       const swapResponse = await oneInchApi.getSwapDetails(
         sourceToken,
         destinationToken,
@@ -260,11 +254,6 @@ export const useBitstake = () => {
         value: ethvalue,
       });
 
-      // await transaction.send({
-      //   from: account,
-      //   gas: estimatedGas,
-      //   value: ethvalue,
-      // });
       setPageLoading?.(false);
     },
     [account, onChainWalletAddress]
@@ -292,8 +281,6 @@ export const useBitstake = () => {
         slippage,
       });
       if (sourceToken !== ETH_TOKEN) {
-        // approval
-
         const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
         const approveTransaction = sourceTokenInstance.methods.approve(
@@ -307,19 +294,9 @@ export const useBitstake = () => {
           from: account || "",
           gas: gasForApproval,
         });
-        // await approveTransaction.send({
-        //   from: account,
-        //   gas: gasForApproval,
-        // });
       }
 
       const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
-
-      console.log('sourceToken : ', sourceToken);
-      console.log('depositAmount : ', depositAmount);
-      console.log('borrowTokenAddress : ', borrowTokenAddress);
-      console.log('borrowAmount : ', borrowAmount);
-      console.log('rateMode : ', rateMode);
 
       const aaveDepositAndBorrowEncodedData = aaveInstance.methods
         .depositAndBorrow(
