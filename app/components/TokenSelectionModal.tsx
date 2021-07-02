@@ -13,6 +13,7 @@ import {BalanceDetailsMap, createMetamaskTokenUrl, formatBalance} from "../util"
 import {covalent} from "../api/api";
 import {useWeb3React} from "@web3-react/core";
 import {graphToken} from "../constants/contracts";
+import {TokenNameSymbol} from "./TokenNameSymbol";
 
 interface TokenSelectionModalProps {
     open: boolean;
@@ -118,23 +119,11 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
                                     container
                                     item
                                     spacing={2}
-                                    justify="space-between"
+                                    justify="space-around"
                                     alignItems="center"
                                 >
                                     <Grid className={classes.item} container item direction="row">
-                                        <Grid className={classes.item} item container alignItems="center">
-                                            <img
-                                                height="40px"
-                                                width="40px"
-                                                src={token?.imgSrc || createMetamaskTokenUrl(token?.logo || '')}
-                                                alt={token?.name}
-                                            />
-                                        </Grid>
-                                        <Grid className={classes.item} item container alignItems="center">
-                                            <Typography variant="body1" color="textPrimary">
-                                                {token?.symbol}
-                                            </Typography>
-                                        </Grid>
+                                        <TokenNameSymbol tokenId={token?.id} />
                                     </Grid>
                                     <Grid className={classes.item} item container alignItems="center">
                                         <Typography variant="body1" color="textPrimary">

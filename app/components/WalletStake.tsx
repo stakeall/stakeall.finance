@@ -97,7 +97,7 @@ export const WalletStake: React.FC = () => {
             </Grid>
             <Grid className={classes.buttonContainer} container spacing={2}>
                 <Grid item>
-                    <Button size="large" variant="outlined" onClick={() => {
+                    <Button color="secondary" variant="outlined" onClick={() => {
                         setClicked(true);
                         if (validator && validateAmount()) {
                             delegate?.(validator, toWei(amount, GRT_DECIMAL))

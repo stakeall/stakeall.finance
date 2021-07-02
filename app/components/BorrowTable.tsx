@@ -15,6 +15,7 @@ import {Bitstake} from "../contexts/Bitstake";
 import {oneInchApi} from "../api/api";
 import {Loading} from "./Loading";
 import {fromWei} from '../util';
+import {TokenNameSymbol} from "./TokenNameSymbol";
 
 interface BorrowTableProps {
     setBorrowerId: (borrowerId: string) => void,
@@ -104,12 +105,7 @@ const useBorrowTableStyles = makeStyles((theme) =>
 
 const headers = [
     {
-        id: 'assetAddress',
-        label: 'Asset Address',
-        width: 50,
-    },
-    {
-        id: 'symbol',
+        id: 'assetName',
         label: 'Asset',
         width: 50,
     },
@@ -200,15 +196,9 @@ const mapToTableData = (
     const sourceTokenBaseLTVasCollateral = sourceTokenReserve?.baseLTVasCollateral || '0';
 
     return reserveFormattedData.map(async (row) => {
-
-        console.log('parseFloat(sourceTokenBaseLTVasCollateral) / 10000)  ',sourceTokenBaseLTVasCollateral );
-        console.log('borrowDetails?.depositAmount  ', borrowDetails?.depositAmount);
-        console.log('sourceTokenPriceInEth  ', sourceTokenPriceInEth);
-        console.log('row.price.priceInEth  ', row.price.priceInEth);
-
         const maxBorrowAmount = (
             parseFloat(sourceTokenBaseLTVasCollateral)
-            * parseFloat(borrowDetails?.depositAmount || '0') 
+            * parseFloat(borrowDetails?.depositAmount || '0')
             * parseFloat(sourceTokenPriceInEth)
             / parseFloat(row.price.priceInEth)
             ).toFixed(2);
@@ -223,15 +213,14 @@ const mapToTableData = (
         );
         const swapAmount = swapResponse.data.toTokenAmount;
         return {
-            "assetAddress": shortenHex(row.underlyingAsset),
-            "assetName": row.name,
-            "symbol": row.symbol,
-            "variableBorrowRate": `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
-            "stableBorrowRate": `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
-            "maxBorrowAmount": maxBorrowAmount,
-            "swapAmount": parseFloat(fromWei(swapAmount)).toFixed(2),
-            "swapSymbol": "GRT",
-            "swapAssetAddress": shortenHex(graphToken),
+            assetName: <TokenNameSymbol tokenId={row.underlyingAsset} />,
+            symbol: row.symbol,
+            variableBorrowRate: `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
+            stableBorrowRate: `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
+            maxBorrowAmount: maxBorrowAmount,
+            swapAmount: parseFloat(fromWei(swapAmount)).toFixed(2),
+            swapSymbol: "GRT",
+            swapAssetAddress: shortenHex(graphToken),
             actions: (
                 <Button
                     variant="outlined"

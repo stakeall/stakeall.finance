@@ -13,6 +13,7 @@ import {Loading} from "./Loading";
 import {UserActionResponse} from "../hooks/useBitstake";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import {TokenNameSymbol} from "./TokenNameSymbol";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -30,11 +31,6 @@ const useAssetStyles = makeStyles((theme: Theme) =>
 )
 
 const balanceHeaders = [
-    {
-        id: 'logo',
-        label: '',
-        width: 50,
-    },
     {
         id: 'name',
         label: 'Name',
@@ -105,8 +101,7 @@ export const Assets = () => {
             const item = balances[address];
             const formattedBalance = formatBalance(item.balance || '0', item.decimals);
             return {
-                logo: <img className={classes.logo} src={item.imgSrc} alt={item.name}/>,
-                name: item.symbol,
+                name: <TokenNameSymbol tokenId={address} />,
                 quantity: formattedBalance,
                 price: item.usdPrice || '-',
                 usdValue: item.usdPrice && formattedBalance && formatUSDWorthOfAsset(formattedBalance, item.usdPrice)

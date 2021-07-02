@@ -9,6 +9,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {graphToken, GRT_DECIMAL} from "../constants/contracts";
 import {Bitstake} from "../contexts/Bitstake";
+import {TokenNameSymbol} from "./TokenNameSymbol";
 
 interface SelectTokenProps {
     tokenDetails?: ContractMap[string],
@@ -18,7 +19,8 @@ interface SelectTokenProps {
 const useSelectTokenStyles = makeStyles((theme) =>
     createStyles({
         buttonContainer: {
-            minWidth: '300px'
+            minWidth: '300px',
+            padding: '8px',
         },
     })
 )
@@ -51,22 +53,9 @@ export const SelectToken: React.FC<SelectTokenProps> = ({tokenDetails, handleTok
                     container
                     justify="space-between"
                     alignItems="center"
+                    wrap="nowrap"
                 >
-                    <Grid direction="row" spacing={2} alignItems="center" item container justify="flex-start">
-                        <Grid item alignItems="center" justify="flex-start">
-                            <img
-                                height="40px"
-                                width="40px"
-                                src={tokenDetails?.imgSrc || createMetamaskTokenUrl(tokenDetails?.logo || "")}
-                                alt={tokenDetails?.name}
-                            />
-                        </Grid>
-                        <Grid item alignItems="center">
-                            <Typography variant="body1" color="textPrimary">
-                                {tokenDetails?.symbol}
-                            </Typography>
-                        </Grid>
-                    </Grid>
+                    <TokenNameSymbol tokenId={tokenDetails?.id || ''} />
                     <Grid item alignItems="center">
                         <Typography variant="body1" color="textPrimary">
                             {data}
