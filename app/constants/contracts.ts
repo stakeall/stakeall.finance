@@ -2,6 +2,7 @@ import Contracts from '../../mainnetfork_contract.json';
 
 export const bitStakeRegistry = Contracts.BitStakerRegistery;
 export const graphProtocol = Contracts.GraphProtocol;
+export const maticProtocol = Contracts.maticProtocol;
 
 export const graphToken = '0xc944E90C64B2c07662A292be6244BDf05Cda44a7';
 export const GRT_DECIMAL = 18;

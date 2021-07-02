@@ -7,9 +7,11 @@ import {
   ETH_TOKEN,
   aaveProtocol,
   fundGatway,
+  maticToken,
 } from "../constants/contracts";
 import { erc20Abi } from "../abi/erc20";
 import { graphProtocolAbi } from "../abi/graphProtocolRegistry";
+import { maticProtocolAbi } from "../abi/maticProtocol";
 import { fundGatewaylAbi } from "../abi/fundGateway";
 import { bitStakeRegistryABI } from "../abi/bitStakeRegistry";
 import { oneInchRegistryABI } from "../abi/oneInchRegistry";
@@ -22,8 +24,12 @@ import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
 const abiDecoder = require("abi-decoder");
-import {fromWei, formatDate} from '../util';
+import { fromWei, formatDate } from "../util";
 
+export enum StakingProtocol {
+  GRAPH = "GRAPH",
+  MATIC = "MATIC",
+}
 export interface GraphProtocolDelegation {
   indexer: string;
   amount: string;
@@ -32,18 +38,18 @@ export interface GraphProtocolDelegation {
 }
 
 export interface AAVEBorrows {
-  depositToken: string,
-  depositAmt: string,
-  borrowToken: string,
-  borrowAmt: string,
-  rateMode: number,
-  blockTimestamp: string
+  depositToken: string;
+  depositAmt: string;
+  borrowToken: string;
+  borrowAmt: string;
+  rateMode: number;
+  blockTimestamp: string;
 }
 
 export interface Web3Event {
- name: string;
- events: {name: string; value: string}[]
-} 
+  name: string;
+  events: { name: string; value: string }[];
+}
 export interface UserActionResponse {
   graphProtocolDelegation: GraphProtocolDelegation[];
   aaveBorrows: AAVEBorrows[];
@@ -88,21 +94,29 @@ export const useBitstake = () => {
   }, [account]);
 
   const delegate = useCallback(
-    async (indexerId: string, amount: string) => {
+    async (
+      validatorId: string,
+      amount: string,
+      protocol: StakingProtocol = StakingProtocol.GRAPH
+    ) => {
       if (typeof window !== "undefined" && account) {
         const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-        const grtERC20Instance = new window.web3.eth.Contract(erc20Abi, graphToken);
+        const maticInstance = new window.web3.eth.Contract(graphProtocolAbi, maticProtocolAbi);
 
-        const allowances = await grtERC20Instance.methods
+        const erc20Address = protocol === StakingProtocol.GRAPH ? graphToken : maticToken;
+
+        const erc20Instance = new window.web3.eth.Contract(erc20Abi, erc20Address);
+
+        const allowances = await erc20Instance.methods
           .allowance(account, onChainWalletAddress)
           .call({ from: account });
 
         if (new BN(allowances).lt(new BN(amount))) {
-          const approvalTx = grtERC20Instance.methods.approve(onChainWalletAddress, amount);
+          const approvalTx = erc20Instance.methods.approve(onChainWalletAddress, amount);
 
           const approvalEstimate = await approvalTx.estimateGas({ from: account });
 
-          const receipt = await sendTransaction(approvalTx, {
+          await sendTransaction(approvalTx, {
             from: account,
             gas: approvalEstimate,
           });
@@ -114,13 +128,27 @@ export const useBitstake = () => {
           .deposit(graphToken, amount)
           .encodeABI();
 
-        const data = graphInstance.methods
-          .delegate(
-            indexerId,
-            amount,
-            0 // getId
-          )
-          .encodeABI();
+        let delegateData;
+
+        if (protocol === StakingProtocol.GRAPH) {
+          delegateData = graphInstance.methods
+            .delegate(
+              validatorId,
+              amount,
+              0 // getId
+            )
+            .encodeABI();
+        } else {
+          delegateData = maticInstance.methods
+            .buyShare(
+              validatorId,
+              amount,
+              0, // min share,
+              0 // get id
+            )
+            .encodeABI();
+        }
+
         const userWalletInstance = new window.web3.eth.Contract(
           userWalletRegistryAbi,
           onChainWalletAddress
@@ -128,7 +156,7 @@ export const useBitstake = () => {
 
         const tx = userWalletInstance.methods.executeMulti(
           [fundGatway, graphProtocol],
-          [depositEncodedData, data],
+          [depositEncodedData, delegateData],
           1,
           1
         );
@@ -421,50 +449,49 @@ export const useBitstake = () => {
       abiDecoder.addABI(graphProtocolAbi);
 
       const graphDelegation: GraphProtocolDelegation[] = [];
-      const aaveBorrows: AAVEBorrows[] = []; 
+      const aaveBorrows: AAVEBorrows[] = [];
 
       for (let i = 0; i < receipts.length; i++) {
-        if(!receipts[i]) {
+        if (!receipts[i]) {
           continue;
         }
 
         const block = await window.web3.eth.getBlock(receipts[i].blockNumber);
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
-        const graphProtocolEvents = decodedReceipt
-          .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === 'Borrow')
-          .forEach( (event: Web3Event) => {
-            
-            if(event.name === "GraphProtocolDelegated") {
-            graphDelegation.push({
-              indexer: event.events[0].value,
-              amount: `${parseFloat(fromWei(event.events[1].value)).toFixed(2)} GRT`,
-              blockNumber: receipts[i].blockNumber,
-              blockTimestamp: formatDate(block.timestamp)
-            });
+        decodedReceipt
+          .filter(
+            (dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === "Borrow"
+          )
+          .forEach((event: Web3Event) => {
+            if (event.name === "GraphProtocolDelegated") {
+              graphDelegation.push({
+                indexer: event.events[0].value,
+                amount: `${parseFloat(fromWei(event.events[1].value)).toFixed(2)} GRT`,
+                blockNumber: receipts[i].blockNumber,
+                blockTimestamp: formatDate(block.timestamp),
+              });
             }
-            if(event.name === "Borrow") {
+            if (event.name === "Borrow") {
               aaveBorrows.push({
                 depositToken: event.events[0].value,
                 depositAmt: event.events[1].value,
                 borrowToken: event.events[2].value,
                 borrowAmt: event.events[3].value,
                 rateMode: parseInt(event.events[4].value),
-                blockTimestamp: formatDate(block.timestamp)
+                blockTimestamp: formatDate(block.timestamp),
               });
             }
           });
-
-        graphDelegation.push(...graphProtocolEvents);
       }
       return {
         graphProtocolDelegation: graphDelegation,
-        aaveBorrows
+        aaveBorrows,
       };
     }
     return {
       graphProtocolDelegation: [],
-      aaveBorrows: []
-    }
+      aaveBorrows: [],
+    };
   };
 
   return {
