@@ -68,9 +68,44 @@ const userTransactionHeaders = [
     },
 ] as const;
 
+const maticTransactionHeaders = [
+    {
+        id: 'validator',
+        label: 'Validator',
+    },
+    {
+        id: 'amount',
+        label: 'Amount',
+    },
+    {
+        id: 'timestamp',
+        label: 'Timestamp',
+    },
+    {
+        id: 'actions',
+        label: 'Actions',
+    },
+] as const;
+
+
 const mapUserActionsTable = (data: UserActionResponse): StandardTableRows<typeof userTransactionHeaders> => {
     return data.graphProtocolDelegation.map(item => ({
         indexer: item.indexer,
+        amount: item.amount,
+        timestamp: item.blockTimestamp,
+        actions: <Button
+            variant="outlined"
+            color="secondary"
+            disabled
+        >
+            Manage
+        </Button>
+    }));
+}
+
+const mapMaticDelegationTable = (data: UserActionResponse): StandardTableRows<typeof maticTransactionHeaders> => {
+    return data.maticProtocolDelegation.map(item => ({
+        validator: item.validator,
         amount: item.amount,
         timestamp: item.blockTimestamp,
         actions: <Button
@@ -94,6 +129,7 @@ export const Assets = () => {
     const {account, chainId} = useWeb3React();
     const [balances, setBalances] = useState<StandardTableRows<typeof balanceHeaders>>([]);
     const [userTransaction, setUserTransaction] = useState<StandardTableRows<typeof userTransactionHeaders>>([]);
+    const [maticTransaction, setMaticTransaction]= useState<StandardTableRows<typeof maticTransactionHeaders>>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
@@ -121,6 +157,7 @@ export const Assets = () => {
             const userTransactions = await getUserActions?.(acc);
             if (userTransactions) {
                 setUserTransaction(mapUserActionsTable(userTransactions));
+                setMaticTransaction(mapMaticDelegationTable(userTransactions));
             }
         }
         if (account && chainId) {
@@ -149,12 +186,24 @@ export const Assets = () => {
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
-                    <Typography color="secondary" id="balance" variant="h5">
+                    <Typography color="secondary" id="graphstaking" variant="h5">
                         Graph Delegations
                     </Typography>
                 </Grid>
                 <Grid item>
                     <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
+                </Grid>
+            </Grid>
+
+            <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
+                  spacing={2}>
+                <Grid item>
+                    <Typography color="secondary" id="maticstaking" variant="h5">
+                        Matic Delegations
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
                 </Grid>
             </Grid>
         </Grid>
