@@ -45,7 +45,10 @@ export const parseBalance = (balance: BigNumberish, decimals = 18, decimalsToDis
 export const isConnected = (account?: unknown, library?: unknown) =>
   typeof account === "string" && !!library;
 
-export const truncateMiddle = (str: string) => {
+export const truncateMiddle = (str?: string) => {
+  if (!str) {
+    return '';
+  }
   if (str.length <= 10) {
     return str;
   }

@@ -5,7 +5,7 @@ import {Borrower, BorrowTable} from "./BorrowTable";
 import Paper from "@material-ui/core/Paper";
 import {Grid} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import {isNumeric, shortenHex} from "../util";
+import {isNumeric, shortenHex, truncateMiddle} from "../util";
 import {SelectToken} from "./SelectToken";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -87,7 +87,7 @@ export const BorrowSwapAndStake = () => {
                 <Grid item container spacing={4} direction="column" alignItems="center" justify="center">
                     <Grid className={classes.validator}>
                         <Typography variant="body1" color="secondary" id="modal-modal-description">
-                            Validator Id : {shortenHex(validator)}
+                            Validator Id : {truncateMiddle(validator)}
                         </Typography>
                     </Grid>
                     <Grid container direction="row" spacing={4} alignItems="center" justify="center">

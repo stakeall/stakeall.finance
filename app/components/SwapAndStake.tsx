@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
 import {graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl, getBN, isNumeric, shortenHex} from "../util";
+import {createMetamaskTokenUrl, getBN, isNumeric, shortenHex, truncateMiddle} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
@@ -76,7 +76,7 @@ export const SwapAndStake = () => {
                 <Grid container spacing={4} direction="column">
                     <Grid className={classes.validator}>
                         <Typography variant="body1" color="secondary" id="modal-modal-description">
-                            Validator Id : {shortenHex(validator)}
+                            Validator Id : {truncateMiddle(validator)}
                         </Typography>
                     </Grid>
                     <SelectToken tokenDetails={tokenDetails} handleTokenChange={handleTokenChange}/>

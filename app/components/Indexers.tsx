@@ -3,7 +3,8 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {GraphIndexers} from "./GraphIndexers";
 import {ProtocolCards} from "./ProtocolCards";
-import {GRAPH} from "../constants/Protocols";
+import {GRAPH, MATIC} from "../constants/Protocols";
+import {MaticIndexers} from "./MaticIndexers";
 
 const useIndexersStyles = makeStyles((theme) =>
     createStyles({
@@ -18,6 +19,9 @@ export const Indexers: React.FC = () => {
     }
     else if (selectedProtocol === GRAPH) {
         return <GraphIndexers />;
+    }
+    else if (selectedProtocol === MATIC) {
+        return <MaticIndexers />;
     }
     else {
         return null;

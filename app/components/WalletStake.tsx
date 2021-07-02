@@ -11,7 +11,7 @@ import {Paper} from "@material-ui/core";
 import useETHBalance from "../hooks/useETHBalance";
 import {Web3Provider} from "@ethersproject/providers";
 import {useWeb3React} from "@web3-react/core";
-import {isNumeric, shortenHex} from "../util";
+import {isNumeric, shortenHex, truncateMiddle} from "../util";
 import {graphToken, GRT_DECIMAL} from "../constants/contracts";
 import {formatBalance, toWei} from '../util';
 
@@ -41,12 +41,9 @@ export const WalletStake: React.FC = () => {
     const [amount, setAmount] = useState<string>('');
     const [amountError, setAmountError] = useState<string>('');
     const [data, setData] = useState<string>('');
-    const [clicked, setClicked] = useState<boolean>(true);
     const {account, chainId} = useWeb3React<Web3Provider>();
-    //const {data} = useETHBalance(account);
 
     useEffect(() => {
-        setClicked(false);
         setAmount('');
         setAmountError('');
     }, [])
@@ -75,7 +72,7 @@ export const WalletStake: React.FC = () => {
         <Paper className={classes.walletContainer} elevation={2}>
             <Grid className={classes.validator}>
                 <Typography variant="body1" color="secondary" id="modal-modal-description">
-                    Validator Id : {shortenHex(validator)}
+                    Validator Id : {truncateMiddle(validator)}
                 </Typography>
             </Grid>
             <Grid className={classes.amount}>
@@ -98,7 +95,6 @@ export const WalletStake: React.FC = () => {
             <Grid className={classes.buttonContainer} container spacing={2}>
                 <Grid item>
                     <Button color="secondary" variant="outlined" onClick={() => {
-                        setClicked(true);
                         if (validator && validateAmount()) {
                             delegate?.(validator, toWei(amount, GRT_DECIMAL))
                         }

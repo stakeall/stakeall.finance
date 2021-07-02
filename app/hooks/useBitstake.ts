@@ -391,10 +391,6 @@ export const useBitstake = () => {
         gas: estimatedGas,
         value: ethvalue
       });
-      // await transaction.send({
-      //   from: account,
-      //   gas: estimatedGas,
-      // });
       setPageLoading?.(false);
     },
     [account, onChainWalletAddress]
