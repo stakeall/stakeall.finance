@@ -228,3 +228,7 @@ export const getBN = (amount: string, decimals: number | string) => {
 }
 
 export const isNumeric = (num: string) => /^-?\d*\.?\d+$/.test(num);
+
+export const formatDate = (timestamp: number) => {
+  return new Date( parseInt(timestamp) * 1000 ).toLocaleDateString("en-US")
+}

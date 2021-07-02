@@ -22,7 +22,7 @@ import { useWeb3React } from "@web3-react/core";
 import { injected } from "../connectors";
 import { BN } from "ethereumjs-util";
 const abiDecoder = require("abi-decoder");
-import {fromWei} from '../util';
+import {fromWei, formatDate} from '../util';
 
 export interface GraphProtocolDelegation {
   indexer: string;
@@ -31,8 +31,22 @@ export interface GraphProtocolDelegation {
   blockTimestamp: string;
 }
 
+export interface AAVEBorrows {
+  depositToken: string,
+  depositAmt: string,
+  borrowToken: string,
+  borrowAmt: string,
+  rateMode: number,
+  blockTimestamp: string
+}
+
+export interface Web3Event {
+ name: string;
+ events: {name: string; value: string}[]
+} 
 export interface UserActionResponse {
   graphProtocolDelegation: GraphProtocolDelegation[];
+  aaveBorrows: AAVEBorrows[];
 }
 import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
 
@@ -424,6 +438,7 @@ export const useBitstake = () => {
       abiDecoder.addABI(graphProtocolAbi);
 
       const graphDelegation: GraphProtocolDelegation[] = [];
+      const aaveBorrows: AAVEBorrows[] = []; 
 
       for (let i = 0; i < receipts.length; i++) {
         if(!receipts[i]) {
@@ -433,24 +448,39 @@ export const useBitstake = () => {
         const block = await window.web3.eth.getBlock(receipts[i].blockNumber);
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
         const graphProtocolEvents = decodedReceipt
-          .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated")
-          .map((event: any): GraphProtocolDelegation => {
-            return {
+          .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === 'Borrow')
+          .forEach( (event: Web3Event) => {
+            
+            if(event.name === "GraphProtocolDelegated") {
+            graphDelegation.push({
               indexer: event.events[0].value,
               amount: `${parseFloat(fromWei(event.events[1].value)).toFixed(2)} GRT`,
               blockNumber: receipts[i].blockNumber,
-              blockTimestamp:new Date( parseInt(block.timestamp) * 1000 ).toLocaleDateString("en-US")
-            };
+              blockTimestamp: formatDate(block.timestamp)
+            });
+            }
+            if(event.name === "Borrow") {
+              aaveBorrows.push({
+                depositToken: event.events[0].value,
+                depositAmt: event.events[1].value,
+                borrowToken: event.events[2].value,
+                borrowAmt: event.events[3].value,
+                rateMode: parseInt(event.events[4].value),
+                blockTimestamp: formatDate(block.timestamp)
+              });
+            }
           });
 
         graphDelegation.push(...graphProtocolEvents);
       }
       return {
         graphProtocolDelegation: graphDelegation,
+        aaveBorrows
       };
     }
     return {
-      graphProtocolDelegation: []
+      graphProtocolDelegation: [],
+      aaveBorrows: []
     }
   };
 
