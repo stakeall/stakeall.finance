@@ -141,7 +141,7 @@ export const Assets = () => {
 
     console.log({userTransaction});
     return (
-        <Grid direction="column" container>
+        <Grid direction="column" wrap="nowrap" container>
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container spacing={2}>
                 <Grid item>
                     <Typography color="secondary" id="balance" variant="h5">
@@ -152,21 +152,17 @@ export const Assets = () => {
                     <StandardTable headers={balanceHeaders} rows={balances}/>
                 </Grid>
             </Grid>
-            {userTransaction && !!userTransaction.length && (
-                <>
-                    <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
-                          spacing={2}>
-                        <Grid item>
-                            <Typography color="secondary" id="balance" variant="h5">
-                                Graph Delegations
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
-                        </Grid>
-                    </Grid>
-                </>
-            )}
+            <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
+                  spacing={2}>
+                <Grid item>
+                    <Typography color="secondary" id="balance" variant="h5">
+                        Graph Delegations
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
+                </Grid>
+            </Grid>
         </Grid>
     );
 }
