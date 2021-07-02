@@ -221,3 +221,5 @@ export const getBN = (amount: string, decimals: number | string) => {
           )
       )
 }
+
+export const isNumeric = (num: string) => /^-?\d*\.?\d+$/.test(num);

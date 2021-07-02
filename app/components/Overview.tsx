@@ -7,7 +7,6 @@ import {Assets} from "./Assets";
 const useOverviewStyles = makeStyles((theme: Theme) =>
     createStyles({
         overviewContainer: {
-            height: '400px',
             width: '100%',
         },
     })

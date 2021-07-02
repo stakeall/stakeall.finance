@@ -10,12 +10,16 @@ import {useWeb3React} from "@web3-react/core";
 import {BalanceDetailsMap, formatBalance} from "../util";
 import {Bitstake} from "../contexts/Bitstake";
 import {Loading} from "./Loading";
+import {UserActionResponse} from "../hooks/useBitstake";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
         table: {},
         tableContainer: {
             height: '100%',
+            padding: '30px',
         },
         logo: {
             height: '30px',
@@ -25,7 +29,7 @@ const useAssetStyles = makeStyles((theme: Theme) =>
     })
 )
 
-const headers = [
+const balanceHeaders = [
     {
         id: 'logo',
         label: '',
@@ -49,7 +53,40 @@ const headers = [
     },
 ] as const;
 
-const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):string => {
+const userTransactionHeaders = [
+    {
+        id: 'indexer',
+        label: 'Indexer',
+    },
+    {
+        id: 'amount',
+        label: 'Amount',
+    },
+    {
+        id: 'timestamp',
+        label: 'Timestamp',
+    },
+    {
+        id: 'actions',
+        label: 'Actions',
+    },
+] as const;
+
+const mapUserActionsTable = (data: UserActionResponse): StandardTableRows<typeof userTransactionHeaders> => {
+    return data.graphProtocolDelegation.map(item => ({
+        indexer: item.indexer,
+        amount: item.amount,
+        timestamp: item.blockTimestamp,
+        actions: <Button
+            variant="outlined"
+            color="secondary"
+            disabled
+        >
+            Manage
+        </Button>
+    }));
+}
+const formatUSDWorthOfAsset = (formattedBalance: string, usdPrice: string): string => {
     const usdPriceFloat = parseFloat(usdPrice);
     const formattedBalanceFloat = parseFloat(formattedBalance);
     return `$${parseFloat(`${formattedBalanceFloat * usdPriceFloat}`).toFixed(2)}`;
@@ -58,8 +95,9 @@ const formatUSDWorthOfAsset =  (formattedBalance: string, usdPrice: string):stri
 export const Assets = () => {
     const {getUserActions} = useContext(Bitstake);
     const classes = useAssetStyles();
-   const {account, chainId} = useWeb3React();
-    const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
+    const {account, chainId} = useWeb3React();
+    const [balances, setBalances] = useState<StandardTableRows<typeof balanceHeaders>>([]);
+    const [userTransaction, setUserTransaction] = useState<StandardTableRows<typeof userTransactionHeaders>>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
@@ -84,8 +122,11 @@ export const Assets = () => {
             setLoading(false);
         }
 
-        const fetchUserTransactions = async(acc: string) => {
-            getUserActions && (await getUserActions(acc)); //todo @antony how to fix this?
+        const fetchUserTransactions = async (acc: string) => {
+            const userTransactions = await getUserActions?.(acc);
+            if (userTransactions) {
+                setUserTransaction(mapUserActionsTable(userTransactions));
+            }
         }
         if (account && chainId) {
             fetchBalances(account, chainId);
@@ -95,12 +136,37 @@ export const Assets = () => {
     }, [account, chainId])
 
     if (loading) {
-        return <Loading />;
+        return <Loading/>;
     }
 
+    console.log({userTransaction});
     return (
-        <Grid className={classes.tableContainer} container>
-            <StandardTable headers={headers} rows={balances}/>
+        <Grid direction="column" container>
+            <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container spacing={2}>
+                <Grid item>
+                    <Typography color="secondary" id="balance" variant="h5">
+                        Balances
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <StandardTable headers={balanceHeaders} rows={balances}/>
+                </Grid>
+            </Grid>
+            {userTransaction && !!userTransaction.length && (
+                <>
+                    <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
+                          spacing={2}>
+                        <Grid item>
+                            <Typography color="secondary" id="balance" variant="h5">
+                                Graph Delegations
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
+                        </Grid>
+                    </Grid>
+                </>
+            )}
         </Grid>
     );
 }

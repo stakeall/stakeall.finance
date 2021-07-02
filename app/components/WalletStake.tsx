@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
@@ -11,8 +11,8 @@ import {Paper} from "@material-ui/core";
 import useETHBalance from "../hooks/useETHBalance";
 import {Web3Provider} from "@ethersproject/providers";
 import {useWeb3React} from "@web3-react/core";
-import {shortenHex} from "../util";
-import { graphToken, GRT_DECIMAL} from "../constants/contracts";
+import {isNumeric, shortenHex} from "../util";
+import {graphToken, GRT_DECIMAL} from "../constants/contracts";
 import {formatBalance, toWei} from '../util';
 
 const useWalletStakeStyles = makeStyles((theme) =>
@@ -39,6 +39,7 @@ export const WalletStake: React.FC = () => {
     const {validator} = useContext(AppCommon);
     const {delegate, getTokenBalance} = useContext(Bitstake);
     const [amount, setAmount] = useState<string>('');
+    const [amountError, setAmountError] = useState<string>('');
     const [data, setData] = useState<string>('');
     const [clicked, setClicked] = useState<boolean>(true);
     const {account, chainId} = useWeb3React<Web3Provider>();
@@ -47,22 +48,28 @@ export const WalletStake: React.FC = () => {
     useEffect(() => {
         setClicked(false);
         setAmount('');
+        setAmountError('');
     }, [])
 
     useEffect(() => {
-        const fetchAmount = async (acc: string) => {
-            const amount  = await getTokenBalance?.(graphToken);
-            
-            setData(formatBalance(amount || '', GRT_DECIMAL));    
-         }
-
-        if(account) {
-
-         fetchAmount(account);       
+        const fetchAmount = async () => {
+            const amount = await getTokenBalance?.(graphToken);
+            setData(formatBalance(amount || '', GRT_DECIMAL));
         }
-        
+
+        if (account) {
+            fetchAmount();
+        }
+
     }, [account, chainId])
-    const amountError = useMemo(() => !amount && clicked, [amount, clicked]);
+
+    const validateAmount = useCallback(() => {
+        if(!isNumeric(amount)) {
+            setAmountError('Enter valid amount')
+            return false;
+        }
+        return true;
+    }, [amount]);
 
     return (
         <Paper className={classes.walletContainer} elevation={2}>
@@ -75,15 +82,13 @@ export const WalletStake: React.FC = () => {
                 <Typography color="textSecondary" id="balance" variant="body1">
                     Balance: {data}
                 </Typography>
-                <Typography id="amount" variant="h5" component="h2">
-                    Delegate Amount:
-                </Typography>
                 <TextField
                     value={amount}
-                    error={amountError}
-                    helperText={amountError && "Please enter amount"}
+                    error={amountError !== ''}
+                    helperText={amountError}
                     type="number"
                     onChange={(e) => {
+                        setAmountError('');
                         setAmount(e.target.value)
                     }}
                     label="Amount"
@@ -94,7 +99,7 @@ export const WalletStake: React.FC = () => {
                 <Grid item>
                     <Button size="large" variant="outlined" onClick={() => {
                         setClicked(true);
-                        if (!!amount && validator) {
+                        if (validator && validateAmount()) {
                             delegate?.(validator, toWei(amount, GRT_DECIMAL))
                         }
                     }}>
