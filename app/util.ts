@@ -202,3 +202,22 @@ export const toWei = (amount: string, decimal: number): string  => {
   const formatredamt = (parseFloat(amount) * 10000).toFixed(0);
   return (new BN(formatredamt).mul(new BN(10).pow(new BN(decimal))).div(new BN(10000))).toString(10);
 }
+
+export const getBN = (amount: string, decimals: number | string) => {
+  const [whole, fractional] = amount.split('.');
+  const wholeBN = new BN(whole);
+  const fractionalBN = new BN(fractional);
+  const decimalsBN = new BN(decimals || 1);
+  const tenBN = new BN(10)
+  const fractionalLengthBN = new BN(fractional?.length || 1);
+  return wholeBN
+      .mul(tenBN
+          .pow(fractionalLengthBN)
+      )
+      .add(fractionalBN)
+      .mul(tenBN
+          .pow(decimalsBN
+              .sub(fractionalLengthBN)
+          )
+      )
+}

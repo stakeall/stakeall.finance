@@ -16,7 +16,7 @@ import {graphToken} from "../constants/contracts";
 import {BN} from "ethereumjs-util";
 import TextField from "@material-ui/core/TextField";
 import {ContractMap} from "../constants/contractMap";
-import {shortenHex} from "../util";
+import {getBN, shortenHex} from "../util";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -65,22 +65,10 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
             validator || '',
             (depositTokenDetails && depositTokenDetails.id) || '',
             graphToken,
-            new BN(depositAmount || '')
-                .mul(
-                    new BN(10)
-                        .pow(
-                            new BN(depositTokenDetails?.decimals || 1)
-                        )
-                ).toString(),
-            new BN(borrowAmount)
-                .mul(
-                    new BN(10)
-                        .pow(
-                            new BN(borrowTokenDetails?.decimals || 1)
-                        )
-                ).toString(),
+            getBN(depositAmount || '', depositTokenDetails?.decimals || 1).toString(),
+            getBN(borrowAmount, borrowTokenDetails?.decimals || 1).toString(),
             borrowerId || '',
-            rateMode
+            rateMode,
         )
     }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrowerId, rateMode]);
     return (
