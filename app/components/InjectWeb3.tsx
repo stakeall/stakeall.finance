@@ -14,7 +14,6 @@ export const InjectWeb3 = () => {
     const { account } = useWeb3React();
     useEffect(() => {
         const enableEth = async () => {
-            console.log('in enableEth', window.ethereum, injectedEth);
             if (window.ethereum && !injectedEth) {
                 window.web3 = new Web3(window.ethereum);
                 setInjectedEth?.(true);

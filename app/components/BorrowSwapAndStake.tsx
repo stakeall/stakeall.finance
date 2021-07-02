@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
-import {BorrowTable} from "./BorrowTable";
+import {Borrower, BorrowTable} from "./BorrowTable";
 import Paper from "@material-ui/core/Paper";
 import {Grid} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
@@ -34,7 +34,7 @@ const useBorrowSwapAndStakeStyles = makeStyles((theme) =>
 
 export const BorrowSwapAndStake = () => {
     const classes = useBorrowSwapAndStakeStyles();
-    const [borrowerId, setBorrowerId] = useState<string>('');
+    const [borrower, setBorrower] = useState<Borrower>();
     const {validator} = useContext(AppCommon);
     const [depositToken, setDepositToken] = useState<string>('Ethereum');
     const [depositAmount, setDepositAmount] = useState<string>('');
@@ -43,19 +43,18 @@ export const BorrowSwapAndStake = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
 
     const borrowTokenDetails = useMemo(() => {
-        const x = toChecksumAddress(borrowerId);
-        console.log({x});
+        const x = toChecksumAddress(borrower?.underlyingAsset || '');
         return contractMap[x];
-    }, [borrowerId]);
+    }, [borrower]);
 
     const modalBorrowDetails: BorrowModalProps['borrowDetails'] = useMemo(() => ({
-        borrowerId,
+        borrower,
         borrowTokenDetails,
         depositAmount,
         depositTokenDetails,
         validator,
     }), [
-        borrowerId,
+        borrower,
         borrowTokenDetails,
         depositAmount,
         depositTokenDetails,
@@ -112,8 +111,8 @@ export const BorrowSwapAndStake = () => {
                 <Paper className={classes.table}>
                     <Grid item container spacing={4} direction="column">
                         <BorrowTable
-                            setBorrowerId={(id) => {
-                                setBorrowerId(id);
+                            setBorrower={(borrower) => {
+                                setBorrower(borrower);
                                 setModalOpen(true);
                             }}
                             borrowDetails={modalBorrowDetails}

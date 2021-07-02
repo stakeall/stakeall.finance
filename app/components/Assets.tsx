@@ -134,7 +134,6 @@ export const Assets = () => {
         return <Loading/>;
     }
 
-    console.log({userTransaction});
     return (
         <Grid direction="column" wrap="nowrap" container>
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container spacing={2}>

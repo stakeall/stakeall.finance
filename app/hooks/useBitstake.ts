@@ -101,19 +101,11 @@ export const useBitstake = () => {
           const approvalTx = grtERC20Instance.methods.approve(onChainWalletAddress, amount);
 
           const approvalEstimate = await approvalTx.estimateGas({ from: account });
-          console.log("approvalEstimate  " + approvalEstimate);
 
           const receipt = await sendTransaction(approvalTx, {
             from: account,
             gas: approvalEstimate,
           });
-
-          // const receipt = await approvalTx.send({
-          //   from: account,
-          //   gas: approvalEstimate,
-          // });
-
-          console.log(receipt);
         }
 
         const fundGatewayInstance = await new window.web3.eth.Contract(fundGatewaylAbi, fundGatway);
@@ -134,8 +126,6 @@ export const useBitstake = () => {
           onChainWalletAddress
         );
 
-        console.log("estimating");
-
         const tx = userWalletInstance.methods.executeMulti(
           [fundGatway, graphProtocol],
           [depositEncodedData, data],
@@ -143,16 +133,11 @@ export const useBitstake = () => {
           1
         );
         const estimatedGas = await tx.estimateGas({ from: account });
-        console.log("multicallEstimate  " + estimatedGas);
 
         await sendTransaction(tx, {
           from: account,
           gas: estimatedGas,
         });
-        // await tx.send({
-        //   from: account,
-        //   gas: estimatedGas,
-        // });
       }
     },
     [account, onChainWalletAddress]
@@ -195,8 +180,6 @@ export const useBitstake = () => {
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
-      console.log("source Token  " + sourceToken);
-      console.log("source Token amount  " + sourceTokenAmount);
       const destinationToken = graphToken;
       if (sourceToken !== ETH_TOKEN) {
         const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);

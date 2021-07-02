@@ -3,7 +3,7 @@ import {AaveReserveResponse, ReserveData} from "../types/AaveData";
 import {AaveClient} from "../api/graphQl/apolloClient";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {AStandardTableRows, StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
-import {v2} from "@aave/protocol-js";
+import {ComputedReserveData, v2} from "@aave/protocol-js";
 import {Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
@@ -17,14 +17,17 @@ import {Loading} from "./Loading";
 import {fromWei} from '../util';
 import {TokenNameSymbol} from "./TokenNameSymbol";
 
+export interface Borrower extends ComputedReserveData {
+    maxBorrowAmount?: string,
+}
 interface BorrowTableProps {
-    setBorrowerId: (borrowerId: string) => void,
+    setBorrower: (borrower: Borrower) => void,
     borrowDetails: {
         validator?: string,
         depositTokenDetails?: ContractMap[string],
         depositAmount?: string,
         borrowTokenDetails?: ContractMap[string],
-        borrowerId?: string,
+        borrower?: Borrower,
     },
 }
 
@@ -125,18 +128,8 @@ const headers = [
         width: 50,
     },
     {
-        id: 'swapAmount',
-        label: 'Swap Amount',
-        width: 50,
-    },
-    {
-        id: 'swapSymbol',
-        label: 'Swap Asset',
-        width: 50,
-    },
-    {
-        id: 'swapAssetAddress',
-        label: 'Swap Asset Address',
+        id: 'swapToken',
+        label: 'Swap Token',
         width: 50,
     },
     {
@@ -182,7 +175,7 @@ const getReserve = (reserveData: ReserveData[], symbol?: string) => { // todo:  
 const mapToTableData = (
     data: AaveReserveResponse['data'],
     borrowDetails: BorrowTableProps['borrowDetails'],
-    onBorrow: (borrowerId: string) => void,
+    onBorrow: BorrowTableProps['setBorrower'],
     onChainWalletAddress?: string,
 ): AStandardTableRows<typeof headers> => {
     const currentTimestamp = (Date.now() / 1000).toFixed();
@@ -218,15 +211,16 @@ const mapToTableData = (
             variableBorrowRate: `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
             stableBorrowRate: `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
             maxBorrowAmount: maxBorrowAmount,
-            swapAmount: parseFloat(fromWei(swapAmount)).toFixed(2),
-            swapSymbol: "GRT",
-            swapAssetAddress: shortenHex(graphToken),
+            swapToken: `${parseFloat(fromWei(swapAmount)).toFixed(2)} GRT`,
             actions: (
                 <Button
                     variant="outlined"
                     color="secondary"
                     onClick={() => {
-                        onBorrow(row.underlyingAsset)
+                        onBorrow({
+                            ...row,
+                            maxBorrowAmount,
+                        })
                     }}
                 >
                     Borrow
@@ -243,7 +237,7 @@ const filterOutReserves = (aaveReserves: AaveReserveResponse['data']) => {
 
 }
 
-export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId, borrowDetails}) => {
+export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDetails}) => {
 
     const classes = useBorrowTableStyles();
     const {data, loading, error} = useQuery<AaveReserveResponse['data']>(query, {
@@ -252,10 +246,10 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId, borrowDe
     const [loadingTableData, setLoadingTableData] = useState<boolean>(false);
     const [tableData, setTableData] = useState<StandardTableRows<typeof headers>>([]);
     const {onChainWalletAddress} = useContext(Bitstake);
-    console.log('onChainWalletAddress : ', onChainWalletAddress);
-    const onBorrow = useCallback((borrowerId: string) => {
-        setBorrowerId?.(borrowerId);
-    }, [setBorrowerId]);
+
+    const onBorrow = useCallback((borrower: Borrower) => {
+        setBorrower?.(borrower);
+    }, [setBorrower]);
 
 
     useEffect(() => {

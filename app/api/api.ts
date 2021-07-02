@@ -16,7 +16,6 @@ export const covalent = {
         try{
         
             const tokenBalances = await getAddressBalances(address);
-            console.log({tokenBalances});
             const symbolAddressMap: {
                 [key: string]: string;
             } = {};

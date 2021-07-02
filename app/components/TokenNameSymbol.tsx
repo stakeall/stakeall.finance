@@ -33,7 +33,6 @@ export const TokenNameSymbol: React.FC<TokenNameSymbolProps> = ({ tokenId }) => 
         }
         return Object.values(contractMap).find(item => item.id.toLowerCase() === tokenId.toLowerCase());
     }, [tokenId]);
-    console.log({token, tokenId, contractMap});
 
     return (
         <Grid className={classes.container} wrap="nowrap" container spacing={2} justify="center" alignItems="center">

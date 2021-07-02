@@ -13,10 +13,10 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {graphToken} from "../constants/contracts";
-import {BN} from "ethereumjs-util";
 import TextField from "@material-ui/core/TextField";
 import {ContractMap} from "../constants/contractMap";
 import {getBN, shortenHex} from "../util";
+import {Borrower} from "./BorrowTable";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -26,7 +26,7 @@ export interface BorrowModalProps {
         depositTokenDetails?: ContractMap[string],
         depositAmount?: string,
         borrowTokenDetails?: ContractMap[string],
-        borrowerId?: string,
+        borrower?: Borrower,
     },
 }
 
@@ -57,7 +57,7 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
         depositTokenDetails,
         depositAmount,
         borrowTokenDetails,
-        borrowerId,
+        borrower,
     } = useMemo(() => borrowDetails, [borrowDetails]);
 
     const handleBorrow = useCallback(() => {
@@ -67,10 +67,10 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
             graphToken,
             getBN(depositAmount || '', depositTokenDetails?.decimals || 1).toString(),
             getBN(borrowAmount, borrowTokenDetails?.decimals || 1).toString(),
-            borrowerId || '',
+            borrower?.underlyingAsset || '',
             rateMode,
         )
-    }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrowerId, rateMode]);
+    }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrower, rateMode]);
     return (
         <Modal
             open={open}
@@ -101,6 +101,11 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
                     <Grid item>
                         <Typography variant="body1" component="h2">
                             Borrower Token: {borrowTokenDetails?.symbol}
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="body1" component="h2">
+                            Max Borrow Amount: {borrower?.maxBorrowAmount || ''}
                         </Typography>
                     </Grid>
                     <Grid item>
