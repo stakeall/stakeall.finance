@@ -8,7 +8,6 @@ export const AppCommonProvider: React.FC = ( { children }) => {
     const [validator, setValidator] = useState<string | undefined>();
     const [injectedEth, setInjectedEth] = useState<boolean | undefined>(false);
 
-
     const appCommonData = useMemo(() => ({
         pageLoading,
         setPageLoading,

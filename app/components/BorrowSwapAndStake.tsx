@@ -68,6 +68,7 @@ export const BorrowSwapAndStake = () => {
     }, [depositToken])
 
     const handleTokenChange = useCallback((name: string) => {
+        setShowBorrowTable(false);
         setDepositToken(name);
     }, []);
 
@@ -87,6 +88,7 @@ export const BorrowSwapAndStake = () => {
                                 type="number"
                                 value={depositAmount}
                                 onChange={(e) => {
+                                    setShowBorrowTable(false);
                                     setDepositAmount(e.target.value)
                                 }}
                                 label="Deposit Amount"
@@ -115,7 +117,6 @@ export const BorrowSwapAndStake = () => {
                                 setModalOpen(true);
                             }}
                             borrowDetails={modalBorrowDetails}
-
                         />
                     </Grid>
                 </Paper>

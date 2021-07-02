@@ -5,6 +5,8 @@ import Grid from "@material-ui/core/Grid";
 import {Typography} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
+import {useWeb3React} from "@web3-react/core";
+import {Account} from "./Account";
 
 const usePageLoaderStyles = makeStyles((theme) =>
     createStyles({
@@ -12,11 +14,28 @@ const usePageLoaderStyles = makeStyles((theme) =>
             height: '100vh',
             width: '100vw',
         },
+        logo: {
+            height: '100px',
+            width: '100px',
+        }
     })
 )
 export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
     const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
+    const { account } = useWeb3React();
+    if (!account) {
+        return (
+            <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
+                <Grid item>
+                    <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg" alt="metamask icon"/>
+                </Grid>
+                <Grid item>
+                    <Account />
+                </Grid>
+            </Grid>
+        )
+    }
     if(pageLoading) {
         return (
             <Grid className={classes.container} container direction="column" justify="center" alignItems="center">

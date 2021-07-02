@@ -20,6 +20,13 @@ export type StandardTableRows<T extends Readonly<Headers>> =
         [k in T[number]["id"]]: string | React.ReactNode;
     }>
 
+export type AStandardTableRows<T extends Readonly<Headers>> =
+    Array<Promise<Record<string, string | React.ReactNode>>> &
+    Array<Promise<{
+        [k in T[number]["id"]]: string | React.ReactNode;
+    }>>
+
+
 type CellStyles = {
     width?: number,
 }

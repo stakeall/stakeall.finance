@@ -35,12 +35,6 @@ export interface UserActionResponse {
 }
 import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
 
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export const useBitstake = () => {
   const { account, chainId } = useWeb3React();
   const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>("");
@@ -73,7 +67,6 @@ export const useBitstake = () => {
   }, [chainId, account]);
 
   useEffect(() => {
-    console.log({ account });
     if (account) {
       checkIfOnChainWalletExists();
     }

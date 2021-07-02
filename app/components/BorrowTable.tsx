@@ -2,7 +2,7 @@ import {gql, useQuery} from "@apollo/client";
 import {AaveReserveResponse, ReserveData} from "../types/AaveData";
 import {AaveClient} from "../api/graphQl/apolloClient";
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
+import {AStandardTableRows, StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {v2} from "@aave/protocol-js";
 import {Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import {ContractMap} from "../constants/contractMap";
 import {Bitstake} from "../contexts/Bitstake";
 import {oneInchApi} from "../api/api";
+import {Loading} from "./Loading";
 
 interface BorrowTableProps {
     setBorrowerId: (borrowerId: string) => void,
@@ -177,21 +178,17 @@ const aaveAdddressesMap: Record<string, number> = {
 };
 
 const getReserve = (reserveData: ReserveData[], symbol?: string) => { // todo:  symbol should not be optional 
-    console.log('symbol : ', symbol);
-    console.log('reserveData : ', reserveData);
     const tokenReserve = reserveData.find(reserve => reserve.symbol === symbol || (symbol === "ETH" && reserve.symbol === "WETH"));
-    console.log('tokenReserve ', tokenReserve);
     return tokenReserve;
 }
 
-const mapToTableData = async (
+const mapToTableData = (
     data: AaveReserveResponse['data'],
     borrowDetails: BorrowTableProps['borrowDetails'],
     onBorrow: (borrowerId: string) => void,
     onChainWalletAddress?: string,
-): Promise<StandardTableRows<typeof headers>> => {
+): AStandardTableRows<typeof headers> => {
     const currentTimestamp = (Date.now() / 1000).toFixed();
-    console.log('data ', data);
     const aaveReserve = getReserve(data?.reserves, "AAVE");
 
     const aavePriceInEth = aaveReserve?.price.priceInEth;
@@ -201,7 +198,7 @@ const mapToTableData = async (
     const sourceTokenPriceInEth = sourceTokenReserve?.price.priceInEth || '0';
     const sourceTokenBaseLTVasCollateral = sourceTokenReserve?.baseLTVasCollateral || '0';
 
-    return Promise.all(reserveFormattedData.map(async (row) => {
+    return reserveFormattedData.map(async (row) => {
         const maxBorrowAmount = (
             parseFloat(sourceTokenBaseLTVasCollateral) / 10000) *
             (
@@ -213,7 +210,7 @@ const mapToTableData = async (
             row.underlyingAsset,
             graphToken,
             toWei(maxBorrowAmount.toString(),
-            row.decimals),
+                row.decimals),
             "1",
             onChainWalletAddress || ''
         );
@@ -240,7 +237,7 @@ const mapToTableData = async (
                 </Button>
             ),
         }
-    }));
+    });
 }
 
 const filterOutReserves = (aaveReserves: AaveReserveResponse['data']) => {
@@ -256,6 +253,7 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId, borrowDe
     const {data, loading, error} = useQuery<AaveReserveResponse['data']>(query, {
         client: AaveClient,
     });
+    const [loadingTableData, setLoadingTableData] = useState<boolean>(false);
     const [tableData, setTableData] = useState<StandardTableRows<typeof headers>>([]);
     const {onChainWalletAddress} = useContext(Bitstake);
     console.log('onChainWalletAddress : ', onChainWalletAddress);
@@ -266,25 +264,31 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrowerId, borrowDe
 
     useEffect(() => {
         const mapData = async () => {
-            if (data) {
+            if (data && borrowDetails?.depositAmount && borrowDetails?.depositAmount !== '0') {
+                setLoadingTableData(true);
                 const filteredReserves = filterOutReserves(data);
-                const mappedData = await mapToTableData(
-                    {
-                        reserves: filteredReserves,
-                        incentivesControllers: data.incentivesControllers
-                    },
-                    borrowDetails,
-                    onBorrow,
-                    onChainWalletAddress
-                );
-                setTableData(mappedData);
+                const mappedData = mapToTableData(
+                        {
+                            reserves: filteredReserves,
+                            incentivesControllers: data.incentivesControllers
+                        },
+                        borrowDetails,
+                        onBorrow,
+                        onChainWalletAddress
+                    );
+                const updatedMappedData = await Promise.all(mappedData.map(item => item.catch(
+                    () => Symbol('Failed')
+                )));
+                // @ts-ignore
+                setTableData(updatedMappedData.filter(item => item !== Symbol('Failed')));
+                setLoadingTableData(false);
             }
         }
         mapData();
-    }, [data]);
+    }, [data, borrowDetails]);
 
-    if (loading) {
-        return <h2>Loading...</h2>;
+    if (loading || loadingTableData) {
+        return <Loading/>;
     }
 
     if (error) {

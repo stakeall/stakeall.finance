@@ -2,7 +2,7 @@ import React from "react";
 
 interface AppCommonData {
     pageLoading: boolean,
-    setPageLoading: (loading: boolean) => void,
+    setPageLoading: (loading: boolean, metamaskDisconnected?: boolean) => void,
     validator: string,
     setValidator: (validator: string) => void,
     injectedEth: boolean,

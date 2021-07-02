@@ -9,6 +9,7 @@ import {formatToken, truncateMiddle} from "../util";
 import Button from "@material-ui/core/Button";
 import {AppCommon} from "../contexts/AppCommon";
 import {useRouter} from "next/router";
+import {Loading} from "./Loading";
 
 const queryVariables = {
     orderBy: "stakedTokens",
@@ -224,7 +225,7 @@ export const GraphIndexers = () => {
     }, [data]);
 
     if (loading) {
-        return <h2>Loading...</h2>;
+        return <Loading />;
     }
 
     if (error) {

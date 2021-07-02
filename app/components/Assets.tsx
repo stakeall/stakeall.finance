@@ -9,6 +9,7 @@ import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {useWeb3React} from "@web3-react/core";
 import {BalanceDetailsMap, formatBalance} from "../util";
 import {Bitstake} from "../contexts/Bitstake";
+import {Loading} from "./Loading";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -59,6 +60,7 @@ export const Assets = () => {
     const classes = useAssetStyles();
    const {account, chainId} = useWeb3React();
     const [balances, setBalances] = useState<StandardTableRows<typeof headers>>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
         return Object.keys(balances).map((address,) => {
@@ -76,8 +78,10 @@ export const Assets = () => {
 
     useEffect(() => {
         const fetchBalances = async (acc: string, ch: number) => {
+            setLoading(true);
             const balance = await covalent.getAllBalance(ch, acc)
             setBalances(mapToAssets(balance));
+            setLoading(false);
         }
 
         const fetchUserTransactions = async(acc: string) => {
@@ -90,6 +94,9 @@ export const Assets = () => {
 
     }, [account, chainId])
 
+    if (loading) {
+        return <Loading />;
+    }
 
     return (
         <Grid className={classes.tableContainer} container>
