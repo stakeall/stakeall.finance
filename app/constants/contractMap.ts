@@ -1,5 +1,6 @@
 const metamaskContractMap = require('@metamask/contract-metadata');
 import {ETH_TOKEN} from "./contracts";
+import {tokens} from '../token';
 
 
 export type InitalContractMap = {
@@ -36,16 +37,24 @@ const contractMapInitial: InitalContractMap= {
 };
 
 export const contractMap: ContractMap = Object.keys(contractMapInitial).reduce((acc, item) => {
-    return {
-        ...acc,
-        [item]: {
-            ...contractMapInitial[item],
-            id: item,
+    if(tokens[item]) {
+        return {
+            ...acc,
+            [item]: {
+                ...contractMapInitial[item],
+                id: item,
+            }
         }
     }
+    return acc;
+    
 }, {});
 
 
 export const getDefaultContractAddress = (): InitalContractMap => {
-    return metamaskContractMap as InitalContractMap;
+    const res: InitalContractMap  = {}
+    Object.keys(tokens).map(t =>  {
+        res[t] = metamaskContractMap[t]
+    });
+    return res;
 }

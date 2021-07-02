@@ -448,6 +448,9 @@ export const useBitstake = () => {
       const graphDelegation: GraphProtocolDelegation[] = [];
 
       for (let i = 0; i < receipts.length; i++) {
+        if(!receipts[i]) {
+          continue;
+        }
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
         const graphProtocolEvents = decodedReceipt
           .filter((dr: { name: string }) => dr.name == "GraphProtocolDelegated")
