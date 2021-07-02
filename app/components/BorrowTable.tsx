@@ -135,13 +135,13 @@ const headers = [
         width: 50,
     },
     {
-        id: 'borrowSymbol',
-        label: 'Borrow Asset',
+        id: 'swapSymbol',
+        label: 'Swap Asset',
         width: 50,
     },
     {
-        id: 'borrowAssetAddress',
-        label: 'Borrow Asset Address',
+        id: 'swapAssetAddress',
+        label: 'Swap Asset Address',
         width: 50,
     },
     {
@@ -272,8 +272,8 @@ const mapToTableData = async (
             "stableBorrowRate": (parseFloat(row.stableBorrowRate) * 100),
             "maxBorrowAmount": maxBorrowAmount,
             "swapAmount": swapAmount,
-            "borrowSymbol": "GRT",
-            "borrowAssetAddress": shortenHex(graphToken),
+            "swapSymbol": "GRT",
+            "swapAssetAddress": shortenHex(graphToken),
             actions: (
                 <Button
                     variant="outlined"
