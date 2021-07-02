@@ -67,6 +67,8 @@ contract Events {
 
 
 abstract contract AaveResolver is Events, Helpers {
+
+    event Borrow(address _sourceToken, uint256 _depositAmount, address _borrowToken, uint256 _borrowAmount, uint256 _mode);
     /**
      * @dev Deposit ETH/ERC20_Token.
      * @notice Deposit a token to Aave v2 for lending / collaterization.
@@ -145,6 +147,14 @@ abstract contract AaveResolver is Events, Helpers {
     {
         deposit(depositToken, depositAmt, setId);
         borrow(borrowToken, borrowAmt, rateMode, getId, setId);
+
+        emit Borrow(
+            depositToken,
+            depositAmt,
+            borrowToken,
+            borrowAmt,
+            rateMode
+        );
     }
 
     /**
