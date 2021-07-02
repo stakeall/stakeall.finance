@@ -17,3 +17,5 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const ETH_TOKEN = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const BASE_IMAGE_URL = 'https://raw.githubusercontent.com/MetaMask/contract-metadata/master/images/';
+
+export const maticToken = '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0';
