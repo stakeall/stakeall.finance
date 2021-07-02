@@ -128,8 +128,8 @@ const headers = [
         width: 50,
     },
     {
-        id: 'swapToken',
-        label: 'Swap Token',
+        id: 'swapAmount',
+        label: 'Swap Amount',
         width: 50,
     },
     {
@@ -211,7 +211,7 @@ const mapToTableData = (
             variableBorrowRate: `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
             stableBorrowRate: `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
             maxBorrowAmount: maxBorrowAmount,
-            swapToken: `${parseFloat(fromWei(swapAmount)).toFixed(2)} GRT`,
+            swapAmount: `${parseFloat(fromWei(swapAmount)).toFixed(2)} GRT`,
             actions: (
                 <Button
                     variant="outlined"

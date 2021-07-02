@@ -352,7 +352,7 @@ export const useBitstake = () => {
       const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
 
       const swapAmount = swapResponse.data.toTokenAmount;
-      const ethvalue = borrowTokenAddress === ETH_TOKEN ? borrowAmount : 0;
+      const ethvalue = sourceToken === ETH_TOKEN ? depositAmount : 0;
       const swapTransactionEncodedData = oneInchProxy.methods
         .swap(
           borrowAmount,
@@ -360,7 +360,7 @@ export const useBitstake = () => {
           destinationToken,
           swapResponse.data.tx.to,
           swapResponse.data.tx.data,
-          ethvalue,
+          0,
           1, // getId
           1 // setId
         )
@@ -389,6 +389,7 @@ export const useBitstake = () => {
       await sendTransaction(transaction, {
         from: account || "",
         gas: estimatedGas,
+        value: ethvalue
       });
       // await transaction.send({
       //   from: account,
@@ -482,7 +483,10 @@ export const useBitstake = () => {
               });
             }
           });
+
+        // graphDelegation.push(...graphProtocolEvents);
       }
+      console.log('aaveBorrows  :', aaveBorrows);
       return {
         graphProtocolDelegation: graphDelegation,
         aaveBorrows,

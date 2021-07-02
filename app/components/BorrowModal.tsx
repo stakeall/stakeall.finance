@@ -68,7 +68,7 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
             graphToken,
             toWei(depositAmount || '', depositTokenDetails?.decimals).toString(),
             toWei(borrowAmount, borrowTokenDetails?.decimals).toString(),
-            borrowerId || '',
+            borrower.underlyingAsset || '',
             rateMode,
         )
     }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrower, rateMode]);
