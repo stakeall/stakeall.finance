@@ -1,8 +1,8 @@
 import {createContext, useCallback} from "react";
-import { UserActionResponse } from "../hooks/useBitstake";
+import { StakingProtocol, UserActionResponse } from "../hooks/useBitstake";
 
 interface BitstakeContextData {
-    delegate: (indexerId: string, amount: string) => void,
+    delegate: (indexerId: string, amount: string, protocol: StakingProtocol) => void,
     deployOnChainWallet: () => void,
 
     onChainWalletAddress: string,

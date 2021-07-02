@@ -3,7 +3,8 @@ import { formatUnits } from "@ethersproject/units";
 import Web3 from "web3";
 import BN from "bn.js";
 import {  getDefaultContractAddress } from "./constants/contractMap";
-import { ETH_TOKEN } from "./constants/contracts";
+import { ETH_TOKEN, graphToken, maticToken } from "./constants/contracts";
+import { StakingProtocol } from "./hooks/useBitstake";
 
 export function shortenHex(hex?: string | null, length = 4) {
   if (!hex) return "";
@@ -234,4 +235,23 @@ export const isNumeric = (num: string) => /^-?\d*\.?\d+$/.test(num);
 
 export const formatDate = (timestamp: number) => {
   return new Date( parseInt(timestamp) * 1000 ).toLocaleDateString("en-US")
+}
+
+export const getTokenByProtocol = (protocol: StakingProtocol): {
+  symbol: string;
+  decimal: number;
+  address: string
+} => {
+  
+  return protocol === StakingProtocol.GRAPH 
+       ? {
+         symbol: 'GRT',
+         decimal: 18,
+         address: graphToken
+       }
+       : {
+         symbol: 'MATIC',
+         decimal: 18, 
+         address: maticToken
+       }
 }
