@@ -3,7 +3,7 @@ import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
 import {graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl, getBN, isNumeric, shortenHex, truncateMiddle} from "../util";
+import {createMetamaskTokenUrl, getBN, getTokenByProtocol, isNumeric, shortenHex, truncateMiddle} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
@@ -40,6 +40,8 @@ export const SwapAndStake = () => {
     const [amountError, setAmountError] = useState<string>('');
     const [estimatedAmount, setEstimatedAmount] = useState<string>('0');
     const [tokenDetails, setTokenDetails] = useState<ContractMap[string]>();
+    const { protocol } = useContext(AppCommon);
+    const protocolToken = getTokenByProtocol(protocol);
 
     useEffect(() => {
         const token = Object.values(contractMap).find(token => token.name === selectedToken);
@@ -53,7 +55,7 @@ export const SwapAndStake = () => {
     useEffect(() => {
         const getEstimate = async () => {
             const convertedAmount = getBN(amount, tokenDetails?.decimals || 1)
-            const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', graphToken, convertedAmount.toString());
+            const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', protocolToken.address, convertedAmount.toString());
             const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1)));
             setEstimatedAmount(convertedEstimated.toString() || '');
         }
@@ -96,7 +98,7 @@ export const SwapAndStake = () => {
                     <Grid item>
                         <Grid item alignItems="center">
                             <Typography variant="body1" color="textPrimary">
-                                Estimated: {estimatedAmount} GRT
+                                Estimated: {estimatedAmount} {protocolToken.symbol}
                             </Typography>
                         </Grid>
                     </Grid>

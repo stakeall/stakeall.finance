@@ -12,10 +12,12 @@ import FormLabel from "@material-ui/core/FormLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
-import {graphToken} from "../constants/contracts";
+import {graphToken, maticToken} from "../constants/contracts";
 import TextField from "@material-ui/core/TextField";
 import {ContractMap} from "../constants/contractMap";
-import {getBN, shortenHex, toWei} from "../util";
+import {getBN, getTokenByProtocol, shortenHex, toWei} from "../util";
+import { AppCommon } from "../contexts/AppCommon";
+import { StakingProtocol } from "../hooks/useBitstake";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -51,6 +53,8 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
     const [rateMode, setRateMode] = useState<string>('');
     const [borrowAmount, setBorrowAmount] = useState<string>('');
     const {borrowSwapAndStake} = useContext(Bitstake);
+    const {protocol} = useContext(AppCommon);
+
     const {
         validator,
         depositTokenDetails,
@@ -60,12 +64,9 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
     } = useMemo(() => borrowDetails, [borrowDetails]);
 
     const handleBorrow = useCallback(() => {
-        console.log('depositTokenDetails?.decimals : ', depositTokenDetails?.decimals);
-        console.log('borrowTokenDetails?.decimals : ', borrowTokenDetails?.decimals);
         borrowSwapAndStake?.(
             validator || '',
             (depositTokenDetails && depositTokenDetails.id) || '',
-            graphToken,
             toWei(depositAmount || '', depositTokenDetails?.decimals).toString(),
             toWei(borrowAmount, borrowTokenDetails?.decimals).toString(),
             borrower.underlyingAsset || '',

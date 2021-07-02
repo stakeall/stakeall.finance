@@ -7,8 +7,8 @@ import {ComputedReserveData, v2} from "@aave/protocol-js";
 import {Grid} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
-import {shortenHex, toWei} from "../util";
-import {graphToken} from "../constants/contracts";
+import {getTokenByProtocol, shortenHex, toWei} from "../util";
+import {graphToken, maticToken} from "../constants/contracts";
 import Button from "@material-ui/core/Button";
 import {ContractMap} from "../constants/contractMap";
 import {Bitstake} from "../contexts/Bitstake";
@@ -16,6 +16,10 @@ import {oneInchApi} from "../api/api";
 import {Loading} from "./Loading";
 import {fromWei} from '../util';
 import {TokenNameSymbol} from "./TokenNameSymbol";
+import { AppCommonProvider } from "./AppCommonProvider";
+import { AppCommon } from "../contexts/AppCommon";
+import Staking from "../pages/staking";
+import { StakingProtocol } from "../hooks/useBitstake";
 
 export interface Borrower extends ComputedReserveData {
     maxBorrowAmount?: string,
@@ -176,6 +180,7 @@ const mapToTableData = (
     data: AaveReserveResponse['data'],
     borrowDetails: BorrowTableProps['borrowDetails'],
     onBorrow: BorrowTableProps['setBorrower'],
+    protocol?: StakingProtocol,
     onChainWalletAddress?: string,
 ): AStandardTableRows<typeof headers> => {
     const currentTimestamp = (Date.now() / 1000).toFixed();
@@ -205,13 +210,17 @@ const mapToTableData = (
             onChainWalletAddress || ''
         );
         const swapAmount = swapResponse.data.toTokenAmount;
+        console.log('protocol : ', protocol);
+
+        const protocolSymbol = getTokenByProtocol(protocol).symbol;
+
         return {
             assetName: <TokenNameSymbol tokenId={row.underlyingAsset} />,
             symbol: row.symbol,
             variableBorrowRate: `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
             stableBorrowRate: `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
             maxBorrowAmount: maxBorrowAmount,
-            swapAmount: `${parseFloat(fromWei(swapAmount)).toFixed(2)} GRT`,
+            swapAmount: `${parseFloat(fromWei(swapAmount)).toFixed(2)} ${protocolSymbol}`,
             actions: (
                 <Button
                     variant="outlined"
@@ -240,6 +249,7 @@ const filterOutReserves = (aaveReserves: AaveReserveResponse['data']) => {
 export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDetails}) => {
 
     const classes = useBorrowTableStyles();
+    const { protocol } = useContext(AppCommon);
     const {data, loading, error} = useQuery<AaveReserveResponse['data']>(query, {
         client: AaveClient,
     });
@@ -264,7 +274,8 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDeta
                         },
                         borrowDetails,
                         onBorrow,
-                        onChainWalletAddress
+                        protocol,
+                        onChainWalletAddress,
                     );
                 const updatedMappedData = await Promise.all(mappedData.map(item => item.catch(
                     () => Symbol('Failed')

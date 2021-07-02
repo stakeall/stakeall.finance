@@ -67,7 +67,7 @@ import { sendTransaction, getTransactionHashes } from "../transactions/transacti
 export const useBitstake = () => {
   const { account, chainId } = useWeb3React();
   const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>("");
-  const { setPageInactive, setPageInactiveReason, setPageLoading } = useContext(AppCommon);
+  const { setPageInactive, setPageInactiveReason, setPageLoading, protocol } = useContext(AppCommon);
 
   const onChainWalletAddressExists = useMemo(
     () => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS,
@@ -177,7 +177,7 @@ export const useBitstake = () => {
         });
       }
     },
-    [account, onChainWalletAddress]
+    [account, onChainWalletAddress, protocol]
   );
 
   const deployOnChainWallet = useCallback(async () => {
@@ -212,12 +212,13 @@ export const useBitstake = () => {
 
   const swapAndStake = useCallback(
     async (
-      indexer: string,
+      validator: string,
       sourceToken: string,
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
-      const destinationToken = graphToken;
+      const protocolToken = getTokenByProtocol(protocol);
+      const destinationToken = protocolToken.address;
       if (sourceToken !== ETH_TOKEN) {
         const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
@@ -265,17 +266,31 @@ export const useBitstake = () => {
         .encodeABI();
 
       const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-      const graphProtocolEncodedData = graphInstance.methods
-        .delegate(
-          indexer,
-          new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(), //"100971045019998194761",
-          1 // getId
-        )
-        .encodeABI();
+      const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+
+      let delegateData;
+      if (protocol === StakingProtocol.GRAPH) {
+        delegateData = graphInstance.methods
+          .delegate(
+            validator,
+            new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(), //"100971045019998194761",
+            1 // getId
+          )
+          .encodeABI();
+      } else {
+        delegateData = maticInstance.methods
+          .buyShare(
+            validator,
+            new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(),
+            0, // min share,
+            1 // get id
+          )
+          .encodeABI();
+      }
 
       const transaction = userWalletInstance.methods.executeMulti(
-        [oneInch, graphProtocol],
-        [swapTransactionEncodedData, graphProtocolEncodedData],
+        [oneInch, protocolToken.protocolContractAddress],
+        [swapTransactionEncodedData, delegateData],
         1,
         1
       );
@@ -291,30 +306,33 @@ export const useBitstake = () => {
 
       setPageLoading?.(false);
     },
-    [account, onChainWalletAddress]
+    [account, onChainWalletAddress, protocol]
   );
 
   const borrowSwapAndStake = useCallback(
     async (
-      indexer: string, //validator
+      validator: string, //validator
       sourceToken: string, //deposit Token input dropdown
-      destinationToken: string, //grt hardcoded
       depositAmount: string, //input
       borrowAmount: string, // calculate hardcoded for now
       borrowTokenAddress: string, // borrowId selected from table
       rateMode: string, // 1 or 2 radio
       slippage: string = "1"
     ) => {
+      const protocolToken = getTokenByProtocol(protocol);
       console.log({
-        indexer,
+        validator,
         sourceToken,
-        destinationToken,
         depositAmount,
         borrowAmount,
         borrowTokenAddress,
         rateMode,
         slippage,
       });
+
+      console.log('protocol : ',protocol);
+      console.log('protocolToken : ', protocolToken);
+
       if (sourceToken !== ETH_TOKEN) {
         const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
@@ -344,6 +362,8 @@ export const useBitstake = () => {
           1 // setId
         )
         .encodeABI();
+
+      let destinationToken = protocolToken.address;
 
       const swapResponse = await oneInchApi.getSwapDetails(
         borrowTokenAddress,
@@ -376,17 +396,31 @@ export const useBitstake = () => {
         .encodeABI();
 
       const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-      const graphProtocolEncodedData = graphInstance.methods
-        .delegate(
-          indexer,
-          swapAmount,
-          1 // getId
-        )
-        .encodeABI();
+      const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+
+      let delegateData;
+      if(protocol === StakingProtocol.GRAPH) {
+        delegateData = graphInstance.methods
+          .delegate(
+            validator,
+            swapAmount,
+            1 // getId
+          )
+          .encodeABI();
+      } else {
+        delegateData = maticInstance.methods
+          .buyShare(
+            validator,
+            swapAmount,
+            0, // min share,
+            1 // get id
+          )
+          .encodeABI();
+      }
 
       const transaction = userWalletInstance.methods.executeMulti(
-        [aaveProtocol, oneInch, graphProtocol],
-        [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, graphProtocolEncodedData],
+        [aaveProtocol, oneInch, protocolToken.protocolContractAddress],
+        [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
         1,
         1
       );
@@ -402,7 +436,7 @@ export const useBitstake = () => {
       });
       setPageLoading?.(false);
     },
-    [account, onChainWalletAddress]
+    [account, onChainWalletAddress, protocol]
   );
 
   // It will be called whenever user changes amount in the field in `swap and stake` tab.

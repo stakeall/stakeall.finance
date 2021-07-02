@@ -237,7 +237,7 @@ export const formatDate = (timestamp: number) => {
   return new Date( parseInt(timestamp) * 1000 ).toLocaleDateString("en-US")
 }
 
-export const getTokenByProtocol = (protocol: StakingProtocol): {
+export const getTokenByProtocol = (protocol?: StakingProtocol): {
   symbol: string;
   decimal: number;
   address: string

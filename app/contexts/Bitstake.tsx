@@ -12,7 +12,6 @@ interface BitstakeContextData {
     borrowSwapAndStake: (
         indexer: string,
         sourceToken: string,
-        destinationToken: string,
         depositAmount: string,
         borrowAmount: string,
         borrowTokenAddress: string,
