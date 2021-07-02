@@ -26,7 +26,7 @@ export const Header = () => {
                     <Grid>
                         <Link href="/">
                             <Button size="large">
-                                BitStake
+                                StakeAll
                             </Button>
                         </Link>
                     </Grid>
