@@ -15,8 +15,7 @@ import Radio from "@material-ui/core/Radio";
 import {graphToken} from "../constants/contracts";
 import TextField from "@material-ui/core/TextField";
 import {ContractMap} from "../constants/contractMap";
-import {getBN, shortenHex} from "../util";
-import {Borrower} from "./BorrowTable";
+import {getBN, shortenHex, toWei} from "../util";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -61,13 +60,15 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
     } = useMemo(() => borrowDetails, [borrowDetails]);
 
     const handleBorrow = useCallback(() => {
+        console.log('depositTokenDetails?.decimals : ', depositTokenDetails?.decimals);
+        console.log('borrowTokenDetails?.decimals : ', borrowTokenDetails?.decimals);
         borrowSwapAndStake?.(
             validator || '',
             (depositTokenDetails && depositTokenDetails.id) || '',
             graphToken,
-            getBN(depositAmount || '', depositTokenDetails?.decimals || 1).toString(),
-            getBN(borrowAmount, borrowTokenDetails?.decimals || 1).toString(),
-            borrower?.underlyingAsset || '',
+            toWei(depositAmount || '', depositTokenDetails?.decimals).toString(),
+            toWei(borrowAmount, borrowTokenDetails?.decimals).toString(),
+            borrowerId || '',
             rateMode,
         )
     }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrower, rateMode]);

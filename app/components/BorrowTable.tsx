@@ -141,9 +141,9 @@ const headers = [
 
 const aaveAdddressesMap: Record<string, number> = {
     "0xdac17f958d2ee523a2206206994597c13d831ec7": 1,
-    // "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1, WBTC
+    "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 1, // WBTC
     "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 1,
-    // "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": 1, YFI
+    "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e": 1, // YFI
     "0xe41d2489571d322189246dafa5ebde1f4699f498": 1,
     "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": 1,
     "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": 1,
