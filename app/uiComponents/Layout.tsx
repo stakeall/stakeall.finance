@@ -2,7 +2,7 @@ import React, {useContext} from "react"
 
 import CssBaseline from "@material-ui/core/CssBaseline"
 import { ThemeProvider } from "@material-ui/core/styles"
-import {themeLight, themeDark} from "../theme/themeConfig2";
+import {themeLight, themeDark} from "../theme/themeConfig3";
 import {AppCommon} from "../contexts/AppCommon";
 
 const Layout: React.FC = ({ children }) => {

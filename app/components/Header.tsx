@@ -10,9 +10,16 @@ import {NightModeSwitch} from "./NightModeSwitch";
 const useHeaderStyles = makeStyles((theme: Theme) =>
     createStyles({
         title: {
-            padding: theme.spacing(2),
+            paddingLeft: theme.spacing(6),
+        },
+        logoImg: {
+            paddingRight: theme.spacing(2),
+            height: '60px',
+            width: '60px',
+            objectFit: 'contain',
         },
         accountId: {
+            minWidth: '250px',
             padding: theme.spacing(2),
         },
         buttonContainer: {
@@ -29,14 +36,19 @@ export const Header = () => {
         <ClientOnly>
             <AppBar position="relative">
                 <Grid className={classes.title} container justify="space-between" alignItems="center" wrap="nowrap">
-                    <Grid item>
-                        <Link href="/">
-                            <Button className={classes.button} size="large">
-                                StakeAll
-                            </Button>
-                        </Link>
+                    <Grid item container wrap="nowrap">
+                        <Grid>
+                            <img className={classes.logoImg} src="logo.svg" alt="logo"/>
+                        </Grid>
+                        <Grid container alignItems="center">
+                            <Link href="/">
+                                <Button className={classes.button} size="large" >
+                                    StakeAll
+                                </Button>
+                            </Link>
+                        </Grid>
                     </Grid>
-                    <Grid className={classes.buttonContainer} direction="row" container item alignItems="center">
+                    <Grid className={classes.buttonContainer} direction="row" container item alignItems="center" wrap="nowrap">
                         <Grid item>
                             <NightModeSwitch />
                         </Grid>
