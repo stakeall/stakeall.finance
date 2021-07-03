@@ -5,13 +5,15 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import {Table, Theme} from "@material-ui/core";
+import {Button, Table, Theme} from "@material-ui/core";
 import {createStyles} from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import {StandardPaginationActions} from "../components/StandardPaginationActions";
 
 export type StandardTableRows<T extends Readonly<Headers>> =
@@ -35,6 +37,8 @@ type Headers = Array<{
     id: string,
     label: string,
     width?: number,
+    sort?: boolean,
+    numeric?: boolean,
 }>
 
 export interface StandardTableProps<T extends Readonly<Headers>> {
@@ -75,7 +79,9 @@ const cellStyles = ({ width }: CellStyles): React.CSSProperties => ({
 export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: StandardTableProps<T>) => {
     const classes = useTableStyles();
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(15);
+    const [rowsPerPage, setRowsPerPage] = useState(15);
+    const [sortedRows, setSortedRows] = useState<StandardTableRows<T>>([]);
+    const [sortStatus, setSortStatus] = useState<{id: string, order: 1 | -1}>({id: '', order: 1});
 
     const handleChangePage = useCallback((event: unknown, newPage: number) => {
         setPage(newPage);
@@ -86,6 +92,28 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
         setPage(0);
     }, []);
 
+    const sort = useCallback((header: Headers[number]) => {
+        const invertedOrder = sortStatus.order > 0 ? -1 : 1;
+        const factor: 1 | -1 = sortStatus.id === header.id ? invertedOrder : 1;
+
+        if(header.numeric) {
+            setSortedRows([...rows].sort((a, b) =>  {
+                // @ts-ignore
+                return parseFloat(a[header.id]) < parseFloat(b[header.id]) ? factor : -factor;
+            }));
+        }
+        else {
+            setSortedRows([...rows].sort((a, b) =>  {
+                // @ts-ignore
+                return a[header.id] < b[header.id] ? factor : -factor;
+            }));
+        }
+        setSortStatus({id: header.id, order: factor});
+    }, [rows, sortStatus])
+
+    useEffect(() => {
+        setSortedRows(rows);
+    }, [])
     return (
         <TableContainer className={classes.tableContainer} component={Paper}>
             <Table stickyHeader>
@@ -96,7 +124,21 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
                                     style={cellStyles({width: header.width})}
                                     key={header.label}
                                 >
-                                    {header.label}
+                                    {header.sort && (
+                                        <Button
+                                            onClick={() => sort(header)}
+                                            color="primary"
+                                        >
+                                            {header.label}
+                                            {sortStatus.order > 0 && header.id === sortStatus.id && (
+                                                <ArrowDownwardIcon />
+                                            )}
+                                            {sortStatus.order < 0 && header.id === sortStatus.id &&(
+                                                <ArrowUpwardIcon />
+                                            )}
+                                        </Button>
+                                    )}
+                                    {!header.sort && header.label}
                                 </TableCell>
                             )
                         )}
@@ -104,8 +146,8 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
                 </TableHead>
                 <TableBody>
                     {(rowsPerPage > 0
-                            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            : rows
+                            ? sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : sortedRows
                     ).map((row, index) => {
                         return (<TableRow key={index.toString()}>
                             {(headers).map((header, index) => (
@@ -124,7 +166,7 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
                         <TablePagination
                             rowsPerPageOptions={[15, 25, 50, { label: 'All', value: -1 }]}
                             colSpan={6}
-                            count={rows.length}
+                            count={sortedRows.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             SelectProps={{

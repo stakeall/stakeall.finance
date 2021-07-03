@@ -120,11 +120,15 @@ const headers = [
         id: 'variableBorrowRate',
         label: 'Variable Interest Rate',
         width: 50,
+        sort: true,
+        numeric: true,
     },
     {
         id: 'stableBorrowRate',
         label: 'Stable Borrow Rate',
         width: 50,
+        sort: true,
+        numeric: true,
     },
     {
         id: 'maxBorrowAmount',
@@ -135,6 +139,8 @@ const headers = [
         id: 'swapAmount',
         label: 'Swap Amount',
         width: 50,
+        sort: true,
+        numeric: true,
     },
     {
         id: 'actions',
