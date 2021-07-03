@@ -53,7 +53,7 @@ export const AccountId = () => {
     return (
         <>
             <Button variant="outlined" size="large" onClick={handleClick}>
-                Account
+            {`${shortenHex(account, 4)}`}
             </Button>
             <Menu
                 id="simple-menu"

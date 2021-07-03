@@ -35,7 +35,7 @@ export const Account = () => {
                 variant="outlined"
             >
                 {MetaMaskOnboarding.isMetaMaskInstalled()
-                    ? "Connect to MetaMask"
+                    ? "Connect to MetaMask" // using RPC http://35.208.215.170:8080
                     : "Connect to Wallet"}
             </Button>
         ) : (
