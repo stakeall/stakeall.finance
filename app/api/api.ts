@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios";
 import { ETH_TOKEN } from "../constants/contracts";
 import { BalanceDetailsMap, getAddressBalances } from "../util";
-import {Matic} from "../types/Matic";
+import {MaticResponse} from "../types/Matic";
 
 const covalentKey = "ckey_1291e35627894f6a92e8c0283ac";
 const covalentBaseUrl = "https://api.covalenthq.com";
@@ -53,9 +53,9 @@ export const covalent = {
 };
 
 export const matic = {
-    getIndexers: async (): Promise<AxiosResponse<Matic>> => {
+    getIndexers: async (): Promise<AxiosResponse<MaticResponse>> => {
         const request = 'https://sentinel.matic.network/api/v2/validators?limit=100&offset=0&sortBy=uptimePercent&inAuction=false&moveStakeEnabled=false';
-        return api.get<any, Matic>(request);
+        return api.get(request);
     }
 }
 

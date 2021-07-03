@@ -14,6 +14,7 @@ import {useWeb3React} from "@web3-react/core";
 import {isNumeric, shortenHex, truncateMiddle} from "../util";
 import { GRT_DECIMAL} from "../constants/contracts";
 import {formatBalance, toWei, getTokenByProtocol} from '../util';
+import { StakingProtocol } from "../hooks/useBitstake";
 
 const useWalletStakeStyles = makeStyles((theme) =>
     createStyles({
@@ -82,7 +83,7 @@ export const WalletStake: React.FC = () => {
             <Grid className={classes.amount}>
                 <Typography color="textSecondary" id="balance" variant="body1">
                     Balance: {data} {protocolToken.symbol}
-                </Typography>p
+                </Typography>
                 <TextField
                     value={amount}
                     error={amountError !== ''}
@@ -100,7 +101,7 @@ export const WalletStake: React.FC = () => {
                 <Grid item>
                     <Button color="secondary" variant="outlined" onClick={() => {
                         if (validator && validateAmount()) {
-                            delegate?.(validator, toWei(amount, GRT_DECIMAL), protocol)
+                            delegate?.(validator, toWei(amount, GRT_DECIMAL), protocol || StakingProtocol.GRAPH)
                         }
                     }}>
                         Delegate

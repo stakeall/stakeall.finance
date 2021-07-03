@@ -18,6 +18,7 @@ import {ContractMap} from "../constants/contractMap";
 import {getBN, getTokenByProtocol, shortenHex, toWei} from "../util";
 import { AppCommon } from "../contexts/AppCommon";
 import { StakingProtocol } from "../hooks/useBitstake";
+import { Borrower } from "./BorrowTable";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -64,12 +65,13 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
     } = useMemo(() => borrowDetails, [borrowDetails]);
 
     const handleBorrow = useCallback(() => {
+        if(depositTokenDetails && borrowTokenDetails)
         borrowSwapAndStake?.(
             validator || '',
             (depositTokenDetails && depositTokenDetails.id) || '',
             toWei(depositAmount || '', depositTokenDetails?.decimals).toString(),
             toWei(borrowAmount, borrowTokenDetails?.decimals).toString(),
-            borrower.underlyingAsset || '',
+            borrower && borrower.underlyingAsset || '',
             rateMode,
         )
     }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrower, rateMode]);
