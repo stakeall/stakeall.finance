@@ -201,9 +201,10 @@ const mapToTableData = (
             / parseFloat(row.price.priceInEth)
             ).toFixed(2);
 
+        const protocolToken = getTokenByProtocol(protocol);
         const swapResponse = await oneInchApi.getEstimatedSwapDetails(
             row.underlyingAsset,
-            graphToken,
+            protocolToken.address,
             toWei(maxBorrowAmount.toString(),
                 row.decimals),
             "1",
@@ -212,15 +213,14 @@ const mapToTableData = (
         const swapAmount = swapResponse.data.toTokenAmount;
         console.log('protocol : ', protocol);
 
-        const protocolSymbol = getTokenByProtocol(protocol).symbol;
-
+        
         return {
             assetName: <TokenNameSymbol tokenId={row.underlyingAsset} />,
             symbol: row.symbol,
             variableBorrowRate: `${(parseFloat(row.variableBorrowRate) * 100).toFixed(2)}%`,
             stableBorrowRate: `${(parseFloat(row.stableBorrowRate) * 100).toFixed(2)}%`,
             maxBorrowAmount: maxBorrowAmount,
-            swapAmount: `${parseFloat(fromWei(swapAmount)).toFixed(2)} ${protocolSymbol}`,
+            swapAmount: `${parseFloat(fromWei(swapAmount)).toFixed(2)} ${protocolToken.symbol}`,
             actions: (
                 <Button
                     variant="outlined"
@@ -261,7 +261,7 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDeta
         setBorrower?.(borrower);
     }, [setBorrower]);
 
-
+    console.log('protocol : ', protocol);
     useEffect(() => {
         const mapData = async () => {
             if (data && borrowDetails?.depositAmount && borrowDetails?.depositAmount !== '0') {
@@ -286,7 +286,7 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDeta
             }
         }
         mapData();
-    }, [data, borrowDetails]);
+    }, [data, borrowDetails, protocol]);
 
     if (loading || loadingTableData) {
         return <Loading/>;
