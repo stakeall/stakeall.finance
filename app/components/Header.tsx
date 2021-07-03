@@ -15,7 +15,7 @@ const useHeaderStyles = makeStyles((theme: Theme) =>
         logoImg: {
             paddingRight: theme.spacing(2),
             height: '60px',
-            width: '60px',
+            width: '300px',
             objectFit: 'contain',
         },
         accountId: {
@@ -36,17 +36,12 @@ export const Header = () => {
         <ClientOnly>
             <AppBar position="relative">
                 <Grid className={classes.title} container justify="space-between" alignItems="center" wrap="nowrap">
-                    <Grid item container wrap="nowrap">
-                        <Grid>
-                            <img className={classes.logoImg} src="logo.svg" alt="logo"/>
-                        </Grid>
-                        <Grid container alignItems="center">
-                            <Link href="/">
-                                <Button className={classes.button} size="large" >
-                                    StakeAll
-                                </Button>
-                            </Link>
-                        </Grid>
+                    <Grid alignItems="center">
+                        <Link href="/">
+                            <Button className={classes.button} size="large" >
+                                <img className={classes.logoImg} src="textLogo.svg" alt="logo"/>
+                            </Button>
+                        </Link>
                     </Grid>
                     <Grid className={classes.buttonContainer} direction="row" container item alignItems="center" wrap="nowrap">
                         <Grid item>
