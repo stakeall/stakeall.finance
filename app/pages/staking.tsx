@@ -15,6 +15,7 @@ import {BorrowSwapAndStake} from "../components/BorrowSwapAndStake";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import {truncateMiddle} from "../util";
+import {StakeCards} from "../components/StakeCards";
 
 const useStakingStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -32,7 +33,7 @@ const useStakingStyles = makeStyles((theme: Theme) =>
 
 const Staking = () => {
     const classes = useStakingStyles();
-    const [tabValue, setTabValue] = useState(0);
+    const [tabValue, setTabValue] = useState(3);
     const handleTabChange = useCallback((event, newValue) => {
         setTabValue(newValue);
     }, [])
@@ -88,6 +89,9 @@ const Staking = () => {
             </DashboardTabLayout>
             <DashboardTabLayout value={tabValue} index={2}>
                 <BorrowSwapAndStake/>
+            </DashboardTabLayout>
+            <DashboardTabLayout value={tabValue} index={3}>
+                <StakeCards onSelect={setTabValue}/>
             </DashboardTabLayout>
         </section>
     );
