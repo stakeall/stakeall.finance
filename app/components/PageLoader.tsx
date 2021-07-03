@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {AppCommon} from "../contexts/AppCommon";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
@@ -8,6 +8,7 @@ import {createStyles} from "@material-ui/styles";
 import {useWeb3React} from "@web3-react/core";
 import {Account} from "./Account";
 import Paper from "@material-ui/core/Paper";
+import {Router} from "next/router";
 
 const usePageLoaderStyles = makeStyles((theme) =>
     createStyles({
@@ -31,9 +32,45 @@ export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
     const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
     const { account } = useWeb3React();
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const start = () => {
+            console.log("start");
+            setLoading(true);
+        };
+        const end = () => {
+            console.log("findished");
+            setLoading(false);
+        };
+
+        Router.events.on("routeChangeStart", start);
+        Router.events.on("routeChangeComplete", end);
+        Router.events.on("routeChangeError", end);
+        return () => {
+            Router.events.off("routeChangeStart", start);
+            Router.events.off("routeChangeComplete", end);
+            Router.events.off("routeChangeError", end);
+        };
+    }, []);
+
+    if(loading) {
+        return (
+            <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
+                <Grid item>
+                    <CircularProgress size={100} color="primary"/>
+                </Grid>
+                <Grid item>
+                    <Typography variant="h5" color="primary">
+                        Please wait while we load...
+                    </Typography>
+                </Grid>
+            </Grid>
+        )
+    }
     if (!account) {
         return (
-                <Grid className={classes.metamaskContainer} container direction="column" justify="center" alignItems="center">
+            <Grid className={classes.metamaskContainer} container direction="column" justify="center" alignItems="center">
                     <Grid item>
                         <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg" alt="metamask icon"/>
                     </Grid>
@@ -47,10 +84,10 @@ export const PageLoader: React.FC = ({ children }) => {
         return (
             <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
                 <Grid item>
-                    <CircularProgress size={100} color="secondary"/>
+                    <CircularProgress size={100} color="primary"/>
                 </Grid>
                 <Grid item>
-                    <Typography variant="h3" color="secondary">
+                   <Typography variant="h5" color="secondary">
                         Please wait while we connect your account...
                     </Typography>
                 </Grid>
@@ -64,7 +101,7 @@ export const PageLoader: React.FC = ({ children }) => {
                     <CircularProgress size={100} color="primary"/>
                 </Grid>
                 <Grid item>
-                    <Typography variant="body1" color="primary">
+                    <Typography variant="h5" color="primary">
                         Cannot use the site for the following reason
                     </Typography>
                 </Grid>

@@ -13,6 +13,7 @@ import {Loading} from "./Loading";
 import {UserActionResponse} from "../hooks/useBitstake";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
 import {TokenNameSymbol} from "./TokenNameSymbol";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
@@ -222,6 +223,7 @@ export const Assets = () => {
                     <StandardTable headers={balanceHeaders} rows={balances}/>
                 </Grid>
             </Grid>
+            <Divider />
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
@@ -230,10 +232,18 @@ export const Assets = () => {
                     </Typography>
                 </Grid>
                 <Grid item>
-                    <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
+                    {!!(userTransaction &&
+                        userTransaction.length) && (
+                            <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
+                    )}
+                    { !(userTransaction && userTransaction.length) && (
+                        <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
+                            You have no Graph Delegations
+                        </Typography>
+                    )}
                 </Grid>
             </Grid>
-
+            <Divider />
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
@@ -242,10 +252,18 @@ export const Assets = () => {
                     </Typography>
                 </Grid>
                 <Grid item>
-                    <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
+                    {!!(maticTransaction &&
+                        maticTransaction.length) && (
+                            <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
+                    )}
+                    { !(maticTransaction && maticTransaction.length) && (
+                        <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
+                            You have no Matic Delegations
+                        </Typography>
+                    )}
                 </Grid>
             </Grid>
-
+            <Divider />
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
@@ -254,7 +272,15 @@ export const Assets = () => {
                     </Typography>
                 </Grid>
                 <Grid item>
-                    <StandardTable headers={aaveLoansHeader} rows={aaveBorrowTransaction}/>
+                    {!!(aaveBorrowTransaction &&
+                        aaveBorrowTransaction.length) && (
+                            <StandardTable headers={aaveLoansHeader} rows={aaveBorrowTransaction}/>
+                    )}
+                    { !(aaveBorrowTransaction && aaveBorrowTransaction.length) && (
+                            <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
+                                You have no AAVE Loans
+                            </Typography>
+                    )}
                 </Grid>
             </Grid>
         </Grid>
