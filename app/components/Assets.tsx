@@ -7,13 +7,12 @@ import Grid from "@material-ui/core/Grid";
 import {covalent} from "../api/api";
 import {StandardTable, StandardTableRows} from "../uiComponents/StandardTable";
 import {useWeb3React} from "@web3-react/core";
-import {BalanceDetailsMap, formatBalance} from "../util";
+import {BalanceDetailsMap, formatBalance, shortenHex} from "../util";
 import {Bitstake} from "../contexts/Bitstake";
 import {Loading} from "./Loading";
 import {UserActionResponse} from "../hooks/useBitstake";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
 import {TokenNameSymbol} from "./TokenNameSymbol";
 
 const useAssetStyles = makeStyles((theme: Theme) =>
@@ -106,12 +105,35 @@ const aaveLoansHeader = [
         id: 'timestamp',
         label: 'Timestamp',
     },
+    {
+        id: 'actions',
+        label: 'Actions'
+    }
 ] as const;
 
 
+const aaveDepositHeader = [
+    {
+        id: 'depositToken',
+        label: 'Deposit Token',
+    },
+    {
+        id: 'depositAmount',
+        label: 'Amount',
+    },
+    {
+        id: 'timestamp',
+        label: 'Timestamp',
+    },
+    {
+        id: 'actions',
+        label: 'Actions'
+    }
+] as const;
+
 const mapUserActionsTable = (data: UserActionResponse): StandardTableRows<typeof userTransactionHeaders> => {
     return data.graphProtocolDelegation.map(item => ({
-        indexer: item.indexer,
+        indexer: shortenHex(item.indexer, 4),
         amount: item.amount,
         timestamp: item.blockTimestamp,
         actions: <Button
@@ -141,7 +163,7 @@ const mapMaticDelegationTable = (data: UserActionResponse): StandardTableRows<ty
 
 const mapAAVEBorrowTable = (data: UserActionResponse): StandardTableRows< typeof aaveLoansHeader> => {
     return data.aaveBorrows.map(item => ({
-        borrowToken: item.borrowToken,
+        borrowToken: shortenHex(item.borrowToken, 4),
         borrowAmount: item.borrowAmt,
         rateMode: item.rateMode,
         timestamp: item.blockTimestamp,
@@ -154,6 +176,22 @@ const mapAAVEBorrowTable = (data: UserActionResponse): StandardTableRows< typeof
         </Button>
     }));
 }
+
+const mapAAVEDepositTable = (data: UserActionResponse): StandardTableRows< typeof aaveDepositHeader> => {
+    return data.aaveBorrows.map(item => ({
+        depositToken: shortenHex(item.depositToken, 4),
+        depositAmount: item.depositAmt,
+        timestamp: item.blockTimestamp,
+        actions: <Button
+            variant="outlined"
+            color="secondary"
+            disabled
+        >
+            Manage
+        </Button>
+    }));
+}
+
 
 const formatUSDWorthOfAsset = (formattedBalance: string, usdPrice: string): string => {
     const usdPriceFloat = parseFloat(usdPrice);
@@ -169,6 +207,7 @@ export const Assets = () => {
     const [userTransaction, setUserTransaction] = useState<StandardTableRows<typeof userTransactionHeaders>>([]);
     const [maticTransaction, setMaticTransaction]= useState<StandardTableRows<typeof maticTransactionHeaders>>([]);
     const [aaveBorrowTransaction, setaaveBorrowTransaction] = useState<StandardTableRows<typeof aaveLoansHeader>>([]);
+    const [aaveDepositTransaction, setaaveDepositTransaction] = useState<StandardTableRows<typeof aaveDepositHeader>>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
@@ -198,6 +237,7 @@ export const Assets = () => {
                 setUserTransaction(mapUserActionsTable(userTransactions));
                 setMaticTransaction(mapMaticDelegationTable(userTransactions));
                 setaaveBorrowTransaction(mapAAVEBorrowTable(userTransactions));
+                setaaveDepositTransaction(mapAAVEDepositTable(userTransactions));
             }
         }
         if (account && chainId) {
@@ -223,7 +263,6 @@ export const Assets = () => {
                     <StandardTable headers={balanceHeaders} rows={balances}/>
                 </Grid>
             </Grid>
-            <Divider />
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
@@ -232,18 +271,10 @@ export const Assets = () => {
                     </Typography>
                 </Grid>
                 <Grid item>
-                    {!!(userTransaction &&
-                        userTransaction.length) && (
-                            <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
-                    )}
-                    { !(userTransaction && userTransaction.length) && (
-                        <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
-                            You have no Graph Delegations
-                        </Typography>
-                    )}
+                    <StandardTable headers={userTransactionHeaders} rows={userTransaction}/>
                 </Grid>
             </Grid>
-            <Divider />
+
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
@@ -252,35 +283,31 @@ export const Assets = () => {
                     </Typography>
                 </Grid>
                 <Grid item>
-                    {!!(maticTransaction &&
-                        maticTransaction.length) && (
-                            <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
-                    )}
-                    { !(maticTransaction && maticTransaction.length) && (
-                        <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
-                            You have no Matic Delegations
-                        </Typography>
-                    )}
+                    <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
                 </Grid>
             </Grid>
-            <Divider />
+
             <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
                   spacing={2}>
                 <Grid item>
                     <Typography color="secondary" id="aaveLoans" variant="h5">
-                        AAVE Loans
+                        AAVE Deposits
                     </Typography>
                 </Grid>
                 <Grid item>
-                    {!!(aaveBorrowTransaction &&
-                        aaveBorrowTransaction.length) && (
-                            <StandardTable headers={aaveLoansHeader} rows={aaveBorrowTransaction}/>
-                    )}
-                    { !(aaveBorrowTransaction && aaveBorrowTransaction.length) && (
-                            <Typography align="center" color="textPrimary" id="graphstaking" variant="body2">
-                                You have no AAVE Loans
-                            </Typography>
-                    )}
+                    <StandardTable headers={aaveDepositHeader} rows={aaveDepositTransaction}/>
+                </Grid>
+            </Grid>
+
+            <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
+                  spacing={2}>
+                <Grid item>
+                    <Typography color="secondary" id="aaveLoans" variant="h5">
+                        AAVE Borrows
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <StandardTable headers={aaveLoansHeader} rows={aaveBorrowTransaction}/>
                 </Grid>
             </Grid>
         </Grid>
