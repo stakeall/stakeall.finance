@@ -5,6 +5,7 @@ import {StakingProtocol} from "../hooks/useBitstake";
 export const AppCommonProvider: React.FC = ( { children }) => {
     const [pageLoading, setPageLoading] = useState<boolean>(false);
     const [pageInactive, setPageInactive] = useState<boolean>(false);
+    const [nightMode, setNightMode] = useState<boolean>(false);
     const [pageInactiveReason, setPageInactiveReason] = useState<string>('');
     const [validator, setValidator] = useState<string | undefined>();
     const [protocol, setProtocol] = useState<StakingProtocol>();
@@ -23,7 +24,9 @@ export const AppCommonProvider: React.FC = ( { children }) => {
         setPageInactive,
         pageInactiveReason,
         setPageInactiveReason,
-    }), [pageLoading, validator, injectedEth, pageInactive, pageInactiveReason, protocol])
+        nightMode,
+        setNightMode,
+    }), [pageLoading, validator, injectedEth, pageInactive, pageInactiveReason, protocol, nightMode])
 
     return (
         <AppCommon.Provider value={appCommonData}>

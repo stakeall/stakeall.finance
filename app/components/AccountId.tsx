@@ -27,6 +27,10 @@ const useAccountIdStyles = makeStyles((theme) =>
         menuItemDetails: {
             paddingRight: 40,
         },
+        button: {
+            color: theme.palette.primary.contrastText,
+            borderColor: theme.palette.primary.contrastText,
+        },
     })
 )
 export const AccountId = () => {
@@ -52,8 +56,13 @@ export const AccountId = () => {
     }, [])
     return (
         <>
-            <Button variant="outlined" size="large" onClick={handleClick}>
-            {`${shortenHex(account, 4)}`}
+            <Button
+                className={classes.button}
+                variant="outlined"
+                size="large"
+                onClick={handleClick}
+            >
+                {ENSName || `${shortenHex(account, 4)}`}
             </Button>
             <Menu
                 id="simple-menu"

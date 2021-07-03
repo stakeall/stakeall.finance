@@ -9,9 +9,13 @@ import {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
 import {useWeb3React} from "@web3-react/core";
 
-const useAccountStyles = makeStyles(() =>
+const useAccountStyles = makeStyles((theme) =>
     createStyles({
         container: {},
+        button: {
+            color: theme.palette.primary.contrastText,
+            borderColor: theme.palette.primary.contrastText,
+        }
     })
 )
 
@@ -30,7 +34,7 @@ export const Account = () => {
     if (typeof account !== "string") {
         return hasMetaMaskOrWeb3Available ? (
             <Button
-                color="secondary"
+                className={classes.button}
                 onClick={onMetaMaskConnect}
                 variant="outlined"
             >
@@ -39,7 +43,10 @@ export const Account = () => {
                     : "Connect to Wallet"}
             </Button>
         ) : (
-            <Button onClick={installMetamask}>
+            <Button
+                className={classes.button}
+                onClick={installMetamask}
+            >
                 Install Metamask
             </Button>
         )

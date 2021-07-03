@@ -19,6 +19,9 @@ const useOnChainStyles = makeStyles((theme) =>
             left: '40%',
             zIndex: 1,
         },
+        button: {
+            color: theme.palette.primary.contrastText,
+        }
     })
 )
 
@@ -30,7 +33,7 @@ export const OnChain = () => {
     return (
         <Grid className={classes.container} container>
             <Button
-                color="secondary"
+                className={classes.button}
                 onClick={() => { setModalOpen(true)}}
                 variant="outlined"
             >

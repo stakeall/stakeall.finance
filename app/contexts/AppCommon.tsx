@@ -14,6 +14,9 @@ interface AppCommonData {
     setPageInactive: (active: boolean) => void,
     pageInactiveReason: string,
     setPageInactiveReason: (reason: string) => void,
+    nightMode: boolean,
+    setNightMode: (nightMode: boolean) => void,
+
 }
 
 export const AppCommon = React.createContext<Partial<AppCommonData>>({});

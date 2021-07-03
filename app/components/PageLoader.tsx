@@ -7,12 +7,19 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {useWeb3React} from "@web3-react/core";
 import {Account} from "./Account";
+import Paper from "@material-ui/core/Paper";
 
 const usePageLoaderStyles = makeStyles((theme) =>
     createStyles({
         container: {
             height: '100vh',
             width: '100vw',
+        },
+        metamaskContainer: {
+            height: '300px',
+            width: '300px',
+            backgroundColor: theme.palette.primary.main,
+            margin: '50px auto',
         },
         logo: {
             height: '100px',
@@ -26,14 +33,14 @@ export const PageLoader: React.FC = ({ children }) => {
     const { account } = useWeb3React();
     if (!account) {
         return (
-            <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
-                <Grid item>
-                    <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg" alt="metamask icon"/>
+                <Grid className={classes.metamaskContainer} container direction="column" justify="center" alignItems="center">
+                    <Grid item>
+                        <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg" alt="metamask icon"/>
+                    </Grid>
+                    <Grid item>
+                        <Account />
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <Account />
-                </Grid>
-            </Grid>
         )
     }
     if(pageLoading) {
