@@ -81,8 +81,8 @@ export const WalletStake: React.FC = () => {
             </Grid>
             <Grid className={classes.amount}>
                 <Typography color="textSecondary" id="balance" variant="body1">
-                    Balance: {data}
-                </Typography>
+                    Balance: {data} {protocolToken.symbol}
+                </Typography>p
                 <TextField
                     value={amount}
                     error={amountError !== ''}

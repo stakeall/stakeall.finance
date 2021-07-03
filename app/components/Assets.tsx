@@ -88,6 +88,26 @@ const maticTransactionHeaders = [
 ] as const;
 
 
+const aaveLoansHeader = [
+    {
+        id: 'borrowToken',
+        label: 'Borrow Token',
+    },
+    {
+        id: 'borrowAmount',
+        label: 'Amount',
+    },
+    {
+        id: 'rateMode',
+        label: 'Rate Mode',
+    },
+    {
+        id: 'timestamp',
+        label: 'Timestamp',
+    },
+] as const;
+
+
 const mapUserActionsTable = (data: UserActionResponse): StandardTableRows<typeof userTransactionHeaders> => {
     return data.graphProtocolDelegation.map(item => ({
         indexer: item.indexer,
@@ -117,6 +137,23 @@ const mapMaticDelegationTable = (data: UserActionResponse): StandardTableRows<ty
         </Button>
     }));
 }
+
+const mapAAVEBorrowTable = (data: UserActionResponse): StandardTableRows< typeof aaveLoansHeader> => {
+    return data.aaveBorrows.map(item => ({
+        borrowToken: item.borrowToken,
+        borrowAmount: item.borrowAmt,
+        rateMode: item.rateMode,
+        timestamp: item.blockTimestamp,
+        actions: <Button
+            variant="outlined"
+            color="secondary"
+            disabled
+        >
+            Manage
+        </Button>
+    }));
+}
+
 const formatUSDWorthOfAsset = (formattedBalance: string, usdPrice: string): string => {
     const usdPriceFloat = parseFloat(usdPrice);
     const formattedBalanceFloat = parseFloat(formattedBalance);
@@ -130,6 +167,7 @@ export const Assets = () => {
     const [balances, setBalances] = useState<StandardTableRows<typeof balanceHeaders>>([]);
     const [userTransaction, setUserTransaction] = useState<StandardTableRows<typeof userTransactionHeaders>>([]);
     const [maticTransaction, setMaticTransaction]= useState<StandardTableRows<typeof maticTransactionHeaders>>([]);
+    const [aaveBorrowTransaction, setaaveBorrowTransaction] = useState<StandardTableRows<typeof aaveLoansHeader>>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const mapToAssets = useCallback((balances: BalanceDetailsMap) => {
@@ -158,6 +196,7 @@ export const Assets = () => {
             if (userTransactions) {
                 setUserTransaction(mapUserActionsTable(userTransactions));
                 setMaticTransaction(mapMaticDelegationTable(userTransactions));
+                setaaveBorrowTransaction(mapAAVEBorrowTable(userTransactions));
             }
         }
         if (account && chainId) {
@@ -204,6 +243,18 @@ export const Assets = () => {
                 </Grid>
                 <Grid item>
                     <StandardTable headers={maticTransactionHeaders} rows={maticTransaction}/>
+                </Grid>
+            </Grid>
+
+            <Grid className={classes.tableContainer} direction="column" wrap="nowrap" item container
+                  spacing={2}>
+                <Grid item>
+                    <Typography color="secondary" id="aaveLoans" variant="h5">
+                        AAVE Loans
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <StandardTable headers={aaveLoansHeader} rows={aaveBorrowTransaction}/>
                 </Grid>
             </Grid>
         </Grid>

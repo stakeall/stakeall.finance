@@ -63,6 +63,7 @@ export interface UserActionResponse {
   maticProtocolDelegation: MaticProtocolDelegation[];
 }
 import { sendTransaction, getTransactionHashes } from "../transactions/transactionUtils";
+import { contractMap } from "../constants/contractMap";
 
 export const useBitstake = () => {
   const { account, chainId } = useWeb3React();
@@ -513,12 +514,21 @@ export const useBitstake = () => {
                 blockTimestamp: formatDate(block.timestamp),
               });
             }
+
             if (event.name === "Borrow") {
+              const depositToken = contractMap[
+                window.web3.utils.toChecksumAddress(event.events[0].value)];
+              const borrowToken = contractMap[
+              window.web3.utils.toChecksumAddress(event.events[2].value)
+            ];
+
+            console.log(depositToken);
+            console.log(borrowToken);
               aaveBorrows.push({
                 depositToken: event.events[0].value,
-                depositAmt: event.events[1].value,
+                depositAmt: `${parseFloat(fromWei(event.events[1].value, depositToken.decimals)).toFixed(2)} ${depositToken.symbol}`,
                 borrowToken: event.events[2].value,
-                borrowAmt: event.events[3].value,
+                borrowAmt: `${parseFloat(fromWei(event.events[3].value, borrowToken.decimals)).toFixed(2)} ${borrowToken.symbol}`,
                 rateMode: parseInt(event.events[4].value),
                 blockTimestamp: formatDate(block.timestamp),
               });
@@ -534,10 +544,7 @@ export const useBitstake = () => {
               }
           });
 
-        // graphDelegation.push(...graphProtocolEvents);
       }
-      console.log('aaveBorrows  :', aaveBorrows);
-      console.log('aaveBorrows  :', maticDelegation);
       return {
         graphProtocolDelegation: graphDelegation,
         aaveBorrows,

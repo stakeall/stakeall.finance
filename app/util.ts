@@ -207,8 +207,11 @@ export const toWei = (amount: string, decimal: number): string  => {
   return (new BN(formatredamt).mul(new BN(10).pow(new BN(decimal))).div(new BN(10000))).toString(10);
 }
 
-export const fromWei = (amount: string): string  => {
+export const fromWei = (amount: string, decimal?: number): string  => {
   
+  if(decimal) {
+    return new BN(amount).div(new BN(10).pow(new BN(decimal))).toString()
+  }
   return window.web3.utils.fromWei(amount);
 }
 
@@ -233,7 +236,7 @@ export const getBN = (amount: string, decimals: number | string) => {
 
 export const isNumeric = (num: string) => /^-?\d*\.?\d+$/.test(num);
 
-export const formatDate = (timestamp: number) => {
+export const formatDate = (timestamp: string) => {
   return new Date( parseInt(timestamp) * 1000 ).toLocaleDateString("en-US")
 }
 
