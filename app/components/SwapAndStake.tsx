@@ -2,12 +2,10 @@ import {Grid} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Button from "@material-ui/core/Button";
-import {graphToken} from "../constants/contracts";
-import {createMetamaskTokenUrl, getBN, getTokenByProtocol, isNumeric, shortenHex, truncateMiddle} from "../util";
+import { getBN, getTokenByProtocol, isNumeric} from "../util";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Paper from "@material-ui/core/Paper";
-import {TokenSelectionModal} from "./TokenSelectionModal";
 import {ContractMap, contractMap} from "../constants/contractMap";
 import TextField from "@material-ui/core/TextField";
 import {Bitstake} from "../contexts/Bitstake";
@@ -54,8 +52,10 @@ export const SwapAndStake = () => {
 
     useEffect(() => {
         const getEstimate = async () => {
-            const convertedAmount = getBN(amount, tokenDetails?.decimals || 1)
+            const convertedAmount = getBN(amount, tokenDetails?.decimals || 1);
+
             const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', protocolToken.address, convertedAmount.toString());
+            console.log(estimatedAmount);
             const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1)));
             setEstimatedAmount(convertedEstimated.toString() || '');
         }

@@ -3,7 +3,7 @@ import {StakingProtocol} from "../hooks/useBitstake";
 
 interface AppCommonData {
     pageLoading: boolean,
-    setPageLoading: (loading: boolean, metamaskDisconnected?: boolean) => void,
+    setPageLoading: (loading: string, metamaskDisconnected?: boolean) => void,
     validator: string,
     setValidator: (validator: string) => void,
     protocol: StakingProtocol,
@@ -16,7 +16,6 @@ interface AppCommonData {
     setPageInactiveReason: (reason: string) => void,
     nightMode: boolean,
     setNightMode: (nightMode: boolean) => void,
-
 }
 
 export const AppCommon = React.createContext<Partial<AppCommonData>>({});

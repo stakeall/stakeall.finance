@@ -3,7 +3,7 @@ import { AppCommon } from "../contexts/AppCommon";
 import {StakingProtocol} from "../hooks/useBitstake";
 
 export const AppCommonProvider: React.FC = ( { children }) => {
-    const [pageLoading, setPageLoading] = useState<boolean>(false);
+    const [pageLoading, setPageLoading] = useState<string>('');
     const [pageInactive, setPageInactive] = useState<boolean>(false);
     const [nightMode, setNightMode] = useState<boolean>(false);
     const [pageInactiveReason, setPageInactiveReason] = useState<string>('');

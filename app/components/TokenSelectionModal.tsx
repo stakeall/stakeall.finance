@@ -6,14 +6,13 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import {Bitstake} from "../contexts/Bitstake";
 import TextField from "@material-ui/core/TextField";
 import {contractMap} from "../constants/contractMap";
-import {BalanceDetailsMap, createMetamaskTokenUrl, formatBalance} from "../util";
+import {BalanceDetailsMap, createMetamaskTokenUrl, formatBalance, getTokenByProtocol} from "../util";
 import {covalent} from "../api/api";
 import {useWeb3React} from "@web3-react/core";
-import {graphToken} from "../constants/contracts";
 import {TokenNameSymbol} from "./TokenNameSymbol";
+import { AppCommon } from "../contexts/AppCommon";
 
 interface TokenSelectionModalProps {
     open: boolean;
@@ -63,6 +62,8 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
     const {account, chainId} = useWeb3React();
     const [search, setSearch] = useState<string>('');
     const [balances, setBalances] = useState<BalanceDetailsMap>();
+    const { protocol } = useContext(AppCommon);
+    const protocolToken = useMemo(() => getTokenByProtocol(protocol), [protocol]);
 
     const filteredTokens = useMemo(() => {
         if(!balances) {
@@ -70,7 +71,7 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
         }
         const availableContractMap = Object.values(contractMap)
             .filter(item => Object.keys(balances).includes(item.id))
-            .filter(item => item.id !== graphToken);
+            .filter(item => item.id !== protocolToken.address);
         return Object.values(availableContractMap).filter(item => {
             return item.name?.toLowerCase().includes(search.toLowerCase()) ||
                 item.symbol?.toLowerCase().includes(search.toLowerCase());
@@ -86,7 +87,7 @@ export const TokenSelectionModal: React.FC<TokenSelectionModalProps> = ({open, h
             fetchBalances(account, chainId);
         }
 
-    }, [account, chainId, open])
+    }, [account, chainId, open, protocolToken])
     return (
         <Modal
             open={open}

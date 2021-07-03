@@ -8,7 +8,7 @@ import {
   aaveProtocol,
   fundGatway,
   maticToken,
-  maticProtocol
+  maticProtocol,
 } from "../constants/contracts";
 import { erc20Abi } from "../abi/erc20";
 import { graphProtocolAbi } from "../abi/graphProtocolRegistry";
@@ -31,8 +31,8 @@ export enum StakingProtocol {
   GRAPH = "GRAPH",
   MATIC = "MATIC",
   LIVEPEER = "LIVEPEER",
-  NUCYPHER = "NUCYPHER"
- }
+  NUCYPHER = "NUCYPHER",
+}
 export interface GraphProtocolDelegation {
   indexer: string;
   amount: string;
@@ -70,7 +70,8 @@ import { contractMap } from "../constants/contractMap";
 export const useBitstake = () => {
   const { account, chainId } = useWeb3React();
   const [onChainWalletAddress, setOnChainWalletAddress] = useState<string>("");
-  const { setPageInactive, setPageInactiveReason, setPageLoading, protocol } = useContext(AppCommon);
+  const { setPageInactive, setPageInactiveReason, setPageLoading, protocol } =
+    useContext(AppCommon);
 
   const onChainWalletAddressExists = useMemo(
     () => !!onChainWalletAddress && onChainWalletAddress !== ZERO_ADDRESS,
@@ -111,73 +112,81 @@ export const useBitstake = () => {
       protocol: StakingProtocol = StakingProtocol.GRAPH
     ) => {
       if (typeof window !== "undefined" && account) {
+        try {
+          setPageLoading?.('Submitting Transaction....');
+          const protocolToken = getTokenByProtocol(protocol);
+          const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
+          const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+          const erc20Instance = new window.web3.eth.Contract(erc20Abi, protocolToken.address);
 
-        const protocolToken = getTokenByProtocol(protocol);
-        const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-        const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
-        const erc20Instance = new window.web3.eth.Contract(erc20Abi, protocolToken.address);
+          const allowances = await erc20Instance.methods
+            .allowance(account, onChainWalletAddress)
+            .call({ from: account });
 
-        const allowances = await erc20Instance.methods
-          .allowance(account, onChainWalletAddress)
-          .call({ from: account });
+          if (new BN(allowances).lt(new BN(amount))) {
+            const approvalTx = erc20Instance.methods.approve(onChainWalletAddress, amount);
 
-        console.log('allowances ',allowances);
-        console.log('amount ',amount);
-        if (new BN(allowances).lt(new BN(amount))) {
-          const approvalTx = erc20Instance.methods.approve(onChainWalletAddress, amount);
+            const approvalEstimate = await approvalTx.estimateGas({ from: account });
+            setPageLoading?.('Submitting Approval Transaction....');
+            await sendTransaction(approvalTx, {
+              from: account,
+              gas: approvalEstimate,
+            });
+          }
 
-          const approvalEstimate = await approvalTx.estimateGas({ from: account });
+          setPageLoading?.('Submitting Delegation Transaction....');
+          const fundGatewayInstance = await new window.web3.eth.Contract(
+            fundGatewaylAbi,
+            fundGatway
+          );
 
-          await sendTransaction(approvalTx, {
+          const depositEncodedData = fundGatewayInstance.methods
+            .deposit(protocolToken.address, amount)
+            .encodeABI();
+
+          let delegateData;
+
+          if (protocol === StakingProtocol.GRAPH) {
+            delegateData = graphInstance.methods
+              .delegate(
+                validatorId,
+                amount,
+                0 // getId
+              )
+              .encodeABI();
+          } else {
+            delegateData = maticInstance.methods
+              .buyShare(
+                validatorId,
+                amount,
+                0, // min share,
+                0 // get id
+              )
+              .encodeABI();
+          }
+
+          const userWalletInstance = new window.web3.eth.Contract(
+            userWalletRegistryAbi,
+            onChainWalletAddress
+          );
+
+          const tx = userWalletInstance.methods.executeMulti(
+            [fundGatway, protocolToken.protocolContractAddress],
+            [depositEncodedData, delegateData],
+            1,
+            1
+          );
+          const estimatedGas = await tx.estimateGas({ from: account });
+
+          await sendTransaction(tx, {
             from: account,
-            gas: approvalEstimate,
+            gas: estimatedGas,
           });
+        } catch (e) {
+          console.log(e);
+        } finally {
+          setPageLoading?.('');
         }
-
-        const fundGatewayInstance = await new window.web3.eth.Contract(fundGatewaylAbi, fundGatway);
-
-        const depositEncodedData = fundGatewayInstance.methods
-          .deposit(protocolToken.address, amount)
-          .encodeABI();
-
-        let delegateData;
-
-        if (protocol === StakingProtocol.GRAPH) {
-          delegateData = graphInstance.methods
-            .delegate(
-              validatorId,
-              amount,
-              0 // getId
-            )
-            .encodeABI();
-        } else {
-          delegateData = maticInstance.methods
-            .buyShare(
-              validatorId,
-              amount,
-              0, // min share,
-              0 // get id
-            )
-            .encodeABI();
-        }
-
-        const userWalletInstance = new window.web3.eth.Contract(
-          userWalletRegistryAbi,
-          onChainWalletAddress
-        );
-
-        const tx = userWalletInstance.methods.executeMulti(
-          [fundGatway, protocolToken.protocolContractAddress ],
-          [depositEncodedData, delegateData],
-          1,
-          1
-        );
-        const estimatedGas = await tx.estimateGas({ from: account });
-
-        await sendTransaction(tx, {
-          from: account,
-          gas: estimatedGas,
-        });
       }
     },
     [account, onChainWalletAddress, protocol]
@@ -194,7 +203,7 @@ export const useBitstake = () => {
         const transaction = await bitStakeRegistryInstance.methods.build();
         const estimatedGas = await transaction.estimateGas({ from: account });
 
-        setPageLoading?.(true);
+        setPageLoading?.('Submitting Transaction....');
 
         await sendTransaction(transaction, {
           from: account,
@@ -204,12 +213,12 @@ export const useBitstake = () => {
         //   from: account,
         //   gas: estimatedGas,
         // });
-        setPageLoading?.(false);
-
         await checkIfOnChainWalletExists();
       }
     } catch (e) {
-      setPageLoading?.(false);
+      console.log("error on deploy on chain wallet", e);
+    } finally {
+      setPageLoading?.('');
     }
   }, [account, checkIfOnChainWalletExists, setPageLoading]);
 
@@ -220,94 +229,103 @@ export const useBitstake = () => {
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
-      const protocolToken = getTokenByProtocol(protocol);
-      const destinationToken = protocolToken.address;
-      if (sourceToken !== ETH_TOKEN) {
-        const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
-        const approveTransaction = sourceTokenInstance.methods.approve(
-          onChainWalletAddress,
-          sourceTokenAmount
-        );
-
-        const gasForApproval = approveTransaction.estimateGas();
-
-        await sendTransaction(approveTransaction, {
-          from: account || "",
-          gas: gasForApproval,
-        });
+      if(account) {
+        try {
+          setPageLoading?.('Submitting Transaction....');
+          const protocolToken = getTokenByProtocol(protocol);
+          const destinationToken = protocolToken.address;
+          if (sourceToken !== ETH_TOKEN) {
+            const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
+  
+            const approveTransaction = sourceTokenInstance.methods.approve(
+              onChainWalletAddress,
+              sourceTokenAmount
+            );
+  
+            const gasForApproval = await approveTransaction.estimateGas();
+            setPageLoading?.('Submitting Approval Transaction....');
+            console.log('approval transaction');
+            await sendTransaction(approveTransaction, {
+              from: account,
+              gas: gasForApproval,
+            });
+          }
+  
+          setPageLoading?.('Submitting Swap and Stake Transaction....');
+          const swapResponse = await oneInchApi.getSwapDetails(
+            sourceToken,
+            destinationToken,
+            sourceTokenAmount,
+            slippage,
+            onChainWalletAddress
+          );
+  
+          const userWalletInstance = new window.web3.eth.Contract(
+            userWalletRegistryAbi,
+            onChainWalletAddress
+          );
+  
+          const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
+  
+          const swapAmount = swapResponse.data.toTokenAmount;
+          const ethvalue = sourceToken === ETH_TOKEN ? sourceTokenAmount : 0;
+          const swapTransactionEncodedData = oneInchProxy.methods
+            .swap(
+              sourceTokenAmount,
+              sourceToken,
+              destinationToken,
+              swapResponse.data.tx.to,
+              swapResponse.data.tx.data,
+              ethvalue,
+              0, // getId
+              1 // setId
+            )
+            .encodeABI();
+  
+          const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
+          const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+  
+          let delegateData;
+          if (protocol === StakingProtocol.GRAPH) {
+            delegateData = graphInstance.methods
+              .delegate(
+                validator,
+                new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(), //"100971045019998194761",
+                1 // getId
+              )
+              .encodeABI();
+          } else {
+            delegateData = maticInstance.methods
+              .buyShare(
+                validator,
+                new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(),
+                0, // min share,
+                1 // get id
+              )
+              .encodeABI();
+          }
+  
+          const transaction = userWalletInstance.methods.executeMulti(
+            [oneInch, protocolToken.protocolContractAddress],
+            [swapTransactionEncodedData, delegateData],
+            1,
+            1
+          );
+          const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
+  
+          await sendTransaction(transaction, {
+            from: account || "",
+            gas: estimatedGas,
+            value: ethvalue,
+          });
+        } catch (e) {
+          console.log("error in swap and stake ", e);
+        } finally {
+          setPageLoading?.('');
+        }
       }
-
-      const swapResponse = await oneInchApi.getSwapDetails(
-        sourceToken,
-        destinationToken,
-        sourceTokenAmount,
-        slippage,
-        onChainWalletAddress
-      );
-
-      const userWalletInstance = new window.web3.eth.Contract(
-        userWalletRegistryAbi,
-        onChainWalletAddress
-      );
-
-      const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
-
-      const swapAmount = swapResponse.data.toTokenAmount;
-      const ethvalue = sourceToken === ETH_TOKEN ? sourceTokenAmount : 0;
-      const swapTransactionEncodedData = oneInchProxy.methods
-        .swap(
-          sourceTokenAmount,
-          sourceToken,
-          destinationToken,
-          swapResponse.data.tx.to,
-          swapResponse.data.tx.data,
-          ethvalue,
-          0, // getId
-          1 // setId
-        )
-        .encodeABI();
-
-      const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-      const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
-
-      let delegateData;
-      if (protocol === StakingProtocol.GRAPH) {
-        delegateData = graphInstance.methods
-          .delegate(
-            validator,
-            new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(), //"100971045019998194761",
-            1 // getId
-          )
-          .encodeABI();
-      } else {
-        delegateData = maticInstance.methods
-          .buyShare(
-            validator,
-            new BN(swapAmount).mul(new BN(9)).div(new BN(10)).toString(),
-            0, // min share,
-            1 // get id
-          )
-          .encodeABI();
-      }
-
-      const transaction = userWalletInstance.methods.executeMulti(
-        [oneInch, protocolToken.protocolContractAddress],
-        [swapTransactionEncodedData, delegateData],
-        1,
-        1
-      );
-      const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
-
-      setPageLoading?.(true);
-
-      await sendTransaction(transaction, {
-        from: account || "",
-        gas: estimatedGas,
-        value: ethvalue,
-      });
-
-      setPageLoading?.(false);
+     
     },
     [account, onChainWalletAddress, protocol]
   );
@@ -322,122 +340,125 @@ export const useBitstake = () => {
       rateMode: string, // 1 or 2 radio
       slippage: string = "1"
     ) => {
-      const protocolToken = getTokenByProtocol(protocol);
-      console.log({
-        validator,
-        sourceToken,
-        depositAmount,
-        borrowAmount,
-        borrowTokenAddress,
-        rateMode,
-        slippage,
-      });
-
-      console.log('protocol : ',protocol);
-      console.log('protocolToken : ', protocolToken);
-
-      if (sourceToken !== ETH_TOKEN) {
-        const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
-
-        const approveTransaction = sourceTokenInstance.methods.approve(
-          onChainWalletAddress,
-          depositAmount
-        );
-
-        const gasForApproval = approveTransaction.estimateGas();
-
-        await sendTransaction(approveTransaction, {
-          from: account || "",
-          gas: gasForApproval,
-        });
-      }
-
-      const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
-
-      const aaveDepositAndBorrowEncodedData = aaveInstance.methods
-        .depositAndBorrow(
+      try {
+        setPageLoading?.('Submitting Transaction....');
+        const protocolToken = getTokenByProtocol(protocol);
+        console.log({
+          validator,
           sourceToken,
-          borrowTokenAddress,
           depositAmount,
           borrowAmount,
+          borrowTokenAddress,
           rateMode,
-          0,
-          1 // setId
-        )
-        .encodeABI();
+          slippage,
+        });
 
-      let destinationToken = protocolToken.address;
+        if (sourceToken !== ETH_TOKEN) {
+          setPageLoading?.('Submitting Approval Transaction....');
+          const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
-      const swapResponse = await oneInchApi.getSwapDetails(
-        borrowTokenAddress,
-        destinationToken,
-        borrowAmount,
-        slippage,
-        onChainWalletAddress
-      );
+          const approveTransaction = sourceTokenInstance.methods.approve(
+            onChainWalletAddress,
+            depositAmount
+          );
 
-      const userWalletInstance = new window.web3.eth.Contract(
-        userWalletRegistryAbi,
-        onChainWalletAddress
-      );
+          const gasForApproval = await approveTransaction.estimateGas();
 
-      const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
+          await sendTransaction(approveTransaction, {
+            from: account || "",
+            gas: gasForApproval,
+          });
+        }
 
-      const swapAmount = swapResponse.data.toTokenAmount;
-      const ethvalue = sourceToken === ETH_TOKEN ? depositAmount : 0;
-      const swapTransactionEncodedData = oneInchProxy.methods
-        .swap(
-          borrowAmount,
+        setPageLoading?.('Submitting Borrow, Swap and Stake Transaction....');
+
+        const aaveInstance = new window.web3.eth.Contract(aaveProtocolABI, aaveProtocol);
+
+        const aaveDepositAndBorrowEncodedData = aaveInstance.methods
+          .depositAndBorrow(
+            sourceToken,
+            borrowTokenAddress,
+            depositAmount,
+            borrowAmount,
+            rateMode,
+            0,
+            1 // setId
+          )
+          .encodeABI();
+
+        let destinationToken = protocolToken.address;
+
+        const swapResponse = await oneInchApi.getSwapDetails(
           borrowTokenAddress,
           destinationToken,
-          swapResponse.data.tx.to,
-          swapResponse.data.tx.data,
-          0,
-          1, // getId
-          1 // setId
-        )
-        .encodeABI();
+          borrowAmount,
+          slippage,
+          onChainWalletAddress
+        );
 
-      const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
-      const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+        const userWalletInstance = new window.web3.eth.Contract(
+          userWalletRegistryAbi,
+          onChainWalletAddress
+        );
 
-      let delegateData;
-      if(protocol === StakingProtocol.GRAPH) {
-        delegateData = graphInstance.methods
-          .delegate(
-            validator,
-            swapAmount,
-            1 // getId
+        const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
+
+        const swapAmount = swapResponse.data.toTokenAmount;
+        const ethvalue = sourceToken === ETH_TOKEN ? depositAmount : 0;
+        const swapTransactionEncodedData = oneInchProxy.methods
+          .swap(
+            borrowAmount,
+            borrowTokenAddress,
+            destinationToken,
+            swapResponse.data.tx.to,
+            swapResponse.data.tx.data,
+            0,
+            1, // getId
+            1 // setId
           )
           .encodeABI();
-      } else {
-        delegateData = maticInstance.methods
-          .buyShare(
-            validator,
-            swapAmount,
-            0, // min share,
-            1 // get id
-          )
-          .encodeABI();
+
+        const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
+        const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
+
+        let delegateData;
+        if (protocol === StakingProtocol.GRAPH) {
+          delegateData = graphInstance.methods
+            .delegate(
+              validator,
+              swapAmount,
+              1 // getId
+            )
+            .encodeABI();
+        } else {
+          delegateData = maticInstance.methods
+            .buyShare(
+              validator,
+              swapAmount,
+              0, // min share,
+              1 // get id
+            )
+            .encodeABI();
+        }
+
+        const transaction = userWalletInstance.methods.executeMulti(
+          [aaveProtocol, oneInch, protocolToken.protocolContractAddress],
+          [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
+          1,
+          1
+        );
+
+        const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
+
+        await sendTransaction(transaction, {
+          from: account || "",
+          gas: estimatedGas,
+          value: ethvalue,
+        });
+      } catch (e) {
+      } finally {
+        setPageLoading?.('');
       }
-
-      const transaction = userWalletInstance.methods.executeMulti(
-        [aaveProtocol, oneInch, protocolToken.protocolContractAddress],
-        [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
-        1,
-        1
-      );
-
-      const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
-
-      setPageLoading?.(true);
-
-      await sendTransaction(transaction, {
-        from: account || "",
-        gas: estimatedGas,
-        value: ethvalue
-      });
-      setPageLoading?.(false);
     },
     [account, onChainWalletAddress, protocol]
   );
@@ -505,7 +526,10 @@ export const useBitstake = () => {
         const decodedReceipt = abiDecoder.decodeLogs(receipts[i].logs);
         decodedReceipt
           .filter(
-            (dr: { name: string }) => dr.name == "GraphProtocolDelegated" || dr.name === "Borrow" || dr.name === "MaticValidatorDelegated"
+            (dr: { name: string }) =>
+              dr.name == "GraphProtocolDelegated" ||
+              dr.name === "Borrow" ||
+              dr.name === "MaticValidatorDelegated"
           )
           .forEach((event: Web3Event) => {
             if (event.name === "GraphProtocolDelegated") {
@@ -518,45 +542,45 @@ export const useBitstake = () => {
             }
 
             if (event.name === "Borrow") {
-              const depositToken = contractMap[
-                window.web3.utils.toChecksumAddress(event.events[0].value)];
-              const borrowToken = contractMap[
-              window.web3.utils.toChecksumAddress(event.events[2].value)
-            ];
+              const depositToken =
+                contractMap[window.web3.utils.toChecksumAddress(event.events[0].value)];
+              const borrowToken =
+                contractMap[window.web3.utils.toChecksumAddress(event.events[2].value)];
 
-            console.log(depositToken);
-            console.log(borrowToken);
               aaveBorrows.push({
                 depositToken: event.events[0].value,
-                depositAmt: `${parseFloat(fromWei(event.events[1].value, depositToken.decimals)).toFixed(2)} ${depositToken.symbol}`,
+                depositAmt: `${parseFloat(
+                  fromWei(event.events[1].value, depositToken.decimals)
+                ).toFixed(2)} ${depositToken.symbol}`,
                 borrowToken: event.events[2].value,
-                borrowAmt: `${parseFloat(fromWei(event.events[3].value, borrowToken.decimals)).toFixed(2)} ${borrowToken.symbol}`,
+                borrowAmt: `${parseFloat(
+                  fromWei(event.events[3].value, borrowToken.decimals)
+                ).toFixed(2)} ${borrowToken.symbol}`,
                 rateMode: parseInt(event.events[4].value),
                 blockTimestamp: formatDate(block.timestamp),
               });
             }
 
-              if(event.name === "MaticValidatorDelegated") {
-                maticDelegation.push({
-                  validator: event.events[0].value,
-                  amount: `${parseFloat(fromWei(event.events[2].value)).toFixed(2)} MATIC`,
-                  blockNumber: receipts[i].blockNumber,
-                  blockTimestamp: formatDate(block.timestamp),
-                })
-              }
+            if (event.name === "MaticValidatorDelegated") {
+              maticDelegation.push({
+                validator: event.events[0].value,
+                amount: `${parseFloat(fromWei(event.events[2].value)).toFixed(2)} MATIC`,
+                blockNumber: receipts[i].blockNumber,
+                blockTimestamp: formatDate(block.timestamp),
+              });
+            }
           });
-
       }
       return {
         graphProtocolDelegation: graphDelegation,
         aaveBorrows,
-        maticProtocolDelegation: maticDelegation
+        maticProtocolDelegation: maticDelegation,
       };
     }
     return {
       graphProtocolDelegation: [],
       aaveBorrows: [],
-      maticProtocolDelegation: []
+      maticProtocolDelegation: [],
     };
   };
 

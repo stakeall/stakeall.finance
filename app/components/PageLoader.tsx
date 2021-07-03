@@ -30,7 +30,7 @@ const usePageLoaderStyles = makeStyles((theme) =>
 )
 export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
-    const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
+    const { pageLoading, pageInactive, pageInactiveReason, pageLoadingReason } = useContext(AppCommon);
     const { account } = useWeb3React();
     const [loading, setLoading] = useState(false);
 
@@ -88,7 +88,7 @@ export const PageLoader: React.FC = ({ children }) => {
                 </Grid>
                 <Grid item>
                    <Typography variant="h5" color="secondary">
-                        Please wait while we connect your account...
+                        {pageLoading || 'Please wait while we connect your account...'} 
                     </Typography>
                 </Grid>
             </Grid>
