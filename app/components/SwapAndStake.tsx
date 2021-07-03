@@ -41,7 +41,7 @@ export const SwapAndStake = () => {
     const [estimatedAmount, setEstimatedAmount] = useState<string>('0');
     const [tokenDetails, setTokenDetails] = useState<ContractMap[string]>();
     const { protocol } = useContext(AppCommon);
-    const protocolToken = getTokenByProtocol(protocol);
+    const protocolToken = useMemo(() => getTokenByProtocol(protocol), [protocol]);
 
     useEffect(() => {
         const token = Object.values(contractMap).find(token => token.name === selectedToken);

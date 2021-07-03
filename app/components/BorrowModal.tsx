@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {Modal} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
@@ -14,8 +14,10 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import TextField from "@material-ui/core/TextField";
 import {ContractMap} from "../constants/contractMap";
-import {shortenHex, toWei} from "../util";
+import {getBN, getTokenByProtocol, shortenHex, toWei} from "../util";
 import {Borrower} from "./BorrowTable";
+import {BN} from "ethereumjs-util";
+import {AppCommon} from "../contexts/AppCommon";
 
 export interface BorrowModalProps {
     open: boolean,
@@ -50,7 +52,10 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
     const classes = useBorrowModalStyles();
     const [rateMode, setRateMode] = useState<string>('');
     const [borrowAmount, setBorrowAmount] = useState<string>('');
-    const {borrowSwapAndStake} = useContext(Bitstake);
+    const [estimatedAmount, setEstimatedAmount] = useState<string>('');
+    const {borrowSwapAndStake, getEstimatedSwapAmount} = useContext(Bitstake);
+    const { protocol } = useContext(AppCommon);
+    const protocolToken = useMemo(() => getTokenByProtocol(protocol), [protocol]);
 
     const {
         validator,
@@ -71,6 +76,27 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
             rateMode,
         )
     }, [validator, depositTokenDetails, depositAmount, borrowAmount, borrowTokenDetails, borrower, rateMode]);
+
+    useEffect(() => {
+        if(!open) {
+            setRateMode('');
+            setBorrowAmount('');
+            setEstimatedAmount('');
+        }
+    }, [open])
+    useEffect(() => {
+        const getEstimate = async () => {
+            const convertedAmount = getBN(borrowAmount, borrowTokenDetails?.decimals || 1)
+            const estimated = await getEstimatedSwapAmount?.(borrowTokenDetails?.id || '', protocolToken.address, convertedAmount.toString());
+            const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(protocolToken?.decimal || 1)));
+            console.log({estimated, borrowAmount});
+            setEstimatedAmount(convertedEstimated.toString() || '');
+        }
+        if (borrowAmount && borrowTokenDetails) {
+            getEstimate();
+        }
+    }, [borrowAmount, borrowTokenDetails]);
+
     return (
         <Modal
             open={open}
@@ -117,6 +143,13 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
                             }}
                             label="Borrow Amount"
                         />
+                    </Grid>
+                    <Grid item>
+                        <Grid item alignItems="center">
+                            <Typography variant="body1" color="textPrimary">
+                                Estimated: {estimatedAmount} {protocolToken.symbol}
+                            </Typography>
+                        </Grid>
                     </Grid>
                     <Grid className={classes.buttonContainer} container justify="flex-start" spacing={2}>
                         <Grid item>
