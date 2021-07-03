@@ -76,11 +76,6 @@ export const SwapAndStake = () => {
         <>
             <Paper className={classes.container}>
                 <Grid container spacing={4} direction="column">
-                    <Grid className={classes.validator}>
-                        <Typography variant="body1" color="secondary" id="modal-modal-description">
-                            Validator Id : {truncateMiddle(validator)}
-                        </Typography>
-                    </Grid>
                     <SelectToken tokenDetails={tokenDetails} handleTokenChange={handleTokenChange}/>
                     <Grid item>
                         <TextField

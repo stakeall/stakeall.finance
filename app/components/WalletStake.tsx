@@ -75,11 +75,6 @@ export const WalletStake: React.FC = () => {
 
     return (
         <Paper className={classes.walletContainer} elevation={2}>
-            <Grid className={classes.validator}>
-                <Typography variant="body1" color="secondary" id="modal-modal-description">
-                    Validator Id : {truncateMiddle(validator)}
-                </Typography>
-            </Grid>
             <Grid className={classes.amount}>
                 <Typography color="textSecondary" id="balance" variant="body1">
                     Balance: {data} {protocolToken.symbol}

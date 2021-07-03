@@ -85,11 +85,6 @@ export const BorrowSwapAndStake = () => {
         <Grid container direction="column" spacing={8} alignItems="center">
             <Paper className={classes.container}>
                 <Grid item container spacing={4} direction="column" alignItems="center" justify="center">
-                    <Grid className={classes.validator}>
-                        <Typography variant="body1" color="secondary" id="modal-modal-description">
-                            Validator Id : {truncateMiddle(validator)}
-                        </Typography>
-                    </Grid>
                     <Grid container direction="row" spacing={4} alignItems="center" justify="center">
                         <SelectToken tokenDetails={depositTokenDetails} handleTokenChange={handleTokenChange}/>
                         <Grid item>

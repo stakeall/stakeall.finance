@@ -89,7 +89,6 @@ export const BorrowModal: React.FC<BorrowModalProps> = ({open, handleClose, borr
             const convertedAmount = getBN(borrowAmount, borrowTokenDetails?.decimals || 1)
             const estimated = await getEstimatedSwapAmount?.(borrowTokenDetails?.id || '', protocolToken.address, convertedAmount.toString());
             const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(protocolToken?.decimal || 1)));
-            console.log({estimated, borrowAmount});
             setEstimatedAmount(convertedEstimated.toString() || '');
         }
         if (borrowAmount && borrowTokenDetails) {
