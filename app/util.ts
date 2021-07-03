@@ -246,18 +246,34 @@ export const getTokenByProtocol = (protocol?: StakingProtocol): {
   address: string
   protocolContractAddress: string;
 } => {
+
+  const protocolMap = {
   
-  return protocol === StakingProtocol.GRAPH 
-       ? {
+    [StakingProtocol.GRAPH]: {
          symbol: 'GRT',
          decimal: 18,
          address: graphToken,
          protocolContractAddress: graphProtocol
-       }
-       : {
-         symbol: 'MATIC',
-         decimal: 18, 
-         address: maticToken,
-         protocolContractAddress: maticProtocol
-       }
+       },
+       [StakingProtocol.MATIC]: {
+        symbol: 'MATIC',
+        decimal: 18, 
+        address: maticToken,
+        protocolContractAddress: maticProtocol
+       },
+       [StakingProtocol.NUCYPHER]: {
+        symbol: 'NU',
+        decimal: 18, 
+        address: '0x4fE83213D56308330EC302a8BD641f1d0113A4Cc',
+        protocolContractAddress: ''
+       },
+       [StakingProtocol.LIVEPEER]: {
+        symbol: 'LPT',
+        decimal: 18, 
+        address: '0x58b6A8A3302369DAEc383334672404Ee733aB239',
+        protocolContractAddress: ''
+       },
+  }
+  
+  return protocolMap[protocol || StakingProtocol.GRAPH];
 }

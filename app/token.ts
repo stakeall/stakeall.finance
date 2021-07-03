@@ -50,5 +50,7 @@ export const tokens: {
   '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd': { symbol: 'Dummy' },
   '0xba100000625a3754423978a60c9317c58a424e3D': { symbol: 'Dummy' },
   '0x8798249c2E607446EfB7Ad49eC89dD1865Ff4272': { symbol: 'Dummy' },
-  '0xD5147bc8e386d91Cc5DBE72099DAC6C9b99276F5': { symbol: 'Dummy' }
+  '0xD5147bc8e386d91Cc5DBE72099DAC6C9b99276F5': { symbol: 'Dummy' },
+  '0x58b6A8A3302369DAEc383334672404Ee733aB239': {symbol: 'LPT'},
+  '0x4fE83213D56308330EC302a8BD641f1d0113A4Cc': {symbol: 'NU'},
 }

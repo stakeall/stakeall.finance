@@ -30,7 +30,9 @@ import { fromWei, formatDate, getTokenByProtocol } from "../util";
 export enum StakingProtocol {
   GRAPH = "GRAPH",
   MATIC = "MATIC",
-}
+  LIVEPEER = "LIVEPEER",
+  NUCYPHER = "NUCYPHER"
+ }
 export interface GraphProtocolDelegation {
   indexer: string;
   amount: string;

@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {AppCommon} from "../contexts/AppCommon";
 import {StakingProtocol} from "../hooks/useBitstake";
+import {getTokenByProtocol} from '../util';
 
 interface  ProtocolCardsProps {}
 
@@ -33,6 +34,9 @@ const useProtocolCardsStyles = makeStyles((theme) =>
 export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
     const classes = useProtocolCardsStyles();
     const {setProtocol} = useContext(AppCommon);
+    const livePeerAddress = getTokenByProtocol(StakingProtocol.LIVEPEER).address;
+    const nucypherAddress = getTokenByProtocol(StakingProtocol.NUCYPHER).address;
+
     return (
         <Grid className={classes.container} container justify="center" spacing={10}>
             <Grid item>
@@ -52,7 +56,7 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="body2" color="textSecondary" id="modal-modal-description">
-                                    Graph Description
+                                The Graph is an indexing protocol for querying networks like Ethereum and IPFS.
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -66,7 +70,7 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
                     }}>
                         <Grid container direction="column" alignItems="center">
                             <Grid item>
-                                <img className={classes.image} src={`${BASE_IMAGE_URL}${contractMap[maticToken].logo}`} alt="graph" />
+                                <img className={classes.image} src={`${BASE_IMAGE_URL}${contractMap[maticToken].logo}`} alt="matic" />
                             </Grid>
                             <Grid item>
                                 <Typography variant="body1" color="secondary" id="modal-modal-description">
@@ -75,7 +79,55 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="body2" color="textSecondary" id="modal-modal-description">
-                                    Matic Description
+                                Polygon is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks.
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </CardActionArea>
+                </Card>
+            </Grid>
+
+            <Grid item>
+                <Card variant="outlined">
+                    <CardActionArea className={classes.card} onClick={() => {
+                        setProtocol?.(StakingProtocol.NUCYPHER);
+                    }}>
+                        <Grid container direction="column" alignItems="center">
+                            <Grid item>
+                                <img className={classes.image} src="https://cryptologos.cc/logos/nucypher-nu-logo.png" alt="graph" />
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body1" color="secondary" id="modal-modal-description">
+                                    Nucypher
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body2" color="textSecondary" id="modal-modal-description">
+                                Cryptographic Infrastructure for Privacy-Preserving Applications.
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </CardActionArea>
+                </Card>
+            </Grid>
+
+            <Grid item>
+                <Card variant="outlined">
+                    <CardActionArea className={classes.card} onClick={() => {
+                        setProtocol?.(StakingProtocol.LIVEPEER);
+                    }}>
+                        <Grid container direction="column" alignItems="center">
+                            <Grid item>
+                                <img className={classes.image}   src={`${BASE_IMAGE_URL}${contractMap[livePeerAddress].logo}`} alt="graph"  />
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body1" color="secondary" id="modal-modal-description">
+                                    LivePeer
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body2" color="textSecondary" id="modal-modal-description">
+                                Livepeer is a decentralized video streaming network built on the Ethereum blockchain.
                                 </Typography>
                             </Grid>
                         </Grid>
