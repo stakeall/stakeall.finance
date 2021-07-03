@@ -19,15 +19,21 @@ const useProtocolCardsStyles = makeStyles((theme) =>
             padding: theme.spacing(2),
         },
         card: {
-            height: '250px',
-            width: '250px',
-            padding: theme.spacing(2),
+            height: '300px',
+            width: '300px',
+            padding: theme.spacing(4),
+            textAlign: 'center',
         },
         image: {
             height: '120px',
             width: '120px',
             objectFit: 'contain',
         },
+        ribbon: {
+            backgroundColor: theme.palette.secondary.main,
+            width: '100%',
+            color: theme.palette.secondary.contrastText,
+        }
     })
 )
 
@@ -108,12 +114,17 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
                             </Grid>
                         </Grid>
                     </CardActionArea>
+                    <Grid className={classes.ribbon} item>
+                        <Typography align="center" variant="body2" id="modal-modal-description">
+                            Coming soon
+                        </Typography>
+                    </Grid>
                 </Card>
             </Grid>
 
             <Grid item>
                 <Card variant="outlined">
-                    <CardActionArea className={classes.card} onClick={() => {
+                    <CardActionArea disabled className={classes.card} onClick={() => {
                         setProtocol?.(StakingProtocol.LIVEPEER);
                     }}>
                         <Grid container direction="column" alignItems="center">
@@ -127,11 +138,16 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="body2" color="textSecondary" id="modal-modal-description">
-                                Livepeer is a decentralized video streaming network built on the Ethereum blockchain.
+                                    Livepeer is a decentralized video streaming network built on the Ethereum blockchain.
                                 </Typography>
                             </Grid>
                         </Grid>
                     </CardActionArea>
+                    <Grid className={classes.ribbon} item>
+                        <Typography align="center" variant="body2" id="modal-modal-description">
+                            Coming soon
+                        </Typography>
+                    </Grid>
                 </Card>
             </Grid>
         </Grid>
