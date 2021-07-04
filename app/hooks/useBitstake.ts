@@ -51,7 +51,7 @@ export interface AAVEBorrows {
   depositAmt: string;
   borrowToken: string;
   borrowAmt: string;
-  rateMode: number;
+  rateMode: string;
   blockTimestamp: string;
 }
 
@@ -556,7 +556,7 @@ export const useBitstake = () => {
                 borrowAmt: `${parseFloat(
                   fromWei(event.events[3].value, borrowToken.decimals)
                 ).toFixed(2)} ${borrowToken.symbol}`,
-                rateMode: parseInt(event.events[4].value),
+                rateMode: parseInt(event.events[4].value) === 1 ? 'STABLE': 'VARIABLE',
                 blockTimestamp: formatDate(block.timestamp),
               });
             }
