@@ -14,8 +14,8 @@ const useHeaderStyles = makeStyles((theme: Theme) =>
         },
         logoImg: {
             paddingRight: theme.spacing(2),
-            height: '60px',
-            width: '300px',
+            height: '35px',
+            width: '165px',
             objectFit: 'contain',
         },
         accountId: {
