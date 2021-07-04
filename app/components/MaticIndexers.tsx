@@ -20,7 +20,7 @@ const headers = [
     },
     {
         id: 'id',
-        label: 'Indexer Id',
+        label: 'Validator Id',
         width: 50,
     },
     {
