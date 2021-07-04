@@ -37,7 +37,7 @@ export const Landing: React.FC = () => {
                     </Grid>
                     <Grid item>
                         <Typography variant="body1" color="textSecondary">
-                            STAKEALL is a DeFi Application for staking in various POS protocols. Allows users to borrow from AAVE, swap from 1inch and stake to POS based protocol in a single transaction for earning passive income.
+                            <b>stakeall.finance</b> is a DeFi protocol for staking in various POS protocols. Allows users to borrow from AAVE, swap from 1inch and stake to POS based protocol in a single transaction for earning passive income.
                         </Typography>
                     </Grid>
                     <Grid item>
@@ -50,17 +50,24 @@ export const Landing: React.FC = () => {
                             [ For demo use this RPC: http://35.208.215.170:8080 ]
                         </Typography>
                     </Grid>
-                </Grid>
-            </Paper>
-            <Grid container direction="column" className={classes.metamaskContainer} alignItems="center"
-                  justify="center">
-                <Grid item>
+                    <Grid item>
+                        <Typography variant="body2" color="secondary">
+                        Request test funds from our  <a href="https://discord.gg/UBWkCBsAqD">Discord</a>
+                        </Typography>
+                    </Grid>
+                    <Grid item>
                     <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg"
                          alt="metamask icon"/>
                 </Grid>
                 <Grid item>
                     <Account color="secondary"/>
                 </Grid>
+                </Grid>
+            </Paper>
+            <Grid container direction="column" className={classes.metamaskContainer} alignItems="center"
+                  justify="center">
+                
+                
             </Grid>
         </>
     )
