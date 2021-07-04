@@ -30,7 +30,7 @@ const usePageLoaderStyles = makeStyles((theme) =>
 )
 export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
-    const { pageLoading, pageInactive, pageInactiveReason, pageLoadingReason } = useContext(AppCommon);
+    const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
     const { account } = useWeb3React();
     const [loading, setLoading] = useState(false);
 

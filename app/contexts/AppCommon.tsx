@@ -2,7 +2,7 @@ import React from "react";
 import {StakingProtocol} from "../hooks/useBitstake";
 
 interface AppCommonData {
-    pageLoading: boolean,
+    pageLoading: string,
     setPageLoading: (loading: string, metamaskDisconnected?: boolean) => void,
     validator: string,
     setValidator: (validator: string) => void,
