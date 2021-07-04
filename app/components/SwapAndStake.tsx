@@ -55,7 +55,6 @@ export const SwapAndStake = () => {
             const convertedAmount = getBN(amount, tokenDetails?.decimals || 1);
 
             const estimated = await getEstimatedSwapAmount?.(tokenDetails?.id || '', protocolToken.address, convertedAmount.toString());
-            console.log(estimatedAmount);
             const convertedEstimated = new BN(estimated || '').div(new BN(10).pow(new BN(tokenDetails?.decimals || 1)));
             setEstimatedAmount(convertedEstimated.toString() || '');
         }

@@ -1,26 +1,30 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
-import Button from "@material-ui/core/Button";
+import Button, {ButtonProps} from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {useConnectAccount} from "../hooks/useConnectAccount";
 import {OnChain} from "./OnChain";
 import {AccountId} from "./AccountId";
-import {useContext} from "react";
+import React, {useContext} from "react";
 import {Bitstake} from "../contexts/Bitstake";
 import {useWeb3React} from "@web3-react/core";
 
-const useAccountStyles = makeStyles((theme) =>
+interface AccountProps {
+    color?: ButtonProps['color'],
+}
+
+const useAccountStyles = (color: AccountProps['color']) => makeStyles((theme) =>
     createStyles({
         container: {},
         button: {
-            color: theme.palette.primary.contrastText,
-            borderColor: theme.palette.primary.contrastText,
+            color: !color ? theme.palette.primary.contrastText: undefined,
+            borderColor: !color ? theme.palette.primary.contrastText: undefined,
         }
     })
 )
 
-export const Account = () => {
-    const classes = useAccountStyles();
+export const Account: React.FC<AccountProps> = ({color}) => {
+    const classes = useAccountStyles(color)();
     const {account, error} = useWeb3React()
     const {hasMetaMaskOrWeb3Available, onMetaMaskConnect, installMetamask} = useConnectAccount();
     const {
@@ -37,6 +41,7 @@ export const Account = () => {
                 className={classes.button}
                 onClick={onMetaMaskConnect}
                 variant="outlined"
+                color={color}
             >
                 {MetaMaskOnboarding.isMetaMaskInstalled()
                     ? "Connect to MetaMask" // using RPC http://35.208.215.170:8080
@@ -46,6 +51,7 @@ export const Account = () => {
             <Button
                 className={classes.button}
                 onClick={installMetamask}
+                color={color}
             >
                 Install Metamask
             </Button>

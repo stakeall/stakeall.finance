@@ -217,7 +217,6 @@ const mapToTableData = (
             onChainWalletAddress || ''
         );
         const swapAmount = swapResponse.data.toTokenAmount;
-        console.log('protocol : ', protocol);
 
         
         return {
@@ -267,7 +266,6 @@ export const BorrowTable: React.FC<BorrowTableProps> = ({setBorrower, borrowDeta
         setBorrower?.(borrower);
     }, [setBorrower]);
 
-    console.log('protocol : ', protocol);
     useEffect(() => {
         const mapData = async () => {
             if (data && borrowDetails?.depositAmount && borrowDetails?.depositAmount !== '0') {

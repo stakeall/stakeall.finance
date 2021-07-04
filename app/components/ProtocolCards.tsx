@@ -48,7 +48,6 @@ export const ProtocolCards: React.FC<ProtocolCardsProps> = () => {
             <Grid item>
                 <Card variant="outlined">
                     <CardActionArea className={classes.card} onClick={() => {
-                        console.log({setProtocol});
                         setProtocol?.(StakingProtocol.GRAPH);
                     }}>
                         <Grid container direction="column" alignItems="center">

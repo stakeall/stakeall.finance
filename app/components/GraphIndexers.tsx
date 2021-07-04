@@ -111,14 +111,6 @@ const headers = [
         label: 'Allocated',
         width: 50,
     },
-    // {
-    //     id: 'available',
-    //     label: 'Available',
-    // },
-    // {
-    //     id: 'maxCapacity',
-    //     label: 'Max Capacity',
-    // },
     {
         id: 'queryFees',
         label: 'Query Fees',

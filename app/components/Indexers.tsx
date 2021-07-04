@@ -20,7 +20,6 @@ export const Indexers: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        console.log({protocol});
     }, [protocol]);
 
     if (!protocol) {

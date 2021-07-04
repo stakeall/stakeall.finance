@@ -6,9 +6,8 @@ import {Typography} from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {createStyles} from "@material-ui/styles";
 import {useWeb3React} from "@web3-react/core";
-import {Account} from "./Account";
-import Paper from "@material-ui/core/Paper";
 import {Router} from "next/router";
+import {Landing} from "./Landing";
 
 const usePageLoaderStyles = makeStyles((theme) =>
     createStyles({
@@ -36,11 +35,9 @@ export const PageLoader: React.FC = ({ children }) => {
 
     useEffect(() => {
         const start = () => {
-            console.log("start");
             setLoading(true);
         };
         const end = () => {
-            console.log("findished");
             setLoading(false);
         };
 
@@ -70,14 +67,7 @@ export const PageLoader: React.FC = ({ children }) => {
     }
     if (!account) {
         return (
-            <Grid className={classes.metamaskContainer} container direction="column" justify="center" alignItems="center">
-                    <Grid item>
-                        <img className={classes.logo} src="https://docs.metamask.io/metamask-fox.svg" alt="metamask icon"/>
-                    </Grid>
-                    <Grid item>
-                        <Account />
-                    </Grid>
-                </Grid>
+            <Landing />
         )
     }
     if(pageLoading) {

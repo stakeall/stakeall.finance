@@ -245,7 +245,6 @@ export const useBitstake = () => {
   
             const gasForApproval = await approveTransaction.estimateGas();
             setPageLoading?.('Submitting Approval Transaction....');
-            console.log('approval transaction');
             await sendTransaction(approveTransaction, {
               from: account,
               gas: gasForApproval,
@@ -343,15 +342,6 @@ export const useBitstake = () => {
       try {
         setPageLoading?.('Submitting Transaction....');
         const protocolToken = getTokenByProtocol(protocol);
-        console.log({
-          validator,
-          sourceToken,
-          depositAmount,
-          borrowAmount,
-          borrowTokenAddress,
-          rateMode,
-          slippage,
-        });
 
         if (sourceToken !== ETH_TOKEN) {
           setPageLoading?.('Submitting Approval Transaction....');
