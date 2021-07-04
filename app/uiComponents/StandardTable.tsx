@@ -113,7 +113,8 @@ export const StandardTable = <T extends Readonly<Headers>>({headers, rows }: Sta
 
     useEffect(() => {
         setSortedRows(rows);
-    }, [])
+    }, [rows])
+
     return (
         <TableContainer className={classes.tableContainer} component={Paper}>
             <Table stickyHeader>
