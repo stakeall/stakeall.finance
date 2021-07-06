@@ -229,28 +229,44 @@ export const useBitstake = () => {
       sourceTokenAmount: string,
       slippage: string = "1"
     ) => {
-
-      if(account) {
+      let depositEncodedData;
+      if (account) {
         try {
           setPageLoading?.('Submitting Transaction....');
           const protocolToken = getTokenByProtocol(protocol);
           const destinationToken = protocolToken.address;
           if (sourceToken !== ETH_TOKEN) {
             const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
-  
-            const approveTransaction = sourceTokenInstance.methods.approve(
-              onChainWalletAddress,
-              sourceTokenAmount
+            const allowances = await sourceTokenInstance.methods
+              .allowance(account, onChainWalletAddress)
+              .call({ from: account });
+
+            if (new BN(allowances).lt(new BN(sourceTokenAmount))) {
+
+              const approveTransaction = sourceTokenInstance.methods.approve(
+                onChainWalletAddress,
+                sourceTokenAmount
+              );
+              const gasForApproval = await approveTransaction.estimateGas();
+              setPageLoading?.('Submitting Approval Transaction....');
+              console.log('approval transaction');
+              await sendTransaction(approveTransaction, {
+                from: account,
+                gas: gasForApproval,
+              });
+            }
+            setPageLoading?.('Submitting Delegation Transaction....');
+            const fundGatewayInstance = await new window.web3.eth.Contract(
+              fundGatewaylAbi,
+              fundGatway
             );
-  
-            const gasForApproval = await approveTransaction.estimateGas();
-            setPageLoading?.('Submitting Approval Transaction....');
-            await sendTransaction(approveTransaction, {
-              from: account,
-              gas: gasForApproval,
-            });
+
+            depositEncodedData = fundGatewayInstance.methods
+              .deposit(protocolToken.address, sourceTokenAmount)
+              .encodeABI();
+
           }
-  
+
           setPageLoading?.('Submitting Swap and Stake Transaction....');
           const swapResponse = await oneInchApi.getSwapDetails(
             sourceToken,
@@ -259,14 +275,14 @@ export const useBitstake = () => {
             slippage,
             onChainWalletAddress
           );
-  
+
           const userWalletInstance = new window.web3.eth.Contract(
             userWalletRegistryAbi,
             onChainWalletAddress
           );
-  
+
           const oneInchProxy = new window.web3.eth.Contract(oneInchRegistryABI, oneInch);
-  
+
           const swapAmount = swapResponse.data.toTokenAmount;
           const ethvalue = sourceToken === ETH_TOKEN ? sourceTokenAmount : 0;
           const swapTransactionEncodedData = oneInchProxy.methods
@@ -281,10 +297,10 @@ export const useBitstake = () => {
               1 // setId
             )
             .encodeABI();
-  
+
           const graphInstance = new window.web3.eth.Contract(graphProtocolAbi, graphProtocol);
           const maticInstance = new window.web3.eth.Contract(maticProtocolAbi, maticProtocol);
-  
+
           let delegateData;
           if (protocol === StakingProtocol.GRAPH) {
             delegateData = graphInstance.methods
@@ -304,15 +320,15 @@ export const useBitstake = () => {
               )
               .encodeABI();
           }
-  
+
           const transaction = userWalletInstance.methods.executeMulti(
-            [oneInch, protocolToken.protocolContractAddress],
-            [swapTransactionEncodedData, delegateData],
+            [fundGatway, oneInch, protocolToken.protocolContractAddress],
+            [depositEncodedData, swapTransactionEncodedData, delegateData],
             1,
             1
           );
           const estimatedGas = await transaction.estimateGas({ from: account, value: ethvalue });
-  
+
           await sendTransaction(transaction, {
             from: account || "",
             gas: estimatedGas,
@@ -324,7 +340,7 @@ export const useBitstake = () => {
           setPageLoading?.('');
         }
       }
-     
+
     },
     [account, onChainWalletAddress, protocol]
   );
@@ -343,21 +359,39 @@ export const useBitstake = () => {
         setPageLoading?.('Submitting Transaction....');
         const protocolToken = getTokenByProtocol(protocol);
 
+        let depositEncodedData;
         if (sourceToken !== ETH_TOKEN) {
           setPageLoading?.('Submitting Approval Transaction....');
           const sourceTokenInstance = new window.web3.eth.Contract(erc20Abi, sourceToken);
 
-          const approveTransaction = sourceTokenInstance.methods.approve(
-            onChainWalletAddress,
-            depositAmount
+          const allowances = await sourceTokenInstance.methods
+            .allowance(account, onChainWalletAddress)
+            .call({ from: account });
+
+          if (new BN(allowances).lt(new BN(depositAmount))) {
+
+            const approveTransaction = sourceTokenInstance.methods.approve(
+              onChainWalletAddress,
+              depositAmount
+            );
+            const gasForApproval = await approveTransaction.estimateGas();
+            setPageLoading?.('Submitting Approval Transaction....');
+            console.log('approval transaction');
+            await sendTransaction(approveTransaction, {
+              from: account || "",
+              gas: gasForApproval,
+            });
+          }
+
+          setPageLoading?.('Submitting Delegation Transaction....');
+          const fundGatewayInstance = await new window.web3.eth.Contract(
+            fundGatewaylAbi,
+            fundGatway
           );
 
-          const gasForApproval = await approveTransaction.estimateGas();
-
-          await sendTransaction(approveTransaction, {
-            from: account || "",
-            gas: gasForApproval,
-          });
+          depositEncodedData = fundGatewayInstance.methods
+            .deposit(protocolToken.address, depositAmount)
+            .encodeABI();
         }
 
         setPageLoading?.('Submitting Borrow, Swap and Stake Transaction....');
@@ -432,8 +466,8 @@ export const useBitstake = () => {
         }
 
         const transaction = userWalletInstance.methods.executeMulti(
-          [aaveProtocol, oneInch, protocolToken.protocolContractAddress],
-          [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
+          [fundGatway, aaveProtocol, oneInch, protocolToken.protocolContractAddress],
+          [depositEncodedData, aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
           1,
           1
         );
