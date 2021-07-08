@@ -90,16 +90,6 @@ export const useBitstake = () => {
   };
 
   useEffect(() => {
-    if (injected.supportedChainIds?.includes(chainId || -1)) {
-      setPageInactive?.(false);
-      setPageInactiveReason?.("");
-    } else {
-      setPageInactive?.(true);
-      setPageInactiveReason?.("Unsupported Network");
-    }
-  }, [chainId, account]);
-
-  useEffect(() => {
     if (account) {
       checkIfOnChainWalletExists();
     }
