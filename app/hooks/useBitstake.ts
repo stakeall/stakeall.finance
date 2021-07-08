@@ -322,8 +322,8 @@ export const useBitstake = () => {
           }
 
           const transaction = userWalletInstance.methods.executeMulti(
-            [fundGatway, oneInch, protocolToken.protocolContractAddress],
-            [depositEncodedData, swapTransactionEncodedData, delegateData],
+            [oneInch, protocolToken.protocolContractAddress],
+            [swapTransactionEncodedData, delegateData],
             1,
             1
           );
@@ -466,8 +466,8 @@ export const useBitstake = () => {
         }
 
         const transaction = userWalletInstance.methods.executeMulti(
-          [fundGatway, aaveProtocol, oneInch, protocolToken.protocolContractAddress],
-          [depositEncodedData, aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
+          [aaveProtocol, oneInch, protocolToken.protocolContractAddress],
+          [aaveDepositAndBorrowEncodedData, swapTransactionEncodedData, delegateData],
           1,
           1
         );
