@@ -30,7 +30,7 @@ const usePageLoaderStyles = makeStyles((theme) =>
 export const PageLoader: React.FC = ({ children }) => {
     const classes = usePageLoaderStyles();
     const { pageLoading, pageInactive, pageInactiveReason } = useContext(AppCommon);
-    const { account } = useWeb3React();
+    const { account, error } = useWeb3React();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -51,6 +51,29 @@ export const PageLoader: React.FC = ({ children }) => {
         };
     }, []);
 
+    console.log({error});
+    if(error) {
+        return (
+            <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
+                <Grid item>
+                    <Typography variant="h5" color="primary">
+                        Unsupported network
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography variant="h6" color="textSecondary">
+                        Please use RPC: http://35.208.215.170:8080
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography variant="h6" color="textSecondary">
+                    Request test funds from our  <a href="https://discord.gg/UBWkCBsAqD">Discord</a>
+                    </Typography>
+                </Grid>
+            </Grid>
+        )
+    }
+
     if(loading) {
         return (
             <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
@@ -65,11 +88,13 @@ export const PageLoader: React.FC = ({ children }) => {
             </Grid>
         )
     }
+
     if (!account) {
         return (
             <Landing />
         )
     }
+
     if(pageLoading) {
         return (
             <Grid className={classes.container} container direction="column" justify="center" alignItems="center">
