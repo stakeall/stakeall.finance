@@ -65,6 +65,11 @@ export const PageLoader: React.FC = ({ children }) => {
                         Please use RPC: http://35.208.215.170:8080
                     </Typography>
                 </Grid>
+                <Grid item>
+                    <Typography variant="h6" color="textSecondary">
+                    Request test funds from our  <a href="https://discord.gg/UBWkCBsAqD">Discord</a>
+                    </Typography>
+                </Grid>
             </Grid>
         )
     }
