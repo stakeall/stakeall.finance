@@ -1,0 +1,6 @@
+{
+  "/": "pages/index.html",
+  "/staking": "pages/staking.html",
+  "/_error": "pages/_error.js",
+  "/404": "pages/404.html"
+}

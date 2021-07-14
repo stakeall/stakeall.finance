@@ -1,0 +1,53 @@
+{
+  "polyfillFiles": [
+    "static/chunks/polyfills-3933e42d5d0cf7767956.js"
+  ],
+  "devFiles": [],
+  "ampDevFiles": [],
+  "lowPriorityFiles": [
+    "static/L5T4w4cdctYMpUrZNoVFu/_buildManifest.js",
+    "static/L5T4w4cdctYMpUrZNoVFu/_ssgManifest.js"
+  ],
+  "pages": {
+    "/": [
+      "static/chunks/webpack-245f049e565ebf942e09.js",
+      "static/chunks/framework.eedb87cb15ebf8a24112.js",
+      "static/chunks/commons.c176146a1e2c1e6c4852.js",
+      "static/chunks/main-1920d9afa31faa523511.js",
+      "static/chunks/ffa3639f92b50e4c2755768f74e5906fdb2c1e65.82627e6ce97b32523538.js",
+      "static/chunks/71247caf95475e3ea7f9a0f8a30beb258b23d005.89856d4f7020e4e6b08b.js",
+      "static/chunks/efde11ef7dff527fa96a86ec9391c1eb99c29dae.b46ef31c91267136e522.js",
+      "static/chunks/pages/index-93aa0fd733ed1e791402.js"
+    ],
+    "/_app": [
+      "static/chunks/webpack-245f049e565ebf942e09.js",
+      "static/chunks/framework.eedb87cb15ebf8a24112.js",
+      "static/chunks/commons.c176146a1e2c1e6c4852.js",
+      "static/chunks/main-1920d9afa31faa523511.js",
+      "static/chunks/ffa3639f92b50e4c2755768f74e5906fdb2c1e65.82627e6ce97b32523538.js",
+      "static/chunks/71247caf95475e3ea7f9a0f8a30beb258b23d005.89856d4f7020e4e6b08b.js",
+      "static/chunks/c4c14a5a57807f0d491ac215fcaa7db6dfc37af3.76dba9ca790b214a6380.js",
+      "static/css/0b79bbcd9c7da358209c.css",
+      "static/chunks/pages/_app-1a5951dbc1c965c246ca.js"
+    ],
+    "/_error": [
+      "static/chunks/webpack-245f049e565ebf942e09.js",
+      "static/chunks/framework.eedb87cb15ebf8a24112.js",
+      "static/chunks/commons.c176146a1e2c1e6c4852.js",
+      "static/chunks/main-1920d9afa31faa523511.js",
+      "static/chunks/pages/_error-70d544480964025041be.js"
+    ],
+    "/staking": [
+      "static/chunks/webpack-245f049e565ebf942e09.js",
+      "static/chunks/framework.eedb87cb15ebf8a24112.js",
+      "static/chunks/commons.c176146a1e2c1e6c4852.js",
+      "static/chunks/main-1920d9afa31faa523511.js",
+      "static/chunks/4407dd9a.29570e6e2e36074a77f4.js",
+      "static/chunks/ffa3639f92b50e4c2755768f74e5906fdb2c1e65.82627e6ce97b32523538.js",
+      "static/chunks/efde11ef7dff527fa96a86ec9391c1eb99c29dae.b46ef31c91267136e522.js",
+      "static/chunks/c4c14a5a57807f0d491ac215fcaa7db6dfc37af3.76dba9ca790b214a6380.js",
+      "static/chunks/pages/staking-ecf1b60ff74eeca30fb7.js"
+    ]
+  },
+  "ampFirstPages": []
+}
